@@ -1,4 +1,4 @@
-/** Lista canónica (public/img/). Compartida por check-images y download-images. */
+/** Lista canónica (src/assets/creators/). Compartida por check-images y download-images. */
 export const CREATOR_IMAGE_FILES = [
   "kappah.webp",
   "kappahsub.webp",

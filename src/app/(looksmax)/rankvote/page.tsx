@@ -1,5 +1,5 @@
-import { RankVotePage } from "@/features/looksmax/pages/RankVotePage";
+import { RankVotePage } from "@/features/rankvote/pages/RankVotePage";
 
 export default function RankVotePageRoute() {
-  return <RankVotePage active />;
+  return <RankVotePage />;
 }

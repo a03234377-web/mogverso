@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { CREATOR_IMAGE_FILES } from "./image-manifest.mjs";
 
 const root = join(fileURLToPath(new URL(".", import.meta.url)), "..");
-const imgDir = join(root, "public", "img");
+const imgDir = join(root, "src", "assets", "creators");
 
 const missing = [];
 for (const file of CREATOR_IMAGE_FILES) {
@@ -17,11 +17,11 @@ for (const file of CREATOR_IMAGE_FILES) {
 }
 
 if (missing.length === 0) {
-  console.log(`OK: ${CREATOR_IMAGE_FILES.length} imágenes en public/img/`);
+  console.log(`OK: ${CREATOR_IMAGE_FILES.length} imágenes en src/assets/creators/`);
   process.exit(0);
 }
 
-console.error(`Faltan ${missing.length} archivo(s) en public/img/:\n`);
+console.error(`Faltan ${missing.length} archivo(s) en src/assets/creators/:\n`);
 for (const f of missing) console.error(`  - ${f}`);
 console.error(
   "\nDescarga automática: npm run download:images -- --base-url https://tu-sitio-original.com",

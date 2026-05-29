@@ -1,5 +1,5 @@
-import { NoticiasPage } from "@/features/looksmax/pages/StaticPages";
+import { NoticiasPage } from "@/features/noticias/pages/NoticiasPage";
 
 export default function NoticiasPageRoute() {
-  return <NoticiasPage active />;
+  return <NoticiasPage />;
 }

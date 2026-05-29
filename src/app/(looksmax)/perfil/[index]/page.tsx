@@ -1,4 +1,4 @@
-import { ProfileRoute } from "@/features/looksmax/views/ProfileRoute";
+import { ProfileRoute } from "@/features/rankings/views/ProfileRoute";
 
 export default function ProfilePageRoute() {
   return <ProfileRoute />;

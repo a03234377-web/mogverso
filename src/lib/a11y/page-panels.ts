@@ -1,4 +1,4 @@
-import type { PageId } from "@/features/looksmax/types";
+import type { PageId } from "@/features/app/types";
 
 export const PAGE_PANEL_IDS: Record<PageId, string> = {
   rankings: "page-rankings",

@@ -9,12 +9,17 @@ type PressableProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 /** Botón con reset visual para tarjetas/listas clicables. */
-export function Pressable({ children, className, type = "button", ...props }: PressableProps) {
+export function Pressable({
+  children,
+  className,
+  type = "button",
+  ...props
+}: PressableProps) {
   return (
     <button
       type={type}
       className={cn(
-        "lm-focus-ring m-0 w-full cursor-pointer border-0 bg-transparent p-0 text-left font-inherit text-inherit",
+        "font-inherit m-0 w-full cursor-pointer border-0 bg-transparent p-0 text-left text-inherit lm-focus-ring",
         className,
       )}
       {...props}

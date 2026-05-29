@@ -1,7 +1,7 @@
 "use client";
 
 import { Icon } from "@/components/icons/Icon";
-import { getRankerFallback } from "@/features/looksmax/data/avatars";
+import { getRankerFallback } from "@/features/rankings/data/avatars";
 import type { IconName } from "@/types/icons";
 
 type CreatorIconProps = {
@@ -12,5 +12,7 @@ type CreatorIconProps = {
 };
 
 export function CreatorIcon({ name, icon, size = 20, className }: CreatorIconProps) {
-  return <Icon name={icon ?? getRankerFallback(name)} size={size} className={className} />;
+  return (
+    <Icon name={icon ?? getRankerFallback(name)} size={size} className={className} />
+  );
 }

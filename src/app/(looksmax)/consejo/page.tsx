@@ -1,5 +1,5 @@
-import { ConsejoPage } from "@/features/looksmax/pages/StaticPages";
+import { ConsejoPage } from "@/features/consejo/pages/ConsejoPage";
 
 export default function ConsejoPageRoute() {
-  return <ConsejoPage active />;
+  return <ConsejoPage />;
 }

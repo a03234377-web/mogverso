@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Descarga imágenes de creadores a public/img/.
+ * Descarga imágenes de creadores a src/assets/creators/.
  *
  * Fuentes (por defecto):
  *   - git: public/legacy-body.html y public/legacy/app-runtime.js (commit antes del refactor)
@@ -27,7 +27,7 @@ import {
 } from "./image-manifest.mjs";
 
 const root = join(fileURLToPath(new URL(".", import.meta.url)), "..");
-const imgDir = join(root, "public", "img");
+const imgDir = join(root, "src", "assets", "creators");
 
 function parseArgs(argv) {
   const opts = {
@@ -168,7 +168,7 @@ async function downloadFile(url, dest) {
 }
 
 function printHelp() {
-  console.log(`download-images — guarda fotos en public/img/
+  console.log(`download-images — guarda fotos en src/assets/creators/
 
 Opciones:
   --base-url <url>   Origen del sitio original (sin barra final). Repetible.
@@ -235,11 +235,12 @@ async function main() {
   }
 
   const extracted = extractImageRefs(combinedText);
-  const sources = opts.onlyCanonical
-    ? { paths: [], absolute: [] }
-    : extracted;
+  const sources = opts.onlyCanonical ? { paths: [], absolute: [] } : extracted;
 
-  console.log("Fuentes:", gitNotes.length ? gitNotes.join(", ") : "(solo lista canónica)");
+  console.log(
+    "Fuentes:",
+    gitNotes.length ? gitNotes.join(", ") : "(solo lista canónica)",
+  );
   console.log(
     "Refs extraídas:",
     `${sources.paths.length} rutas /img, ${sources.absolute.length} URLs absolutas`,

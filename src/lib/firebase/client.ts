@@ -11,7 +11,7 @@ import {
   type Database,
 } from "firebase/database";
 import { firebaseConfig, isFirebaseConfigured } from "./config";
-import type { Ranker } from "@/features/looksmax/data/rankers";
+import type { Ranker } from "@/features/rankings/data/rankers";
 import type { IconName } from "@/types/icons";
 
 export type FirebaseBridge = {

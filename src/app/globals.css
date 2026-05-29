@@ -44,9 +44,14 @@
 }
 
 :root {
-  --lm-nav-height: 60px;
-  --lm-ticker-height: 32px;
+  --lm-nav-height: 64px;
+  --lm-ticker-height: 40px;
   --lm-bottom-nav-height: 0px;
+  --lm-text-body: 1rem;
+  --lm-text-secondary: 0.9375rem;
+  --lm-text-meta: 0.875rem;
+  --lm-line-body: 1.5;
+  --lm-line-snug: 1.35;
   --lm-selection-bg: #ffd166;
   --lm-selection-color: #07090f;
   --lm-focus-ring: var(--color-lm-gold2);
@@ -120,9 +125,9 @@
 
 @media (max-width: 768px) {
   :root {
-    --lm-nav-height: 52px;
-    --lm-ticker-height: 28px;
-    --lm-bottom-nav-height: 68px;
+    --lm-nav-height: 56px;
+    --lm-ticker-height: 40px;
+    --lm-bottom-nav-height: 72px;
   }
 }
 
@@ -133,16 +138,42 @@ html {
   overflow-x: clip;
 }
 
-/* Bebas Neue: métricas más altas que line-height 1 → recorte y selección inflada */
+body {
+  font-size: var(--lm-text-body);
+  line-height: var(--lm-line-body);
+}
+
+#looksmax-root {
+  font-size: var(--lm-text-body);
+  line-height: var(--lm-line-body);
+}
+
+/* Bebas Neue: evitar recorte vertical de glifos */
 .font-display {
-  line-height: 1.08;
+  line-height: 1.12;
+  overflow: visible;
+}
+
+@utility lm-text-body {
+  font-size: var(--lm-text-body);
+  line-height: var(--lm-line-body);
+}
+
+@utility lm-text-secondary {
+  font-size: var(--lm-text-secondary);
+  line-height: var(--lm-line-snug);
+}
+
+@utility lm-text-meta {
+  font-size: var(--lm-text-meta);
+  line-height: var(--lm-line-snug);
 }
 
 @utility lm-text-gradient {
   display: inline-block;
   max-width: 100%;
-  overflow: hidden;
-  padding-block: 0.04em;
+  overflow: visible;
+  padding-block: 0.06em;
   vertical-align: top;
 
   &::selection {
@@ -151,11 +182,68 @@ html {
   }
 }
 
+@utility scrollbar-none {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.lm-header-scroll {
+  --header-opacity: 0;
+  background: rgb(7 9 15 / calc(var(--header-opacity) * 0.92));
+  border-bottom: 1px solid rgb(232 184 75 / calc(var(--header-opacity) * 0.15));
+  backdrop-filter: blur(calc(var(--header-opacity) * 16px));
+  box-shadow: 0 4px 24px rgb(0 0 0 / calc(var(--header-opacity) * 0.35));
+}
+
+.lm-header-scroll-accent {
+  opacity: var(--header-opacity, 1);
+}
+
+.lm-logo-scroll {
+  --logo-opacity: 0;
+  opacity: var(--logo-opacity);
+  transform: translateY(calc((1 - var(--logo-opacity)) * 20px));
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.lm-logo-scroll[aria-hidden="true"] {
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lm-logo-scroll {
+    transform: none;
+    transition: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .lm-header-scroll {
+    --header-opacity: 1;
+    background: rgb(7 9 15 / 0.92);
+    border-bottom-color: rgb(232 184 75 / 0.15);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 4px 24px rgb(0 0 0 / 0.35);
+  }
+
+  .lm-logo-scroll {
+    --logo-opacity: 1;
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .bg-clip-text.text-transparent {
   display: inline-block;
   max-width: 100%;
-  overflow: hidden;
-  padding-block: 0.04em;
+  overflow: visible;
+  line-height: 1.12;
+  padding-block: 0.06em;
   vertical-align: top;
 
   &::selection {

@@ -1,5 +1,5 @@
-import { LexicoPage } from "@/features/looksmax/pages/StaticPages";
+import { LexicoPage } from "@/features/lexico/pages/LexicoPage";
 
 export default function LexicoPageRoute() {
-  return <LexicoPage active />;
+  return <LexicoPage />;
 }

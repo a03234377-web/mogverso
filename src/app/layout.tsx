@@ -35,10 +35,23 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+
   return (
-    <html lang="es" className={`${bebas.variable} ${syne.variable}`}>
-      <body className="min-h-screen overflow-x-hidden bg-lm-bg font-sans text-lm-text antialiased select-text pb-[calc(var(--lm-bottom-nav-height)+env(safe-area-inset-bottom,0px))] max-md:text-base">
+    <html
+      lang="es"
+      className={`${bebas.variable} ${syne.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="min-h-screen overflow-x-hidden bg-lm-bg pb-[calc(var(--lm-bottom-nav-height)+env(safe-area-inset-bottom,0px))] font-sans text-base text-lm-text antialiased select-text">
         {children}
+        {adsenseClient ? (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
+            crossOrigin="anonymous"
+          />
+        ) : null}
       </body>
     </html>
   );
