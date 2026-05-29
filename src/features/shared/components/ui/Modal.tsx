@@ -3,7 +3,6 @@
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { Icon } from "@/components/icons";
-import { cn } from "@/lib/cn";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 type ModalProps = {
