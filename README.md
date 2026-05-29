@@ -74,6 +74,6 @@ docs/                # Documentación y HTML original de referencia
 - [Desarrollo](./docs/desarrollo.md)
 - [Despliegue](./docs/despliegue.md)
 
-## HTML original
+## Capa legacy
 
-La versión monolítica anterior está en `docs/original.html` como referencia.
+El marcado y la lógica de la SPA original están en `public/legacy-body.html` y `public/legacy/app-runtime.js`.
