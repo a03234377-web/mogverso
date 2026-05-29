@@ -1,4 +1,7 @@
 
+/* Vote UI disabled state (batched via classList) */
+.lm-vote-disabled { pointer-events: none; opacity: 0.6; }
+
 /* ═══════════════════════════════════════════════
    CUSTOM CURSOR
 ════════════════════════════════════════════════ */

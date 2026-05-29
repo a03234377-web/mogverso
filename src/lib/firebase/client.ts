@@ -281,14 +281,16 @@ export async function initFirebaseClient(): Promise<boolean> {
 
     if (v1 === 0 && v2 === 0) {
       await set(ref(db!, "rankvote/current/resolved"), true);
-      await push(ref(db!, "rankvoteHistory"), {
-        winner: "empate",
-        loser: "empate",
-        wVotes: 0,
-        lVotes: 0,
-        ts: tsNow,
-      });
-      await createNewRVRound();
+      await Promise.all([
+        push(ref(db!, "rankvoteHistory"), {
+          winner: "empate",
+          loser: "empate",
+          wVotes: 0,
+          lVotes: 0,
+          ts: tsNow,
+        }),
+        createNewRVRound(),
+      ]);
       return;
     }
 
@@ -303,15 +305,17 @@ export async function initFirebaseClient(): Promise<boolean> {
 
     if (winnerIdx === -1 || loserIdx === -1) {
       await set(ref(db!, "rankvote/current/resolved"), true);
-      await push(ref(db!, "rankvoteHistory"), {
-        winner,
-        loser,
-        wVotes,
-        lVotes,
-        error: "not_found",
-        ts: tsNow,
-      });
-      await createNewRVRound();
+      await Promise.all([
+        push(ref(db!, "rankvoteHistory"), {
+          winner,
+          loser,
+          wVotes,
+          lVotes,
+          error: "not_found",
+          ts: tsNow,
+        }),
+        createNewRVRound(),
+      ]);
       return;
     }
 
@@ -373,22 +377,21 @@ export async function initFirebaseClient(): Promise<boolean> {
       batch.rankMovements = movements;
     }
 
-    await update(ref(db!, "/"), batch);
-
-    await push(ref(db!, "rankvoteHistory"), {
-      winner,
-      loser,
-      wVotes,
-      lVotes,
-      winnerPos: winnerOrigIdx + 1,
-      loserPos: loserOrigIdx + 1,
-      winnerNewPos: winnerFinalIdx + 1,
-      loserNewPos: loserFinalIdx + 1,
-      ts: tsNow,
-    });
-
-    await set(ref(db!, "rankvote/current/resolved"), true);
-    await createNewRVRound();
+    await Promise.all([
+      update(ref(db!, "/"), batch),
+      push(ref(db!, "rankvoteHistory"), {
+        winner,
+        loser,
+        wVotes,
+        lVotes,
+        winnerPos: winnerOrigIdx + 1,
+        loserPos: loserOrigIdx + 1,
+        winnerNewPos: winnerFinalIdx + 1,
+        loserNewPos: loserFinalIdx + 1,
+        ts: tsNow,
+      }),
+      set(ref(db!, "rankvote/current/resolved"), true),
+    ]).then(() => createNewRVRound());
   }
 
   async function castRVVoteDB(name: string) {

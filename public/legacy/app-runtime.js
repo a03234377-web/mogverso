@@ -18,6 +18,10 @@
         alert('❌ Error al reiniciar: ' + e.message);
     }
 }
+function setVoteDisabled(el, disabled) {
+    if (disabled) el.classList.add('lm-vote-disabled');
+    else el.classList.remove('lm-vote-disabled');
+}
 // ══════════════════════════════════════════════════════════════
 //  SECURITY — Block right-click, CTRL+U/S/A/C, F12, DevTools
 // ══════════════════════════════════════════════════════════════
@@ -875,7 +879,7 @@ async function handleTorneoVote(matchId, playerName, round) {
     try { myVote = localStorage.getItem('torneoVote_'+torneoCreatedAt+'_'+matchId); } catch(e) {}
     if (myVote) return;
     const card = document.querySelector(`.match-card[data-matchid="${matchId}"]`);
-    if (card) card.querySelectorAll('.mf-side').forEach(s => { s.style.pointerEvents='none'; s.style.opacity='.6'; });
+    if (card) card.querySelectorAll('.mf-side').forEach(s => setVoteDisabled(s, true));
     const result = await window.FB.castTorneoVote(matchId, playerName);
     if (result.ok) {
         const fresh = await window.FB.getTorneoState();
@@ -886,7 +890,7 @@ async function handleTorneoVote(matchId, playerName, round) {
             renderMatches(matchesObj, matchIds, round);
         }
     } else {
-        if (card) card.querySelectorAll('.mf-side').forEach(s => { s.style.pointerEvents=''; s.style.opacity=''; });
+        if (card) card.querySelectorAll('.mf-side').forEach(s => setVoteDisabled(s, false));
         if (result.reason === 'already_voted') {
             const msg = document.createElement('div');
             msg.className = 'match-voted-msg';
@@ -1388,7 +1392,7 @@ function renderEntryVotingCard(ev, myVote) {
 async function evVoteClick(id) {
     if(!id||!window.FB) return;
     const grid=document.getElementById('evCandidatesGrid');
-    if(grid) grid.querySelectorAll('.candidate-card').forEach(c=>{c.style.pointerEvents='none';c.style.opacity='.6';});
+    if(grid) grid.querySelectorAll('.candidate-card').forEach(c=>setVoteDisabled(c,true));
     const actionEl=document.getElementById('evAction');
     if(actionEl) actionEl.innerHTML='<div style="color:var(--text2);font-size:.75rem;">⏳ Enviando voto…</div>';
     try{
@@ -1401,11 +1405,11 @@ async function evVoteClick(id) {
             const myVote=myVoteSnap.exists()?{evId:ev?.id,candidate:myVoteSnap.val().candidate}:{evId:ev?.id,candidate:id};
             renderEntryVotingCard(ev,myVote);
         } else {
-            if(grid) grid.querySelectorAll('.candidate-card').forEach(c=>{c.style.pointerEvents='';c.style.opacity='';});
+            if(grid) grid.querySelectorAll('.candidate-card').forEach(c=>setVoteDisabled(c,false));
             if(actionEl) actionEl.innerHTML=`<div class="already-voted-msg">⚠️ Ya has votado (verificado por dispositivo e IP)</div>`;
         }
     } catch(e){
-        if(grid) grid.querySelectorAll('.candidate-card').forEach(c=>{c.style.pointerEvents='';c.style.opacity='';});
+        if(grid) grid.querySelectorAll('.candidate-card').forEach(c=>setVoteDisabled(c,false));
         if(actionEl) actionEl.innerHTML=`<div style="color:var(--red2);font-size:.75rem;">❌ Error al votar</div>`;
     }
 }
