@@ -17,12 +17,19 @@ function loadLegacyScript(): Promise<void> {
   });
 }
 
+let bootstrapPromise: Promise<void> | null = null;
+
 export async function bootstrapLooksMax(
   root: HTMLDivElement,
   legacyHtml: string,
 ): Promise<void> {
-  window.RANKERS = RANKERS;
-  root.innerHTML = legacyHtml;
-  await loadLegacyScript();
-  await initFirebaseClient();
+  if (!bootstrapPromise) {
+    bootstrapPromise = (async () => {
+      window.RANKERS = RANKERS;
+      root.innerHTML = legacyHtml;
+      await loadLegacyScript();
+      await initFirebaseClient();
+    })();
+  }
+  return bootstrapPromise;
 }
