@@ -60,7 +60,6 @@ Ajusta las reglas de seguridad en Firebase según tu entorno (desarrollo vs prod
 
 - Si el loader de Firebase no desaparece, revisa `.env.local` y la consola del navegador.
 - Si faltan fotos, las rutas en `/img/` devolverán 404; la UI muestra emojis de respaldo.
-- El marcado legacy está en `public/legacy-body.html`; la lógica en `public/legacy/app-runtime.js`.
 
 ## Editar estilos
 
