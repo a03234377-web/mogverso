@@ -51,7 +51,7 @@ export function LooksMaxShell({ children }: { children: ReactNode }) {
   }, [moreOpen, discordOpen]);
 
   return (
-    <div id="looksmax-root" className="relative overflow-x-clip">
+    <div id="looksmax-root" className="relative">
       <SkipLink />
       <BackgroundEffects />
       <Particles />
@@ -70,7 +70,7 @@ export function LooksMaxShell({ children }: { children: ReactNode }) {
         id="main-content"
         ref={mainRef}
         tabIndex={-1}
-        className="outline-none"
+        className="overflow-x-clip outline-none"
         aria-label="Contenido principal"
       >
         {children}

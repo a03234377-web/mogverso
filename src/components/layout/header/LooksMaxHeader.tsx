@@ -12,9 +12,9 @@ import {
   DESKTOP_TABS,
   desktopSelectedIndex,
   sectionTitle,
-} from "@/components/layout/looksmax-nav-config";
-import { useHeaderScroll } from "@/components/layout/useHeaderScroll";
-import type { LooksMaxHeaderProps } from "@/components/layout/types";
+} from "@/components/layout/header/nav-config";
+import { useHeaderScroll } from "@/components/layout/header/useHeaderScroll";
+import type { LooksMaxHeaderProps } from "@/components/layout/header/types";
 
 function isRovingKey(key: string): boolean {
   return (

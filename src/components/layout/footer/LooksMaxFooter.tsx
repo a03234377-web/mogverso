@@ -9,8 +9,8 @@ import { PAGE_PANEL_IDS } from "@/lib/a11y/page-panels";
 import { cn } from "@/lib/cn";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { useRovingTabIndex } from "@/hooks/useRovingTabIndex";
-import { BNAV, bottomSelectedIndex } from "@/components/layout/looksmax-nav-config";
-import type { LooksMaxFooterProps } from "@/components/layout/types";
+import { BNAV, bottomSelectedIndex } from "@/components/layout/footer/nav-config";
+import type { LooksMaxFooterProps } from "@/components/layout/footer/types";
 import type { IconName } from "@/types/icons";
 
 function isRovingKey(key: string): boolean {

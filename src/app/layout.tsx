@@ -43,7 +43,7 @@ export default function RootLayout({
       className={`${bebas.variable} ${syne.variable}`}
       suppressHydrationWarning
     >
-      <body className="min-h-screen overflow-x-hidden bg-lm-bg pb-[calc(var(--lm-bottom-nav-height)+env(safe-area-inset-bottom,0px))] font-sans text-base text-lm-text antialiased select-text">
+      <body className="min-h-screen bg-lm-bg pb-[calc(var(--lm-bottom-nav-height)+env(safe-area-inset-bottom,0px))] font-sans text-base text-lm-text antialiased select-text">
         {children}
         {adsenseClient ? (
           <script

@@ -1,6 +1,4 @@
-export { LooksMaxHeader } from "@/components/layout/LooksMaxHeader";
-export { LooksMaxFooter } from "@/components/layout/LooksMaxFooter";
-export type {
-  LooksMaxHeaderProps,
-  LooksMaxFooterProps,
-} from "@/components/layout/types";
+export { LooksMaxHeader, useHeaderScroll } from "@/components/layout/header";
+export { LooksMaxFooter } from "@/components/layout/footer";
+export type { LooksMaxHeaderProps } from "@/components/layout/header";
+export type { LooksMaxFooterProps } from "@/components/layout/footer";

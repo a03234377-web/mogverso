@@ -4,8 +4,3 @@ export type LooksMaxHeaderProps = {
   page: PageId;
   onOpenDiscord: () => void;
 };
-
-export type LooksMaxFooterProps = LooksMaxHeaderProps & {
-  moreOpen: boolean;
-  onToggleMore: () => void;
-};
