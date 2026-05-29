@@ -76,7 +76,9 @@ export function RankVotePage() {
                 No hay votaciones resueltas aún · ¡Participa en la primera!
               </div>
             ) : (
-              history.map((h, i) => <HistoryRow key={i} h={h} />)
+              history.map((h, i) => (
+                <HistoryRow key={`${h.ts}-${h.winner}-${h.loser}-${i}`} h={h} />
+              ))
             )}
           </div>
         </div>
@@ -263,7 +265,7 @@ function FighterCard({
           )}
         />
       )}
-      <div className="mx-auto mb-2 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border-2 border-lm-border bg-lm-bg3 text-[2rem] max-[400px]:h-[54px] max-[400px]:w-[54px] max-[400px]:text-[1.4rem] max-md:h-16 max-md:w-16 max-md:text-[1.6rem]">
+      <div className="relative mx-auto mb-2 h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-lm-border bg-lm-bg3 max-[400px]:h-[54px] max-[400px]:w-[54px] max-md:h-16 max-md:w-16">
         <Avatar name={name} size={80} />
       </div>
       <div

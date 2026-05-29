@@ -70,7 +70,7 @@ export function LooksMaxShell({ children }: { children: ReactNode }) {
         id="main-content"
         ref={mainRef}
         tabIndex={-1}
-        className="overflow-x-clip outline-none"
+        className="relative z-[2] overflow-x-clip outline-none"
         aria-label="Contenido principal"
       >
         {children}

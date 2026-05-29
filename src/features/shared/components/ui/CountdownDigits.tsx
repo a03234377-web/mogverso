@@ -10,12 +10,19 @@ type CountdownDigitsProps = {
   className?: string;
 };
 
-const numStyles: Record<CountdownVariant, string> = {
-  gold: "font-display min-w-[55px] rounded-[10px] border border-lm-border bg-[rgba(232,184,75,0.08)] bg-[linear-gradient(180deg,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text px-2 py-0.5 text-center text-[clamp(1.8rem,5vw,4.5rem)] text-transparent max-md:min-w-[44px] max-md:text-[clamp(1.4rem,4vw,2.2rem)]",
+const numBoxStyles: Record<CountdownVariant, string> = {
+  gold: "font-display min-w-[55px] rounded-[10px] border border-lm-border bg-[rgba(232,184,75,0.08)] px-2 py-0.5 text-center max-md:min-w-[44px]",
   purple:
-    "font-display min-w-[45px] rounded-lg border border-[rgba(168,85,247,0.3)] bg-[rgba(168,85,247,0.1)] px-2 py-0.5 text-center text-[clamp(1.4rem,4vw,2.5rem)] text-lm-purple",
+    "font-display min-w-[45px] rounded-lg border border-[rgba(168,85,247,0.3)] bg-[rgba(168,85,247,0.1)] px-2 py-0.5 text-center max-md:min-w-[38px]",
   green:
-    "font-display min-w-[44px] rounded-[7px] border border-[rgba(46,204,113,0.3)] bg-[rgba(46,204,113,0.1)] px-1.5 py-0.5 text-center text-[clamp(1.4rem,4vw,2.2rem)] text-lm-green2 max-md:text-[clamp(1.2rem,4vw,1.8rem)] max-md:min-w-[38px]",
+    "font-display min-w-[44px] rounded-[7px] border border-[rgba(46,204,113,0.3)] bg-[rgba(46,204,113,0.1)] px-1.5 py-0.5 text-center max-md:min-w-[38px]",
+};
+
+const numTextStyles: Record<CountdownVariant, string> = {
+  gold: "bg-[linear-gradient(180deg,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text text-[clamp(1.8rem,5vw,4.5rem)] text-transparent max-md:text-[clamp(1.4rem,4vw,2.2rem)]",
+  purple: "text-[clamp(1.4rem,4vw,2.5rem)] text-lm-purple",
+  green:
+    "text-[clamp(1.4rem,4vw,2.2rem)] text-lm-green2 max-md:text-[clamp(1.2rem,4vw,1.8rem)]",
 };
 
 const sepStyles: Record<CountdownVariant, string> = {
@@ -37,8 +44,8 @@ function DigitUnit({
 }) {
   return (
     <div className="flex flex-col items-center gap-1">
-      <div id={id} className={numStyles[variant]}>
-        {value}
+      <div id={id} className={numBoxStyles[variant]}>
+        <span className={numTextStyles[variant]}>{value}</span>
       </div>
       <div className="text-sm font-extrabold tracking-[1.5px] text-lm-text2 uppercase max-md:text-sm">
         {label}

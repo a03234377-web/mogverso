@@ -85,9 +85,7 @@ export function RankingsPage({
         </div>
       </div>
 
-      <AdBanner clientId={adsenseClient} />
-
-      <div className="mx-auto max-w-[700px] px-5 pb-6 max-md:px-4 max-md:pb-4">
+      <div className="mx-auto max-w-[700px] px-5 pt-2 pb-6 max-md:px-4 max-md:pt-1 max-md:pb-4">
         <div className="relative overflow-hidden rounded-2xl border border-lm-border2 bg-[linear-gradient(135deg,rgba(232,184,75,0.06),rgba(232,184,75,0.02))] px-4 py-6 text-center">
           <div className="mb-4 text-sm font-extrabold tracking-[2px] text-lm-text2 uppercase">
             <IconLabel icon="hourglass" iconSize={14} className="justify-center">
