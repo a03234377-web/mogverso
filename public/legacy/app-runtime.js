@@ -49,45 +49,6 @@ function setVoteDisabled(el, disabled) {
 })();
 
 // ══════════════════════════════════════════════════════════════
-//  CUSTOM CURSOR
-// ══════════════════════════════════════════════════════════════
-(function() {
-    const outer = document.getElementById('cursor-outer');
-    const inner = document.getElementById('cursor-inner');
-    let mx = -200, my = -200;
-    let ox = -200, oy = -200;
-    let rafId;
-
-    document.addEventListener('mousemove', e => {
-        mx = e.clientX; my = e.clientY;
-        inner.style.left = mx + 'px';
-        inner.style.top  = my + 'px';
-    });
-
-    function animateOuter() {
-        ox += (mx - ox) * 0.18;
-        oy += (my - oy) * 0.18;
-        outer.style.left = ox + 'px';
-        outer.style.top  = oy + 'px';
-        rafId = requestAnimationFrame(animateOuter);
-    }
-    animateOuter();
-
-    // Hover state on interactive elements
-    const hoverSel = 'button, a, [onclick], .rank-row, .candidate-card, .rvf-card, .mf-side, .nav-tab, .bnav-tab, .noticia-card, .consejo-card, .lexico-card, .qa-btn, .profile-back-btn, .modal-close';
-    document.addEventListener('mouseover', e => {
-        if (e.target.closest(hoverSel)) document.body.classList.add('cursor-hover');
-    });
-    document.addEventListener('mouseout', e => {
-        if (e.target.closest(hoverSel)) document.body.classList.remove('cursor-hover');
-    });
-    document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
-    document.addEventListener('mouseup',   () => document.body.classList.remove('cursor-click'));
-    document.addEventListener('mouseleave', () => { outer.style.opacity='0'; inner.style.opacity='0'; });
-    document.addEventListener('mouseenter', () => { outer.style.opacity='1'; inner.style.opacity='1'; });
-})();
-
-// ══════════════════════════════════════════════════════════════
 //  GLOBAL DATA
 // ══════════════════════════════════════════════════════════════
 function abrirModalUnirse() { document.getElementById('modalUnirse').classList.add('open'); }
@@ -1139,7 +1100,7 @@ function renderRankvoteArena(rv, myVote, overrides) {
             <div class="rvtd-u"><div class="rvtd-n" id="rvtd-s">00</div><div class="rvtd-l">Seg</div></div>
         </div>
         <div class="rv-fighters">
-            <div class="rvf-card rvf-up ${canVote?'can-vote':''} ${myCandidate===rv.p1?'rvf-selected':''}" id="rvfc1" ${canVote?'style="cursor:none"':''}>
+            <div class="rvf-card rvf-up ${canVote?'can-vote':''} ${myCandidate===rv.p1?'rvf-selected':''}" id="rvfc1" ${canVote?'style="cursor:pointer"':''}>
                 <div class="rvf-avatar">${avatarIMG(rv.p1,80)}</div>
                 <div class="rvf-name rvf-name-up">${rv.p1}</div>
                 <div class="rvf-sub">${r1.sub||'España'}</div>
@@ -1150,7 +1111,7 @@ function renderRankvoteArena(rv, myVote, overrides) {
                 <div class="rvf-votes" id="rvvotes1">${voted?v1+' voto'+(v1!==1?'s':''):''}</div>
             </div>
             <div class="rv-vs">VS</div>
-            <div class="rvf-card rvf-down ${canVote?'can-vote':''} ${myCandidate===rv.p2?'rvf-selected':''}" id="rvfc2" ${canVote?'style="cursor:none"':''}>
+            <div class="rvf-card rvf-down ${canVote?'can-vote':''} ${myCandidate===rv.p2?'rvf-selected':''}" id="rvfc2" ${canVote?'style="cursor:pointer"':''}>
                 <div class="rvf-avatar">${avatarIMG(rv.p2,80)}</div>
                 <div class="rvf-name rvf-name-down">${rv.p2}</div>
                 <div class="rvf-sub">${r2.sub||'España'}</div>
@@ -1350,7 +1311,7 @@ function renderEntryVotingCard(ev, myVote) {
         const votes=ev.votes?.[c.id]||0;
         const pct=Math.round((votes/total)*100);
         const isSel=voted&&myVote.candidate===c.id;
-        return `<div class="candidate-card${isSel?' selected':''}" data-id="${c.id}" ${!voted?'style="cursor:none"':''}>
+        return `<div class="candidate-card${isSel?' selected':''}" data-id="${c.id}" ${!voted?'style="cursor:pointer"':''}>
             <div class="candidate-avatar"><img src="${c.photo}" alt="${c.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><span style="display:none;align-items:center;justify-content:center;width:100%;height:100%;font-size:1.8rem;">${c.emoji}</span></div>
             <div class="candidate-name">${c.name}</div>
             <div class="candidate-sub">${c.sub}</div>
