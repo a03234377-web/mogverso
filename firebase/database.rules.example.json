@@ -1,0 +1,80 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": false,
+    "rankvoteVotes": {
+      "$voteId": {
+        ".write": "!data.exists()",
+        ".validate": "newData.hasChildren(['candidate', 'ts']) && newData.child('ts').isNumber()"
+      }
+    },
+    "entryVotes": {
+      "$voteId": {
+        ".write": "!data.exists()",
+        ".validate": "newData.hasChildren(['candidate', 'ts']) && newData.child('ts').isNumber()"
+      }
+    },
+    "torneoVotes": {
+      "$voteId": {
+        ".write": "!data.exists()",
+        ".validate": "newData.hasChildren(['candidate', 'ts']) && newData.child('ts').isNumber()"
+      }
+    },
+    "rankvote": {
+      "current": {
+        "votes": {
+          "$candidate": {
+            ".write": "newData.isNumber() && (!data.exists() || newData.val() === data.val() + 1)"
+          }
+        }
+      }
+    },
+    "entryVote": {
+      "current": {
+        "votes": {
+          "$candidate": {
+            ".write": "newData.isNumber() && (!data.exists() || newData.val() === data.val() + 1)"
+          }
+        }
+      }
+    },
+    "torneo": {
+      "state": {
+        "matches": {
+          "$matchId": {
+            "votes": {
+              "$candidate": {
+                ".write": "newData.isNumber() && (!data.exists() || newData.val() === data.val() + 1)"
+              }
+            }
+          }
+        },
+        "cuartosMatches": {
+          "$matchId": {
+            "votes": {
+              "$candidate": {
+                ".write": "newData.isNumber() && (!data.exists() || newData.val() === data.val() + 1)"
+              }
+            }
+          }
+        },
+        "semisMatches": {
+          "$matchId": {
+            "votes": {
+              "$candidate": {
+                ".write": "newData.isNumber() && (!data.exists() || newData.val() === data.val() + 1)"
+              }
+            }
+          }
+        },
+        "finalMatch": {
+          "votes": {
+            "$candidate": {
+              ".write": "newData.isNumber() && (!data.exists() || newData.val() === data.val() + 1)"
+            }
+          }
+        }
+      }
+    }
+  }
+}
