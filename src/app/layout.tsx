@@ -15,7 +15,7 @@ const syne = Syne({
   subsets: ["latin"],
   variable: "--font-syne",
   display: "swap",
-  preload: true,
+  preload: false,
 });
 
 export const metadata: Metadata = {
