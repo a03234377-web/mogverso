@@ -33,7 +33,7 @@ chore(cursor): align rules with mogverso repo
 ### Formato clásico — commit atómico
 
 ```text
-feat(torneo): wire tournament phase timer to Firestore
+feat(torneo): wire tournament phase timer to Realtime Database
 
 Optional body explaining why, in English.
 ```
