@@ -1569,7 +1569,11 @@ window.addEventListener('firebase-ready', async () => {
 setTimeout(()=>{
     const loader=document.getElementById('fb-loader');
     if(loader&&!loader.classList.contains('hide')){
-        loader.innerHTML='<div style="color:var(--red2);font-size:.8rem;font-weight:700;text-align:center;padding:1rem;">⚠️ No se pudo conectar a Firebase.<br>Comprueba tu configuración.</div>';
+        loader.replaceChildren();
+        const err=document.createElement('div');
+        err.style.cssText='color:var(--red2);font-size:.8rem;font-weight:700;text-align:center;padding:1rem;line-height:1.5;';
+        err.textContent='⚠️ No se pudo conectar a Firebase. Comprueba tu configuración.';
+        loader.appendChild(err);
     }
 },8000);
 
