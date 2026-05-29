@@ -63,10 +63,7 @@ function getDeviceId(): string {
   if (typeof window === "undefined") return "dev_ssr";
   let id = localStorage.getItem("lm_device_id");
   if (!id) {
-    id =
-      "dev_" +
-      Math.random().toString(36).slice(2, 14) +
-      Date.now().toString(36);
+    id = "dev_" + Math.random().toString(36).slice(2, 14) + Date.now().toString(36);
     try {
       localStorage.setItem("lm_device_id", id);
     } catch {
@@ -111,8 +108,11 @@ function getRankedNamesFromOverrides(overrides: Record<string, number>): string[
     .map((x) => x.name);
 }
 
+let unsubscribeAnnouncements: (() => void) | null = null;
+
 function subscribeAnnouncements(database: Database): void {
-  onValue(ref(database, "announcements"), (snap) => {
+  unsubscribeAnnouncements?.();
+  unsubscribeAnnouncements = onValue(ref(database, "announcements"), (snap) => {
     document.querySelectorAll(".lm-global-ann").forEach((el) => el.remove());
     if (!snap.exists()) return;
 
@@ -132,29 +132,28 @@ function subscribeAnnouncements(database: Database): void {
       .filter((a) => a.active && (!a.expiresAt || a.expiresAt > now))
       .sort((a, b) => (b.ts || 0) - (a.ts || 0));
 
-    const colors: Record<string, { bg: string; border: string; icon: string }> =
-      {
-        info: {
-          bg: "rgba(59,130,246,.16)",
-          border: "rgba(59,130,246,.55)",
-          icon: "ℹ️",
-        },
-        warning: {
-          bg: "rgba(249,115,22,.16)",
-          border: "rgba(249,115,22,.55)",
-          icon: "⚠️",
-        },
-        success: {
-          bg: "rgba(46,204,113,.14)",
-          border: "rgba(46,204,113,.55)",
-          icon: "🏆",
-        },
-        emergency: {
-          bg: "rgba(255,71,87,.16)",
-          border: "rgba(255,71,87,.65)",
-          icon: "🚨",
-        },
-      };
+    const colors: Record<string, { bg: string; border: string; icon: string }> = {
+      info: {
+        bg: "rgba(59,130,246,.16)",
+        border: "rgba(59,130,246,.55)",
+        icon: "ℹ️",
+      },
+      warning: {
+        bg: "rgba(249,115,22,.16)",
+        border: "rgba(249,115,22,.55)",
+        icon: "⚠️",
+      },
+      success: {
+        bg: "rgba(46,204,113,.14)",
+        border: "rgba(46,204,113,.55)",
+        icon: "🏆",
+      },
+      emergency: {
+        bg: "rgba(255,71,87,.16)",
+        border: "rgba(255,71,87,.65)",
+        icon: "🚨",
+      },
+    };
 
     active.forEach((ann) => {
       const c = colors[ann.type ?? ""] ?? colors.info;
@@ -172,14 +171,22 @@ function subscribeAnnouncements(database: Database): void {
       backdrop-filter:blur(12px);
       animation:fadeUp .3s ease;
     `;
-      el.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:center;gap:1rem;width:100%;text-align:center;">
-        <span style="font-size:2rem;">${c.icon}</span>
-        <span style="font-size:1.35rem;font-weight:900;letter-spacing:.5px;color:var(--text);line-height:1.4;">${ann.text ?? ""}</span>
-      </div>
-      <button class="ann-close" type="button">✕</button>
-    `;
-      const btn = el.querySelector(".ann-close") as HTMLButtonElement;
+      const row = document.createElement("div");
+      row.style.cssText =
+        "display:flex;align-items:center;justify-content:center;gap:1rem;width:100%;text-align:center;";
+      const icon = document.createElement("span");
+      icon.style.fontSize = "2rem";
+      icon.textContent = c.icon;
+      const text = document.createElement("span");
+      text.style.cssText =
+        "font-size:1.35rem;font-weight:900;letter-spacing:.5px;color:var(--text);line-height:1.4;";
+      text.textContent = ann.text ?? "";
+      row.append(icon, text);
+      const btn = document.createElement("button");
+      btn.className = "ann-close";
+      btn.type = "button";
+      btn.textContent = "✕";
+      el.append(row, btn);
       btn.style.cssText = `
       position:absolute;right:18px;top:50%;transform:translateY(-50%);
       background:none;border:none;color:var(--text2);font-size:1.4rem;font-weight:900;cursor:pointer;transition:.2s;
@@ -194,10 +201,12 @@ function subscribeAnnouncements(database: Database): void {
 
 export async function initFirebaseClient(): Promise<boolean> {
   if (!isFirebaseConfigured()) {
-    console.warn(
-      "[LooksMax] Firebase no configurado. Copia .env.example a .env.local",
-    );
+    console.warn("[LooksMax] Firebase no configurado. Copia .env.example a .env.local");
     return false;
+  }
+
+  if (typeof window !== "undefined" && window.FB) {
+    return true;
   }
 
   if (!app) {
@@ -268,9 +277,7 @@ export async function initFirebaseClient(): Promise<boolean> {
     if (fresh.resolved) return;
 
     const ovSnap = await get(ref(db!, "rankOverrides"));
-    const overrides = ovSnap.exists()
-      ? (ovSnap.val() as Record<string, number>)
-      : {};
+    const overrides = ovSnap.exists() ? (ovSnap.val() as Record<string, number>) : {};
 
     const p1 = fresh.p1 as string;
     const p2 = fresh.p2 as string;
@@ -350,10 +357,7 @@ export async function initFirebaseClient(): Promise<boolean> {
     const winnerFinalIdx = newRanked.indexOf(winner);
     const loserFinalIdx = newRanked.indexOf(loser);
 
-    const movUpdates: Record<
-      string,
-      { dir: string; delta: number; ts: number }
-    > = {};
+    const movUpdates: Record<string, { dir: string; delta: number; ts: number }> = {};
     if (winnerFinalIdx < winnerOrigIdx)
       movUpdates[winner] = {
         dir: "up",
@@ -411,15 +415,12 @@ export async function initFirebaseClient(): Promise<boolean> {
 
     const localKey = "rvVote_" + rv.id;
     try {
-      if (localStorage.getItem(localKey))
-        return { ok: false, reason: "already_voted" };
+      if (localStorage.getItem(localKey)) return { ok: false, reason: "already_voted" };
     } catch {
       /* ignore */
     }
 
-    const devSnap = await get(
-      ref(db!, "rankvoteVotes/dev_" + DEVICE_ID + "_" + rv.id),
-    );
+    const devSnap = await get(ref(db!, "rankvoteVotes/dev_" + DEVICE_ID + "_" + rv.id));
     if (devSnap.exists()) {
       try {
         localStorage.setItem(localKey, name);
@@ -430,9 +431,7 @@ export async function initFirebaseClient(): Promise<boolean> {
     }
 
     const ipHash = await getIPHash();
-    const ipSnap = await get(
-      ref(db!, "rankvoteVotes/ip_" + ipHash + "_" + rv.id),
-    );
+    const ipSnap = await get(ref(db!, "rankvoteVotes/ip_" + ipHash + "_" + rv.id));
     if (ipSnap.exists()) {
       try {
         localStorage.setItem(localKey, name);
@@ -530,9 +529,7 @@ export async function initFirebaseClient(): Promise<boolean> {
       /* ignore */
     }
 
-    const devSnap = await get(
-      ref(db!, `entryVotes/dev_${DEVICE_ID}_${ev.id}`),
-    );
+    const devSnap = await get(ref(db!, `entryVotes/dev_${DEVICE_ID}_${ev.id}`));
     if (devSnap.exists()) return false;
 
     const ipHash = await getIPHash();
@@ -612,15 +609,12 @@ export async function initFirebaseClient(): Promise<boolean> {
       : 0;
     const localKey = "torneoVote_" + torneoCreatedAt + "_" + matchId;
     try {
-      if (localStorage.getItem(localKey))
-        return { ok: false, reason: "already_voted" };
+      if (localStorage.getItem(localKey)) return { ok: false, reason: "already_voted" };
     } catch {
       /* ignore */
     }
 
-    const devSnap = await get(
-      ref(db!, `torneoVotes/dev_${DEVICE_ID}_${matchId}`),
-    );
+    const devSnap = await get(ref(db!, `torneoVotes/dev_${DEVICE_ID}_${matchId}`));
     if (devSnap.exists()) {
       try {
         localStorage.setItem(localKey, candidateName);
@@ -631,9 +625,7 @@ export async function initFirebaseClient(): Promise<boolean> {
     }
 
     const ipHash = await getIPHash();
-    const ipSnap = await get(
-      ref(db!, `torneoVotes/ip_${ipHash}_${matchId}`),
-    );
+    const ipSnap = await get(ref(db!, `torneoVotes/ip_${ipHash}_${matchId}`));
     if (ipSnap.exists()) {
       try {
         localStorage.setItem(localKey, candidateName);
@@ -654,9 +646,7 @@ export async function initFirebaseClient(): Promise<boolean> {
       const st = stateSnap.val() as Record<string, unknown>;
       let votePath: string;
       const matches = st.matches as Record<string, unknown> | undefined;
-      const cuartosMatches = st.cuartosMatches as
-        | Record<string, unknown>
-        | undefined;
+      const cuartosMatches = st.cuartosMatches as Record<string, unknown> | undefined;
       const semisMatches = st.semisMatches as Record<string, unknown> | undefined;
       const finalMatch = st.finalMatch as { id?: string } | undefined;
 
