@@ -1,6 +1,6 @@
 # Fotos de creadores
 
-Coloca aquí las imágenes referenciadas por la app. Los nombres deben coincidir **exactamente** (Linux distingue mayúsculas: `SergiCabrer.jpeg`).
+Coloca aquí las imágenes referenciadas por la app en **WebP**. Los nombres deben coincidir **exactamente** (Linux distingue mayúsculas: `SergiCabrer.webp`).
 
 ## Comprobar
 
@@ -10,7 +10,7 @@ npm run check:images
 
 ## Descargar desde el sitio original
 
-El HTML legacy (`public/legacy-body.html` en git) usa rutas **relativas** (`/img/kappah.png`), no URLs de internet en el código. Para bajarlas desde donde estuvieran publicadas:
+Las rutas en código son `/img/{nombre}.webp` (p. ej. `kappah.webp`, `rubenmaxxing.webp`). Para bajarlas desde donde estuvieran publicadas:
 
 ```bash
 # Sustituye por la URL donde existía la carpeta img/ (Firebase Hosting, Vercel anterior, etc.)

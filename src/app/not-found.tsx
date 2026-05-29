@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@/components/icons";
-import { BackgroundEffects } from "@/components/looksmax/ui/BackgroundEffects";
+import { BackgroundEffects } from "@/features/looksmax/components/ui/BackgroundEffects";
 
 export const metadata: Metadata = {
   title: "404 — Página no encontrada",

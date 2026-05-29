@@ -1,7 +1,7 @@
 "use client";
 
 import { Icon } from "@/components/icons/Icon";
-import { getRankerFallback } from "@/data/avatars";
+import { getRankerFallback } from "@/features/looksmax/data/avatars";
 import type { IconName } from "@/types/icons";
 
 type CreatorIconProps = {
