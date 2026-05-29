@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { creatorImage } from "@/data/creator-images";
 import { LEXICO } from "@/data/lexico";
+import { CreatorImage } from "@/components/looksmax/CreatorImage";
 import { ActivePage } from "@/components/looksmax/ui/ActivePage";
 import { cn } from "@/lib/cn";
 
@@ -51,7 +53,7 @@ export function NoticiasPage({ active }: { active: boolean }) {
             <CompareSide
               label="Antes"
               labelClass="before"
-              img="/img/kappahsub.png"
+              img={creatorImage("kappahsub.png")}
               score="Sub-3"
               scoreClass="bad"
             />
@@ -59,7 +61,7 @@ export function NoticiasPage({ active }: { active: boolean }) {
             <CompareSide
               label="Después"
               labelClass="after"
-              img="/img/kappah.png"
+              img={creatorImage("kappah.png")}
               score="9.4 CHAD"
               scoreClass="good"
             />
@@ -103,7 +105,16 @@ function CompareSide({
         {label}
       </div>
       <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl border-2 border-white/8 bg-lm-bg3 max-md:rounded-[10px]">
-        <img src={img} alt={label} className="block h-full w-full object-cover object-top" />
+        <CreatorImage
+          src={img}
+          alt={label}
+          className="block h-full w-full object-cover object-top"
+          fallback={
+            <span className="flex h-full w-full items-center justify-center text-4xl opacity-40">
+              👤
+            </span>
+          }
+        />
       </div>
       <div
         className={cn(

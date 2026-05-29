@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { CANDIDATES } from "@/data/candidates";
+import { CreatorImage } from "@/components/looksmax/CreatorImage";
 import { CountdownDigits } from "@/components/looksmax/ui/CountdownDigits";
 import { useCountdown } from "@/hooks/useCountdown";
 import { useEntryVote } from "@/hooks/useEntryVote";
@@ -47,15 +48,12 @@ export function EntryVoteCard() {
             {winnerC?.name ?? ev.winner}
           </div>
           <div className="animate-winner-pop mx-auto my-5 flex h-[130px] w-[130px] items-center justify-center overflow-hidden rounded-full border-[3px] border-lm-gold bg-lm-card2 text-[3.5rem] shadow-[0_0_40px_rgba(232,184,75,0.4)]">
-            {winnerC?.photo ? (
-              <img
-                src={winnerC.photo}
-                alt={winnerC.name}
-                className="h-full w-full rounded-full object-cover"
-              />
-            ) : (
-              <span className="text-[3rem]">{winnerC?.emoji ?? "🏆"}</span>
-            )}
+            <CreatorImage
+              src={winnerC?.photo ?? ""}
+              alt={winnerC?.name ?? "Ganador"}
+              className="h-full w-full rounded-full object-cover"
+              fallback={<span className="text-[3rem]">{winnerC?.emoji ?? "🏆"}</span>}
+            />
           </div>
           <div className="mt-4 text-[0.75rem] font-semibold text-lm-text2">
             🏆 Esta persona será añadida al ranking en la próxima actualización
@@ -105,10 +103,11 @@ export function EntryVoteCard() {
               }
             >
               <div className="mx-auto mb-2.5 flex h-[70px] w-[70px] items-center justify-center overflow-hidden rounded-full border-2 border-lm-border bg-lm-bg3 text-[1.8rem]">
-                <img
+                <CreatorImage
                   src={c.photo}
                   alt={c.name}
                   className="h-full w-full rounded-full object-cover"
+                  fallback={<span>{c.emoji}</span>}
                 />
               </div>
               <div className="font-display mb-0.5 text-[1.2rem] tracking-[1.5px] text-lm-text">
