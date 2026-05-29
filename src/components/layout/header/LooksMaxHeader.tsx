@@ -189,7 +189,8 @@ export function LooksMaxHeader({ page, onOpenDiscord }: LooksMaxHeaderProps) {
         <div className="flex shrink-0 items-center gap-2">
           <button
             type="button"
-            className="flex cursor-pointer items-center gap-1.5 rounded-full border border-[rgba(232,184,75,0.35)] bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold3))] px-3.5 py-2 font-sans text-sm font-extrabold tracking-wide text-black uppercase shadow-[0_0_16px_rgba(232,184,75,0.25)] lm-focus-ring-on-gold transition-all duration-200 hover:scale-[1.03] hover:shadow-[0_0_22px_rgba(232,184,75,0.4)] max-md:px-3 max-md:py-1.5"
+            aria-label="Unirse a la comunidad"
+            className="flex cursor-pointer items-center gap-1.5 rounded-full border border-[rgba(232,184,75,0.35)] bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold3))] px-3.5 py-2 font-sans text-sm leading-none font-bold tracking-normal text-black shadow-[0_0_16px_rgba(232,184,75,0.25)] lm-focus-ring-on-gold transition-all duration-200 hover:scale-[1.03] hover:shadow-[0_0_22px_rgba(232,184,75,0.4)] max-md:px-3 max-md:py-1.5"
             onClick={onOpenDiscord}
           >
             <Icon name="star" size={16} className="text-black" />

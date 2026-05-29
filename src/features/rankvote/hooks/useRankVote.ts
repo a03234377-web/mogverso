@@ -115,6 +115,12 @@ export function useRankVote(active: boolean) {
         const hist = Object.values(raw)
           .filter((h) => h.ts && typeof h.ts === "number")
           .sort((a, b) => b.ts - a.ts)
+          .filter(
+            (h, i, arr) =>
+              arr.findIndex(
+                (x) => x.ts === h.ts && x.winner === h.winner && x.loser === h.loser,
+              ) === i,
+          )
           .slice(0, 20);
         setHistory(hist);
       });

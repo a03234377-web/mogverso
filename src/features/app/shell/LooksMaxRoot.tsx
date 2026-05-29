@@ -6,8 +6,7 @@ import { LooksMaxShell } from "@/features/app/shell/LooksMaxShell";
 import type { ReactNode } from "react";
 
 /**
- * Scripts de terceros (AdSense, reCAPTCHA) van en `app/layout.tsx` como <script> nativo
- * para evitar atributos `data-nscript` de next/script que AdSense no soporta.
+ * AdSense se carga bajo demanda desde `AdBanner` (idle + solo en rankings).
  * reCAPTCHA: cargar bajo demanda cuando exista flujo de voto que lo use.
  */
 export function LooksMaxRoot({ children }: { children: ReactNode }) {

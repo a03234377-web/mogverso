@@ -10,6 +10,7 @@ export type CreatorImageProps = {
   className?: string;
   style?: CSSProperties;
   fallback?: ReactNode;
+  /** Si true, la imagen rellena el contenedor padre (debe tener tamaño explícito). */
   fill?: boolean;
   sizes?: string;
   priority?: boolean;
@@ -32,31 +33,15 @@ export function CreatorImage({
     return fallback ? <>{fallback}</> : null;
   }
 
-  if (fill) {
-    return (
-      <span className="relative block h-full w-full">
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          sizes={sizes}
-          priority={priority}
-          className={cn(className)}
-          style={style}
-          onError={() => setFailed(true)}
-        />
-      </span>
-    );
-  }
-
   return (
     <Image
       src={src}
       alt={alt}
       width={src.width}
       height={src.height}
+      sizes={sizes}
       priority={priority}
-      className={cn(className)}
+      className={cn(fill && "h-full w-full object-cover", className)}
       style={style}
       onError={() => setFailed(true)}
     />

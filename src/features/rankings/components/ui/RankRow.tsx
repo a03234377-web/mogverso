@@ -66,7 +66,7 @@ export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
       >
         {rank}
       </div>
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-lm-border bg-lm-bg3 text-[1.1rem] max-md:h-10 max-md:w-10">
+      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-lm-border bg-lm-bg3">
         <Avatar name={ranker.name} size={40} />
       </div>
       <div className="min-w-0 flex-1">

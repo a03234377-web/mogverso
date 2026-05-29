@@ -1,5 +1,5 @@
 import { creatorImage } from "@/assets/creators";
-import type { CreatorPhoto } from "@/assets/creators";
+import { getRankerFallback, getRankerPhoto } from "@/features/rankings/data/avatars";
 import type { FirebaseBridge } from "@/lib/firebase/client";
 import type {
   OctavosMatchDef,
@@ -79,13 +79,15 @@ function cloneMatches<T>(obj: T): T {
 }
 
 export function getPlayerByName(name: string): TorneoPlayer {
-  return (
-    TORNEO_PLAYERS.find((p) => p.name === name) ?? {
-      name,
-      photo: creatorImage("kappah.webp"),
-      icon: "help-circle",
-    }
-  );
+  const found = TORNEO_PLAYERS.find((p) => p.name === name);
+  if (found) return found;
+
+  const photo = getRankerPhoto(name);
+  return {
+    name,
+    photo: photo ?? creatorImage("kappah.webp"),
+    icon: getRankerFallback(name),
+  };
 }
 
 /** Estado inicial cuando termina la cuenta atrás (cuartos directo, sin octavos en UI). */

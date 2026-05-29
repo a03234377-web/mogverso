@@ -21,19 +21,17 @@ export function Avatar({
 }: AvatarProps) {
   const src = getRankerPhoto(name);
   const [failed, setFailed] = useState(false);
-  const radius = rounded === "full" ? "50%" : "12px";
+  const radiusClass = rounded === "full" ? "rounded-full" : "rounded-xl";
 
   if (!src || failed) {
     return (
       <span
-        className={className}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-          height: "100%",
-        }}
+        className={cn(
+          "inline-flex shrink-0 items-center justify-center",
+          radiusClass,
+          className,
+        )}
+        style={{ width: size, height: size }}
       >
         <CreatorIcon name={name} size={Math.round(size * 0.55)} />
       </span>
@@ -41,17 +39,15 @@ export function Avatar({
   }
 
   return (
-    <span className={cn("relative block h-full w-full", className)}>
-      <Image
-        src={src}
-        alt={name}
-        fill
-        sizes={`${size}px`}
-        className="object-cover"
-        style={{ borderRadius: radius }}
-        onError={() => setFailed(true)}
-      />
-    </span>
+    <Image
+      src={src}
+      alt={name}
+      width={size}
+      height={size}
+      sizes={`${size}px`}
+      className={cn("shrink-0 object-cover", radiusClass, className)}
+      onError={() => setFailed(true)}
+    />
   );
 }
 
@@ -68,9 +64,10 @@ export function ProfileAvatar({ name, photoBg }: { name: string; photoBg: string
         <Image
           src={src}
           alt={name}
-          fill
+          width={110}
+          height={130}
           sizes="130px"
-          className="rounded-xl object-cover"
+          className="h-full w-full rounded-xl object-cover"
           onError={() => setFailed(true)}
         />
       ) : (
