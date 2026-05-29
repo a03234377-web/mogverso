@@ -20,9 +20,13 @@ export function IconLabel({
   children,
 }: IconLabelProps) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5", className)}>
-      <Icon name={icon} size={iconSize} className={iconClassName} />
-      {children}
+    <span className={cn("inline-flex items-baseline gap-1.5", className)}>
+      <Icon
+        name={icon}
+        size={iconSize}
+        className={cn("relative top-[0.12em] shrink-0 self-auto", iconClassName)}
+      />
+      <span className="min-w-0 leading-snug">{children}</span>
     </span>
   );
 }

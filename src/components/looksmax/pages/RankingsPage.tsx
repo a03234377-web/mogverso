@@ -69,7 +69,7 @@ export function RankingsPage({
           >
             <Icon name="vote" size={18} className="inline text-black" /> VOTAR RANKING
           </button>
-          <p className="m-0 flex min-h-9 items-center justify-center text-center text-[0.75rem] font-semibold leading-normal text-lm-text2 max-md:min-h-0 max-md:flex-[1.3] max-md:text-left max-md:text-[0.72rem]">
+          <p className="m-0 text-center text-[0.75rem] font-semibold leading-snug text-lm-text2 max-md:flex-[1.3] max-md:text-left max-md:text-[0.72rem]">
             Elige a tu looksmaxer favorito para que suba en el ranking
           </p>
         </div>
@@ -81,7 +81,7 @@ export function RankingsPage({
           >
             <Icon name="goal" size={18} className="inline text-black" /> TORNEO EN VIVO
           </button>
-          <p className="m-0 flex min-h-9 items-center justify-center text-center text-[0.75rem] font-semibold leading-normal text-lm-text2 max-md:min-h-0 max-md:flex-[1.3] max-md:text-left max-md:text-[0.72rem]">
+          <p className="m-0 text-center text-[0.75rem] font-semibold leading-snug text-lm-text2 max-md:flex-[1.3] max-md:text-left max-md:text-[0.72rem]">
             ¡El torneo ha comenzado — vota los partidos!
           </p>
         </div>
@@ -127,17 +127,17 @@ export function RankingsPage({
 
       <AdBanner clientId={adsenseClient} />
 
-      <div className="mx-auto mb-6 flex max-w-[1100px] items-center gap-4 px-5 max-md:px-3">
-        <div className="h-px flex-1 bg-lm-border" />
-        <div className="whitespace-nowrap text-[0.65rem] font-extrabold uppercase tracking-[2px] text-lm-text2">
-          <IconLabel icon="vote" iconSize={12}>
+      <div className="mx-auto mb-6 flex max-w-[1100px] items-center gap-4 px-5 max-md:flex-col max-md:gap-2 max-md:px-3">
+        <div className="h-px flex-1 bg-lm-border max-md:hidden" />
+        <div className="text-center text-[0.65rem] font-extrabold uppercase leading-snug tracking-[2px] text-lm-text2 max-md:max-w-full max-md:text-[0.58rem] max-md:tracking-[1px] md:whitespace-nowrap">
+          <IconLabel icon="vote" iconSize={12} className="justify-center md:justify-start">
             Votación Especial · Próximo Candidato
           </IconLabel>
         </div>
-        <div className="h-px flex-1 bg-lm-border" />
+        <div className="h-px flex-1 bg-lm-border max-md:hidden" />
       </div>
 
-      <div className="mx-auto max-w-[1100px] px-5 pb-16 max-md:px-3 max-md:pb-8">
+      <div className="mx-auto max-w-[1100px] px-5 pb-16 max-md:px-3 max-md:pb-4">
         <EntryVoteCard />
       </div>
     </div>

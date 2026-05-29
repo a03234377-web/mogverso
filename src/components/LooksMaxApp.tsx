@@ -90,7 +90,7 @@ function LooksMaxAppInner() {
   const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
   return (
-    <div id="looksmax-root" className="relative">
+    <div id="looksmax-root" className="relative overflow-x-clip">
       <SkipLink />
       <BackgroundEffects />
       <Particles />

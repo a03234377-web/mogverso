@@ -130,6 +130,38 @@ html {
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
+}
+
+/* Bebas Neue: métricas más altas que line-height 1 → recorte y selección inflada */
+.font-display {
+  line-height: 1.08;
+}
+
+@utility lm-text-gradient {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  padding-block: 0.04em;
+  vertical-align: top;
+
+  &::selection {
+    -webkit-text-fill-color: var(--lm-selection-color);
+    color: var(--lm-selection-color);
+  }
+}
+
+.bg-clip-text.text-transparent {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  padding-block: 0.04em;
+  vertical-align: top;
+
+  &::selection {
+    -webkit-text-fill-color: var(--lm-selection-color);
+    color: var(--lm-selection-color);
+  }
 }
 
 ::selection {

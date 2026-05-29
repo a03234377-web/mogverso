@@ -38,26 +38,26 @@ export function HeroSection({
           {eyebrow}
         </div>
       )}
-      <div
+      <h1
         className={cn(
-          "font-display leading-[0.9] tracking-[4px]",
+          "font-display mx-auto w-fit max-w-full tracking-[4px] max-md:tracking-[2px] max-[360px]:tracking-[1px]",
           variant === "default" &&
-            "animate-hero-entrance bg-[linear-gradient(135deg,#fff_0%,var(--color-lm-gold2)_40%,var(--color-lm-gold)_70%,var(--color-lm-gold3)_100%)] bg-clip-text text-[clamp(3rem,8vw,9rem)] text-transparent",
+            "animate-hero-entrance bg-[linear-gradient(135deg,#fff_0%,var(--color-lm-gold2)_40%,var(--color-lm-gold)_70%,var(--color-lm-gold3)_100%)] bg-clip-text text-[clamp(2.4rem,8vw,9rem)] text-transparent",
           variant === "torneo" &&
-            "bg-[linear-gradient(135deg,#fff_0%,#ff9f5b_40%,#ff6b35_70%,var(--color-lm-gold)_100%)] bg-clip-text text-[clamp(3rem,9vw,8rem)] text-transparent",
+            "bg-[linear-gradient(135deg,#fff_0%,#ff9f5b_40%,#ff6b35_70%,var(--color-lm-gold)_100%)] bg-clip-text text-[clamp(2.4rem,9vw,8rem)] text-transparent",
           variant === "rankvote" &&
-            "bg-[linear-gradient(135deg,var(--color-lm-green2),#3bde8f,var(--color-lm-gold))] bg-clip-text text-[clamp(2.5rem,7vw,6rem)] text-transparent",
+            "bg-[linear-gradient(135deg,var(--color-lm-green2),#3bde8f,var(--color-lm-gold))] bg-clip-text text-[clamp(2rem,7vw,6rem)] text-transparent",
         )}
       >
         {title}
-      </div>
+      </h1>
       {subtitle && (
         <div
           className={cn(
             "mt-2 font-semibold uppercase tracking-[2px] text-lm-text2",
             variant === "default" && "text-[clamp(0.85rem,1.8vw,1.25rem)]",
-            variant === "torneo" && "text-[0.8rem]",
-            variant === "rankvote" && "text-[0.78rem]",
+            variant === "torneo" && "text-[clamp(0.72rem,2.5vw,0.8rem)] max-md:px-2",
+            variant === "rankvote" && "text-[clamp(0.68rem,2.5vw,0.78rem)] max-md:px-2",
           )}
         >
           {subtitle}

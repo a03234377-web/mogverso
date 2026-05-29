@@ -59,7 +59,7 @@ export function TorneoPage({ active }: { active: boolean }) {
         phases={phases}
       />
 
-      <div className="mx-auto mb-8 max-w-[860px] px-5 max-md:px-3">
+      <div className="mx-auto mb-8 max-w-[860px] px-5 pb-8 max-md:px-3 max-md:pb-4">
         <SectionTitle center className="mb-4">
           <IconLabel icon="bar-chart-3" iconSize={20}>
             Cuadro del Torneo
@@ -131,7 +131,7 @@ function TorneoPhaseCard({
           <PhaseTitle color="orange" className="text-[clamp(2rem,6vw,4.5rem)]">
             {nextLabel}
           </PhaseTitle>
-          <div className="font-display my-1 mb-2.5 bg-[linear-gradient(135deg,var(--color-lm-orange),var(--color-lm-gold2))] bg-clip-text text-[clamp(2.5rem,8vw,6rem)] tracking-[6px] text-transparent">
+          <div className="font-display mx-auto my-1 mb-2.5 w-fit max-w-full bg-[linear-gradient(135deg,var(--color-lm-orange),var(--color-lm-gold2))] bg-clip-text text-[clamp(1.4rem,6vw,6rem)] tracking-[6px] text-transparent max-md:tracking-[2px] max-[360px]:tracking-[1px]">
             EMPIEZA A LAS {horaStr}
           </div>
           <div className="mb-3.5 flex items-center justify-center gap-1.5 text-[0.65rem] font-bold text-lm-text2">
@@ -248,7 +248,7 @@ function TorneoPhaseCard({
                 fallback={<CreatorIcon name={champ} icon={champInfo.icon} size={36} />}
               />
             </div>
-            <div className="font-display bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text text-[clamp(2rem,7vw,4rem)] tracking-[4px] text-transparent">
+            <div className="font-display mx-auto w-fit max-w-full bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text text-[clamp(2rem,7vw,4rem)] tracking-[4px] text-transparent">
               {champ}
             </div>
           </div>
