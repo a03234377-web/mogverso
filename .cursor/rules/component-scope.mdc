@@ -1,0 +1,43 @@
+---
+description: Dónde colocar código en la app Next.js mogverso
+alwaysApply: true
+---
+
+# Alcance de código (mogverso)
+
+App **Next.js App Router** con `src/`. Coloca cada cambio en la carpeta correcta; no mezclar UI, lógica de datos y config.
+
+## Árbol de decisión
+
+1. **¿Ruta o layout?** → `src/app/<segmento>/page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`.
+2. **¿Componente usado en una sola ruta?** → Colocalizar en `src/app/<ruta>/` o subcarpeta `_components/`.
+3. **¿Componente compartido (2+ rutas)?** → `src/components/<Nombre>/`.
+4. **¿Hook o util pura?** → `src/hooks/`, `src/lib/`.
+5. **¿Tipos compartidos?** → `src/types/`.
+6. **¿Firebase (init, queries, listeners)?** → `src/lib/firebase/`; env vars en `.env.local` (no commitear).
+7. **¿API HTTP o webhook?** → `src/app/api/<nombre>/route.ts`.
+8. **¿Server Action?** → `src/app/<ruta>/actions.ts` o junto al feature.
+9. **¿Estilo global / tokens?** → `globals.css` (Tailwind) o `looksmax.css` (design system legacy).
+10. **¿Asset estático?** → `public/`.
+
+## Convenciones App Router
+
+| Alcance | Ubicación |
+| :--- | :--- |
+| Página principal | `src/app/page.tsx` |
+| Layout raíz | `src/app/layout.tsx` |
+| Ruta anidada | `src/app/<ruta>/page.tsx` |
+| Metadata | `export const metadata` o `generateMetadata` en layout/page |
+| Cliente (`useState`, Firebase listeners, cursor custom) | `'use client'` al inicio del archivo |
+| Server Components | Por defecto; no marcar `'use client'` sin necesidad |
+
+## Migración desde looksmax
+
+- **Prohibido** añadir scripts inline que manipulen `#cursor-outer`, `.page.active`, etc. desde HTML estático nuevo; portar a componentes React.
+- Reutilizar **clases existentes** de `looksmax.css` (`rank-row`, `nav-tab`, `voting-card`, …) en JSX con `className`.
+- Estado de tabs/páginas: preferir rutas Next (`/ranking`, `/torneo`) o search params; evitar el patrón `.page { display: none }` salvo transición temporal.
+- Firebase loader (`#fb-loader`): convertir en componente cliente con estado de carga.
+
+## Antes de crear un archivo
+
+Preguntarse: **¿es ruta, componente, lib, estilo o config?** Si la duda es server vs client: ¿usa hooks, eventos DOM, Firebase en tiempo real o `window`? → `'use client'`.

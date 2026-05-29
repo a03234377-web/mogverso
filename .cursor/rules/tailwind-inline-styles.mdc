@@ -1,0 +1,42 @@
+---
+description: Estilos en mogverso — Tailwind inline, looksmax.css semántico, sin registries
+globs: src/**/*.{tsx,ts,jsx,js}
+alwaysApply: false
+---
+
+# Estilos (mogverso)
+
+Dos capas coexisten:
+
+1. **`looksmax.css`** — design system legacy con variables (`--gold`, `--bg`, …) y clases semánticas (`.rank-row`, `.hero-title`, …). **Reutilizar** al migrar UI.
+2. **`globals.css`** — Tailwind v4 (`@import "tailwindcss"`, `@theme inline`). Para layout/utilidades nuevas en componentes Next.
+
+## En componentes TSX
+
+- Clases Tailwind **en el JSX** donde se usan (`className`, `className={cn(...)}`).
+- Clases de `looksmax.css` igual: `className="rank-row top1"`, no wrappers de strings exportados.
+- Combinar ambas cuando tenga sentido: `className="rank-row flex gap-2"`.
+
+## Prohibido
+
+- Archivos `uiClasses.ts`, `styles.ts` que exporten strings de clases para importar en otros archivos.
+- `const cardClass = "..."` en módulo compartido solo por estilos.
+- Copiar trozos grandes de `looksmax.css` a CSS modules sin motivo.
+
+## Permitido
+
+- `cn()` en el mismo componente (crear `@/lib/cn` si hace falta merge).
+- Tokens globales en `globals.css` o variables en `:root` de `looksmax.css`.
+- Extraer **componente** (p. ej. `RankRow.tsx`) con clases inline en su JSX.
+- CSS module **por componente** si el estilo es local y no existe en `looksmax.css`.
+
+## Ejemplos
+
+```tsx
+// ❌
+export const rankRowClass = "rank-row top1";
+<article className={rankRowClass} />
+
+// ✅ — reutiliza looksmax + Tailwind puntual
+<article className="rank-row top1 md:px-4" />
+```

@@ -1,0 +1,53 @@
+---
+description: Fuentes de información y mapa del repo mogverso (Next.js + Firebase)
+alwaysApply: true
+---
+
+# Fuentes de información (mogverso)
+
+App **Next.js 16** (App Router) en migración desde una SPA estática con estilos `looksmax.css`. Backend previsto: **Firebase** (Firestore/Auth). Respuesta al usuario en **español**; commits en **inglés**.
+
+## Stack
+
+| Capa | Tecnología |
+| :--- | :--- |
+| Framework | Next.js 16 (`next dev/build/start`) |
+| UI | React 19, TypeScript |
+| Estilos | Tailwind CSS v4 (`src/app/globals.css`) + design system legacy (`src/app/looksmax.css`) |
+| Backend | Firebase (`firebase` en deps; config en `src/lib/firebase/` cuando exista) |
+| Alias | `@/*` → `src/*` (`tsconfig.json`) |
+
+**Next.js 16:** APIs pueden diferir del training data. Antes de escribir código Next, consultar `node_modules/next/dist/docs/` y `AGENTS.md`.
+
+## Mapa del repositorio
+
+| Qué | Dónde |
+| :--- | :--- |
+| Rutas y layouts | `src/app/` (`layout.tsx`, `page.tsx`, subcarpetas por ruta) |
+| Estilos globales Tailwind | `src/app/globals.css` |
+| Design system legacy (ranking, votos, torneo, perfiles…) | `src/app/looksmax.css` |
+| Componentes reutilizables | `src/components/` (crear al migrar; colocalizar si solo una ruta) |
+| Hooks, utilidades, tipos | `src/lib/`, `src/hooks/`, `src/types/` |
+| Cliente Firebase, reglas de datos | `src/lib/firebase/` |
+| Server Actions / Route Handlers | `src/app/**/actions.ts`, `src/app/api/**/route.ts` |
+| Assets estáticos | `public/` |
+| Config | `next.config.ts`, `eslint.config.mjs`, `postcss.config.mjs`, `tsconfig.json` |
+| Reglas del agente | `.cursor/rules/` |
+
+## Orden de investigación
+
+1. **Código existente** en `src/` — comportamiento real prevalece sobre suposiciones.
+2. **Clases CSS** en `looksmax.css` — reutilizar antes de duplicar estilos.
+3. **Docs de Next.js 16** en `node_modules/next/dist/docs/` para APIs del framework.
+4. **Firebase SDK** — patrones oficiales; no hardcodear credenciales (usar env vars).
+
+## Dominio funcional (looksmax → mogverso)
+
+Secciones previstas en el CSS legacy: ranking, votación, rankvote, noticias, consejos, léxico, perfiles, torneo, modal Discord, loader Firebase, reCAPTCHA, ceremonia. Al migrar a React, **extraer componentes por sección** y sustituir manipulación DOM imperativa por estado React + listeners de Firebase.
+
+## Qué evitar
+
+- Convenciones de otros frameworks (Ryunix `.ryx`, Pages Router obsoleto salvo que ya exista).
+- Commitear `.env`, claves Firebase o tokens reCAPTCHA.
+- Duplicar bloques enteros de `looksmax.css` en módulos TS; importar el CSS o extraer componentes.
+- Asumir APIs de Next.js 14/15 sin verificar la versión instalada (`package.json`).
