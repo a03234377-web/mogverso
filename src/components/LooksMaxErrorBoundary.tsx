@@ -1,6 +1,7 @@
 "use client";
 
 import { Component, type ReactNode } from "react";
+import { IconLabel } from "@/components/icons";
 
 type Props = {
   children: ReactNode;
@@ -14,7 +15,11 @@ function LooksMaxErrorDisplay({ message }: { message: string }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-lm-bg p-6 text-center text-lm-text">
       <div>
-        <p className="mb-2 text-xl font-bold text-lm-red2">⚠️ Error</p>
+        <p className="mb-2 flex items-center justify-center gap-2 text-xl font-bold text-lm-red2">
+          <IconLabel icon="alert-triangle" iconSize={22}>
+            Error
+          </IconLabel>
+        </p>
         <p className="text-sm text-lm-text2">{message}</p>
       </div>
     </div>

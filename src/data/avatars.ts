@@ -1,4 +1,5 @@
 import { creatorImage } from "@/data/creator-images";
+import type { IconName } from "@/types/icons";
 
 /** Rutas de foto por nombre de ranker (clave canónica en RANKERS). */
 export const FOTOS: Record<string, string> = {
@@ -39,36 +40,36 @@ export function getRankerPhoto(name: string): string | undefined {
   return FOTOS[key];
 }
 
-/** Emoji fallback cuando no hay foto */
-export const FALLBACK: Record<string, string> = {
-  Kappah: "👑",
-  RubenMaxxing: "🔬",
-  SergiCabrer: "🌊",
-  Sergi: "🌊",
-  JoseNogales: "🌿",
-  TitoChape: "🍪",
-  Aaronjaureguii: "⭐",
-  AlejandroAle: "😄",
-  JordiWild: "🎙️",
-  Peldanyos: "🏗️",
-  IbaiLlanos: "🎮",
-  ChiquiIbai: "😂",
-  Peereira7: "⚽",
-  Franbeuve: "🎭",
-  Franbv: "🎭",
-  Febron: "💪",
-  Elcalvo: "🧠",
-  Didac: "🎯",
-  Javichu: "⚡",
-  Ismael: "🌟",
-  AlvaroSapo: "🐸",
-  Hectrollprox: "👾",
-  Giva: "🔥",
-  "Nil Ojeda": "💎",
+/** Icono Lucide fallback cuando no hay foto */
+export const FALLBACK: Record<string, IconName> = {
+  Kappah: "crown",
+  RubenMaxxing: "microscope",
+  SergiCabrer: "waves",
+  Sergi: "waves",
+  JoseNogales: "leaf",
+  TitoChape: "cookie",
+  Aaronjaureguii: "star",
+  AlejandroAle: "smile",
+  JordiWild: "mic",
+  Peldanyos: "building-2",
+  IbaiLlanos: "gamepad-2",
+  ChiquiIbai: "laugh",
+  Peereira7: "goal",
+  Franbeuve: "drama",
+  Franbv: "drama",
+  Febron: "dumbbell",
+  Elcalvo: "brain",
+  Didac: "target",
+  Javichu: "zap",
+  Ismael: "sparkles",
+  AlvaroSapo: "turtle",
+  Hectrollprox: "ghost",
+  Giva: "flame",
+  "Nil Ojeda": "gem",
 };
 
-export function getRankerFallback(name: string): string {
-  if (!name) return "👤";
+export function getRankerFallback(name: string): IconName {
+  if (!name) return "user";
   const key = RANKER_PHOTO_ALIASES[name] ?? name;
-  return FALLBACK[key] ?? FALLBACK[name] ?? "👤";
+  return FALLBACK[key] ?? FALLBACK[name] ?? "user";
 }

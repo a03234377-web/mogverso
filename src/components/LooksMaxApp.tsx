@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Script from "next/script";
+import { SkipLink } from "@/components/a11y/SkipLink";
 import { LooksMaxErrorBoundary } from "@/components/LooksMaxErrorBoundary";
 import { DiscordModal } from "@/components/looksmax/DiscordModal";
+import { isEscape } from "@/lib/a11y/keyboard";
 import { FirebaseLoader } from "@/components/looksmax/FirebaseLoader";
 import { GlobalAnnouncements } from "@/components/looksmax/GlobalAnnouncements";
 import { BottomNav, DesktopNav } from "@/components/looksmax/Navigation";
@@ -31,38 +33,65 @@ function LooksMaxAppInner() {
 
   useSecurityGuard();
 
-  const navigate = useCallback((id: PageId) => {
-    setPage(id);
-    setProfileIndex(null);
-    setMoreOpen(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const mainRef = useRef<HTMLElement>(null);
+
+  const focusMain = useCallback(() => {
+    requestAnimationFrame(() => {
+      mainRef.current?.focus({ preventScroll: true });
+    });
   }, []);
 
-  const openProfile = useCallback((originalIndex: number, rankPos: number) => {
-    setProfileIndex(originalIndex);
-    setProfileRank(rankPos);
-    setPage("profile");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  const navigate = useCallback(
+    (id: PageId) => {
+      setPage(id);
+      setProfileIndex(null);
+      setMoreOpen(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      focusMain();
+    },
+    [focusMain],
+  );
+
+  const openProfile = useCallback(
+    (originalIndex: number, rankPos: number) => {
+      setProfileIndex(originalIndex);
+      setProfileRank(rankPos);
+      setPage("profile");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      focusMain();
+    },
+    [focusMain],
+  );
 
   const backToRanking = useCallback(() => {
     setProfileIndex(null);
     setPage("rankings");
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+    focusMain();
+  }, [focusMain]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setDiscordOpen(false);
+      if (!isEscape(e.key)) return;
+      if (moreOpen) {
+        setMoreOpen(false);
+        e.preventDefault();
+        return;
+      }
+      if (discordOpen) {
+        setDiscordOpen(false);
+        e.preventDefault();
+      }
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, []);
+  }, [moreOpen, discordOpen]);
 
   const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
   return (
     <div id="looksmax-root" className="relative">
+      <SkipLink />
       <BackgroundEffects />
       <Particles />
       <FirebaseLoader />
@@ -81,30 +110,38 @@ function LooksMaxAppInner() {
         onToggleMore={() => setMoreOpen((o) => !o)}
       />
 
-      {page === "rankings" && (
-        <RankingsPage
-          page="rankings"
-          entries={entries}
-          upMovers={upMovers}
-          downMovers={downMovers}
-          rankVoteEnd={rankVoteEnd}
-          onNavigate={navigate}
-          onOpenDiscord={() => setDiscordOpen(true)}
-          onOpenProfile={openProfile}
-          adsenseClient={adsenseClient}
+      <main
+        id="main-content"
+        ref={mainRef}
+        tabIndex={-1}
+        className="outline-none"
+        aria-label="Contenido principal"
+      >
+        {page === "rankings" && (
+          <RankingsPage
+            page="rankings"
+            entries={entries}
+            upMovers={upMovers}
+            downMovers={downMovers}
+            rankVoteEnd={rankVoteEnd}
+            onNavigate={navigate}
+            onOpenDiscord={() => setDiscordOpen(true)}
+            onOpenProfile={openProfile}
+            adsenseClient={adsenseClient}
+          />
+        )}
+        <RankVotePage active={page === "rankvote"} />
+        <TorneoPage active={page === "torneo"} />
+        <NoticiasPage active={page === "noticias"} />
+        <ConsejoPage active={page === "consejo"} />
+        <LexicoPage active={page === "lexico"} />
+        <ProfilePage
+          active={page === "profile"}
+          profileIndex={profileIndex}
+          rankPosition={profileRank}
+          onBack={backToRanking}
         />
-      )}
-      <RankVotePage active={page === "rankvote"} />
-      <TorneoPage active={page === "torneo"} />
-      <NoticiasPage active={page === "noticias"} />
-      <ConsejoPage active={page === "consejo"} />
-      <LexicoPage active={page === "lexico"} />
-      <ProfilePage
-        active={page === "profile"}
-        profileIndex={profileIndex}
-        rankPosition={profileRank}
-        onBack={backToRanking}
-      />
+      </main>
 
       <DiscordModal open={discordOpen} onClose={() => setDiscordOpen(false)} />
     </div>

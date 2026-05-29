@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { CANDIDATES } from "@/data/candidates";
 import { CreatorImage } from "@/components/looksmax/CreatorImage";
+import { CreatorIcon, Icon, IconLabel } from "@/components/icons";
 import { CountdownDigits } from "@/components/looksmax/ui/CountdownDigits";
 import { useCountdown } from "@/hooks/useCountdown";
 import { useEntryVote } from "@/hooks/useEntryVote";
@@ -24,7 +25,10 @@ export function EntryVoteCard() {
         className="relative overflow-hidden rounded-[20px] border border-[rgba(168,85,247,0.35)] bg-[linear-gradient(135deg,rgba(168,85,247,0.08),rgba(59,130,246,0.05))] px-6 py-8 text-center max-md:rounded-2xl max-md:px-3.5 max-md:py-5"
         id="entryVotingCard"
       >
-        <div className="px-6 py-8 text-center text-lm-text2">⏳ Cargando votación…</div>
+        <div className="flex items-center justify-center gap-2 px-6 py-8 text-lm-text2">
+          <Icon name="hourglass" size={18} className="text-lm-purple" />
+          Cargando votación…
+        </div>
       </div>
     );
   }
@@ -37,9 +41,13 @@ export function EntryVoteCard() {
         id="entryVotingCard"
       >
         <div className="px-4 py-8 text-center">
-          <div className="animate-fade-up mb-3 flex justify-center gap-2 text-2xl">🎉 🏆 🎊 ✨ 🎉</div>
+          <div className="animate-fade-up mb-3 flex justify-center gap-3 text-lm-gold">
+            <Icon name="party-popper" size={24} />
+            <Icon name="trophy" size={24} />
+            <Icon name="sparkles" size={24} />
+          </div>
           <div className="mb-3 flex items-center justify-center gap-2 text-[0.7rem] font-extrabold uppercase tracking-[3px] text-lm-gold">
-            <span>★</span> VOTACIÓN CERRADA <span>★</span>
+            <Icon name="star" size={12} /> VOTACIÓN CERRADA <Icon name="star" size={12} />
           </div>
           <div className="animate-hero-entrance font-display mb-2 text-[clamp(2rem,6vw,5rem)] tracking-[4px] bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text text-transparent">
             GANADOR
@@ -47,16 +55,25 @@ export function EntryVoteCard() {
           <div className="animate-hero-entrance font-display text-[clamp(2.5rem,8vw,7rem)] leading-none tracking-[3px] bg-[linear-gradient(135deg,var(--color-lm-gold2),var(--color-lm-gold),#fff)] bg-clip-text text-transparent">
             {winnerC?.name ?? ev.winner}
           </div>
-          <div className="animate-winner-pop mx-auto my-5 flex h-[130px] w-[130px] items-center justify-center overflow-hidden rounded-full border-[3px] border-lm-gold bg-lm-card2 text-[3.5rem] shadow-[0_0_40px_rgba(232,184,75,0.4)]">
+          <div className="animate-winner-pop mx-auto my-5 flex h-[130px] w-[130px] items-center justify-center overflow-hidden rounded-full border-[3px] border-lm-gold bg-lm-card2 shadow-[0_0_40px_rgba(232,184,75,0.4)]">
             <CreatorImage
               src={winnerC?.photo ?? ""}
               alt={winnerC?.name ?? "Ganador"}
               className="h-full w-full rounded-full object-cover"
-              fallback={<span className="text-[3rem]">{winnerC?.emoji ?? "🏆"}</span>}
+              fallback={
+                <CreatorIcon
+                  name={winnerC?.name ?? ""}
+                  icon={winnerC?.icon ?? "trophy"}
+                  size={48}
+                  className="text-lm-gold"
+                />
+              }
             />
           </div>
           <div className="mt-4 text-[0.75rem] font-semibold text-lm-text2">
-            🏆 Esta persona será añadida al ranking en la próxima actualización
+            <IconLabel icon="trophy" iconSize={14} className="justify-center">
+              Esta persona será añadida al ranking en la próxima actualización
+            </IconLabel>
           </div>
         </div>
       </div>
@@ -92,7 +109,7 @@ export function EntryVoteCard() {
                 "relative cursor-pointer overflow-hidden rounded-[14px] border border-lm-border bg-lm-card p-5 transition-all duration-300 max-md:rounded-xl max-md:p-3.5",
                 !voted && "hover:-translate-y-0.5 hover:border-[rgba(168,85,247,0.5)]",
                 isSel &&
-                  "border-lm-purple bg-[rgba(168,85,247,0.15)] shadow-[0_0_24px_rgba(168,85,247,0.3)] -translate-y-0.5 after:absolute after:right-2.5 after:top-2.5 after:text-base after:font-black after:text-lm-purple after:content-['✓']",
+                  "border-lm-purple bg-[rgba(168,85,247,0.15)] shadow-[0_0_24px_rgba(168,85,247,0.3)] -translate-y-0.5",
               )}
               data-id={c.id}
               role={!voted ? "button" : undefined}
@@ -102,12 +119,19 @@ export function EntryVoteCard() {
                 e.key === "Enter" && !voted && !voting && void vote(c.id)
               }
             >
-              <div className="mx-auto mb-2.5 flex h-[70px] w-[70px] items-center justify-center overflow-hidden rounded-full border-2 border-lm-border bg-lm-bg3 text-[1.8rem]">
+              {isSel && (
+                <Icon
+                  name="check"
+                  size={16}
+                  className="absolute right-2.5 top-2.5 text-lm-purple"
+                />
+              )}
+              <div className="mx-auto mb-2.5 flex h-[70px] w-[70px] items-center justify-center overflow-hidden rounded-full border-2 border-lm-border bg-lm-bg3">
                 <CreatorImage
                   src={c.photo}
                   alt={c.name}
                   className="h-full w-full rounded-full object-cover"
-                  fallback={<span>{c.emoji}</span>}
+                  fallback={<CreatorIcon name={c.name} icon={c.icon} size={28} />}
                 />
               </div>
               <div className="font-display mb-0.5 text-[1.2rem] tracking-[1.5px] text-lm-text">
@@ -121,7 +145,13 @@ export function EntryVoteCard() {
                 />
               </div>
               <div className="text-[0.7rem] font-extrabold text-lm-purple">
-                {voted ? `${pct}%` : "👆 Clic para votar"}
+                {voted ? (
+                  `${pct}%`
+                ) : (
+                  <IconLabel icon="pointer" iconSize={12} className="justify-center">
+                    Clic para votar
+                  </IconLabel>
+                )}
               </div>
               <div className="text-[0.6rem] font-semibold text-lm-text2">
                 {voted ? `${votes} voto${votes !== 1 ? "s" : ""}` : ""}
@@ -133,12 +163,15 @@ export function EntryVoteCard() {
       <div id="evAction">
         {voted ? (
           <div className="mt-3 flex items-center justify-center gap-1.5 text-[0.8rem] font-bold text-lm-green2">
-            ✅ Has votado por{" "}
+            <Icon name="circle-check" size={16} />
+            Has votado por{" "}
             <strong>{CANDIDATES.find((c) => c.id === myVote?.candidate)?.name ?? "—"}</strong>
           </div>
         ) : (
           <div className="text-[0.65rem] font-semibold text-lm-text2">
-            👆 Solo puedes votar una vez · El ganador entra al ranking
+            <IconLabel icon="pointer" iconSize={12} className="justify-center">
+              Solo puedes votar una vez · El ganador entra al ranking
+            </IconLabel>
           </div>
         )}
       </div>

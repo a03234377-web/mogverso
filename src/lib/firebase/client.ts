@@ -12,6 +12,7 @@ import {
 } from "firebase/database";
 import { firebaseConfig, isFirebaseConfigured } from "./config";
 import type { Ranker } from "@/data/rankers";
+import type { IconName } from "@/types/icons";
 
 export type FirebaseBridge = {
   db: Database;
@@ -52,7 +53,7 @@ export type FirebaseBridge = {
 export type Announcement = {
   type: string;
   text: string;
-  icon: string;
+  icon: IconName;
   bg: string;
   border: string;
 };
@@ -111,27 +112,27 @@ async function getIPHash(): Promise<string> {
 
 const ANNOUNCEMENT_COLORS: Record<
   string,
-  { bg: string; border: string; icon: string }
+  { bg: string; border: string; icon: IconName }
 > = {
   info: {
     bg: "rgba(59,130,246,.16)",
     border: "rgba(59,130,246,.55)",
-    icon: "ℹ️",
+    icon: "info",
   },
   warning: {
     bg: "rgba(249,115,22,.16)",
     border: "rgba(249,115,22,.55)",
-    icon: "⚠️",
+    icon: "alert-triangle",
   },
   success: {
     bg: "rgba(46,204,113,.14)",
     border: "rgba(46,204,113,.55)",
-    icon: "🏆",
+    icon: "trophy",
   },
   emergency: {
     bg: "rgba(255,71,87,.16)",
     border: "rgba(255,71,87,.65)",
-    icon: "🚨",
+    icon: "siren",
   },
 };
 

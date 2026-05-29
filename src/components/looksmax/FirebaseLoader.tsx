@@ -1,5 +1,6 @@
 "use client";
 
+import { IconLabel } from "@/components/icons";
 import { useFirebase } from "@/contexts/FirebaseProvider";
 import { cn } from "@/lib/cn";
 
@@ -18,7 +19,9 @@ export function FirebaseLoader() {
     >
       {error ? (
         <div className="px-4 py-4 text-center text-[0.8rem] font-bold leading-normal text-lm-red2">
-          ⚠️ No se pudo conectar a Firebase. Comprueba tu configuración.
+          <IconLabel icon="alert-triangle" iconSize={18}>
+            No se pudo conectar a Firebase. Comprueba tu configuración.
+          </IconLabel>
         </div>
       ) : (
         <>

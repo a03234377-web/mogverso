@@ -39,11 +39,13 @@ export type RankMovement = {
 
 export type RankMovements = Record<string, RankMovement>;
 
+import type { IconName } from "@/types/icons";
+
 /** Torneo */
 export type TorneoPlayer = {
   name: string;
   photo: string;
-  emoji: string;
+  icon: IconName;
 };
 
 export type TorneoMatchRound = "octavos" | "cuartos" | "semis" | "final";

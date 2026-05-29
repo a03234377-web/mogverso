@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { Pressable } from "@/components/a11y/Pressable";
 import { Avatar } from "@/components/looksmax/Avatar";
 import { cn } from "@/lib/cn";
 import type { RankedEntry } from "@/lib/looksmax/ranking";
@@ -50,16 +51,14 @@ export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
   }
 
   return (
-    <div
+    <Pressable
+      aria-label={`Ver perfil de ${ranker.name}, puesto ${rank}`}
       className={cn(
-        "group relative flex min-h-[58px] cursor-pointer items-center gap-3 overflow-hidden rounded-xl border border-lm-border bg-lm-card px-4 py-3 transition-all duration-300 animate-row-slide select-none max-md:gap-2.5 max-md:px-3.5 max-md:active:scale-[0.99] max-md:active:border-lm-border2 max-md:active:bg-lm-card2 hover:border-lm-border2 hover:bg-lm-card2 hover:translate-x-1 max-md:hover:translate-x-0",
+        "group relative flex min-h-[58px] items-center gap-3 overflow-hidden rounded-xl border border-lm-border bg-lm-card px-4 py-3 transition-all duration-300 animate-row-slide select-none max-md:gap-2.5 max-md:px-3.5 max-md:active:scale-[0.99] max-md:active:border-lm-border2 max-md:active:bg-lm-card2 hover:border-lm-border2 hover:bg-lm-card2 hover:translate-x-1 max-md:hover:translate-x-0",
         topClass && topRowStyles[topClass],
       )}
       style={{ animationDelay: `${index * 0.05}s` }}
-      role="button"
-      tabIndex={0}
       onClick={() => onOpenProfile(originalIndex, rank - 1)}
-      onKeyDown={(e) => e.key === "Enter" && onOpenProfile(originalIndex, rank - 1)}
     >
       <div
         className={cn(
@@ -90,6 +89,6 @@ export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
           ›
         </div>
       </div>
-    </div>
+    </Pressable>
   );
 }

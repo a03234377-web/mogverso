@@ -13,7 +13,14 @@ export function useSecurityGuard(): void {
 
     const blockKeys = (e: KeyboardEvent) => {
       const k = e.key.toLowerCase();
+      const target = e.target;
+      const inTextField =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        (target instanceof HTMLElement && target.isContentEditable);
+
       if (e.ctrlKey || e.metaKey) {
+        if (k === "f" && inTextField) return;
         if (["u", "s", "a", "p", "f"].includes(k)) {
           e.preventDefault();
           return false;

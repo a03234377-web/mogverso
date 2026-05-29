@@ -1,3 +1,5 @@
+import type { IconName } from "@/types/icons";
+
 export type Ranker = {
   name: string;
   title: string;
@@ -8,7 +10,7 @@ export type Ranker = {
   tagNames: string[];
   bio: string;
   movement: string;
-  movIcon: string;
+  movIcon: IconName;
   photoBg: string;
 };
 
@@ -24,7 +26,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Transformación", "Chad", "Low Cortisol", "Score: 9.4"],
     bio: "Kappah es la historia de transformación más brutal que ha visto la comunidad looksmaxer española.",
     movement: "Kappah consolida el #1 con una puntuación histórica de 9.4.",
-    movIcon: "🔥",
+    movIcon: "flame",
     photoBg: "linear-gradient(135deg,#d4a843,#ffd166)",
   },
   {
@@ -37,7 +39,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Chad", "En Ascenso", "Low Cortisol", "Score: 9.1"],
     bio: "RubenMaxxing es el looksmaxer más metódico de la escena española.",
     movement: "RubenMaxxing sube consolidándose como el rival más serio de Kappah.",
-    movIcon: "🚀",
+    movIcon: "rocket",
     photoBg: "linear-gradient(135deg,#aaa,#e8e8e8)",
   },
   {
@@ -50,7 +52,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Alta Percepción", "Humor", "Veterano", "Score: 8.7"],
     bio: "TitoChape es lo más parecido que tiene la comunidad española a un Cookie King con clase.",
     movement: "TitoChape asciende al #3.",
-    movIcon: "🍪",
+    movIcon: "cookie",
     photoBg: "linear-gradient(135deg,#6b2737,#c0392b)",
   },
   {
@@ -63,7 +65,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Chad", "En Ascenso", "Nuevo", "Score: 8.5"],
     bio: "Peereira7 entra al ranking con una energía arrolladora.",
     movement: "Peereira7 debuta directamente en el Top 4.",
-    movIcon: "⚽",
+    movIcon: "goal",
     photoBg: "linear-gradient(135deg,#1a4a6b,#2196b3)",
   },
   {
@@ -76,7 +78,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Chad", "En Ascenso", "Alta Percepción", "Score: 8.6"],
     bio: "Aaronjaureguii irrumpe en el ranking con una presencia arrolladora.",
     movement: "Aaronjaureguii en el Top 5.",
-    movIcon: "⭐",
+    movIcon: "star",
     photoBg: "linear-gradient(135deg,#1a3a6b,#2155b3)",
   },
   {
@@ -89,7 +91,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Chad", "Nuevo", "Low Cortisol", "Score: 8.3"],
     bio: "Febron irrumpe en el ranking con una presencia imponente.",
     movement: "Febron en el Top 6.",
-    movIcon: "💪",
+    movIcon: "dumbbell",
     photoBg: "linear-gradient(135deg,#2d1b69,#7c3aed)",
   },
   {
@@ -102,7 +104,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Chad", "En Ascenso", "Alta Percepción", "Score: 8.9"],
     bio: "SergiCabrer es la bomba que nadie vio venir.",
     movement: "SergiCabrer en el Top 7.",
-    movIcon: "🌊",
+    movIcon: "waves",
     photoBg: "linear-gradient(135deg,#1a6b8a,#2196b3)",
   },
   {
@@ -115,7 +117,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Nuevo", "Chad", "En Ascenso", "Score: 8.7"],
     bio: "Giva irrumpe en el Top 8 con una energía arrolladora y presencia que no pasa desapercibida.",
     movement: "Giva debuta directamente en el Top 8.",
-    movIcon: "🔥",
+    movIcon: "flame",
     photoBg: "linear-gradient(135deg,#6b1a1a,#c0392b)",
   },
   {
@@ -128,7 +130,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Sube", "Chad", "Alta Percepción", "Score: 8.8"],
     bio: "JoseNogales es el looksmaxer que no necesita explicaciones.",
     movement: "JoseNogales en el Top 8.",
-    movIcon: "🌿",
+    movIcon: "leaf",
     photoBg: "linear-gradient(135deg,#b46428,#e07840)",
   },
   {
@@ -141,7 +143,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Nuevo", "Alta Percepción", "En Ascenso", "Score: 7.8"],
     bio: "Ismael irrumpe en el ranking con ganas de demostrar lo que vale.",
     movement: "Ismael debuta en el ranking.",
-    movIcon: "🌟",
+    movIcon: "sparkles",
     photoBg: "linear-gradient(135deg,#1a5c6b,#21a3b3)",
   },
   {
@@ -154,7 +156,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Nuevo", "Chad", "Alta Percepción", "Score: 7.6"],
     bio: "Didac entra al ranking con una actitud ganadora.",
     movement: "Didac debuta en el ranking.",
-    movIcon: "🎯",
+    movIcon: "target",
     photoBg: "linear-gradient(135deg,#2d4a1e,#4caf50)",
   },
   {
@@ -167,7 +169,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Nuevo", "En Ascenso", "Alta Percepción", "Score: 7.4"],
     bio: "Javichu llega con energía eléctrica dispuesto a escalar posiciones.",
     movement: "Javichu debuta en el ranking.",
-    movIcon: "⚡",
+    movIcon: "zap",
     photoBg: "linear-gradient(135deg,#6b4a1e,#c8851e)",
   },
   {
@@ -180,7 +182,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Nuevo", "Humor", "Alta Percepción", "Score: 7.3"],
     bio: "AlvaroSapo trae su propio estilo único al ranking.",
     movement: "AlvaroSapo debuta en el ranking.",
-    movIcon: "🐸",
+    movIcon: "turtle",
     photoBg: "linear-gradient(135deg,#1e6b2d,#2db84c)",
   },
   {
@@ -193,7 +195,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Veterano", "Chad", "Score: 8.3"],
     bio: "AlejandroAle es el looksmaxer con más carisma del ranking.",
     movement: "AlejandroAle en el ranking.",
-    movIcon: "🌊",
+    movIcon: "smile",
     photoBg: "linear-gradient(135deg,#2d6a4f,#52b788)",
   },
   {
@@ -206,7 +208,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Nuevo", "Chad", "Veterano", "Score: 7.1"],
     bio: "Elcalvo demuestra que el cabello es opcional cuando tienes el resto.",
     movement: "Elcalvo debuta en el ranking.",
-    movIcon: "🧠",
+    movIcon: "brain",
     photoBg: "linear-gradient(135deg,#4a4a4a,#888888)",
   },
   {
@@ -219,7 +221,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Nuevo", "Humor", "Creador", "Score: 7.0"],
     bio: "Hectrollprox llega al ranking para agitar las aguas.",
     movement: "Hectrollprox debuta en el ranking.",
-    movIcon: "👾",
+    movIcon: "ghost",
     photoBg: "linear-gradient(135deg,#1a1a4e,#3a3a9e)",
   },
   {
@@ -232,7 +234,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Creador", "Chad", "Veterano", "Score: 7.9"],
     bio: "Jordi Wild no necesita presentación.",
     movement: "JordiWild en el ranking.",
-    movIcon: "🎙️",
+    movIcon: "mic",
     photoBg: "linear-gradient(135deg,#1a1a2e,#16213e)",
   },
   {
@@ -245,7 +247,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Creador", "Alta Percepción", "Activo", "Score: 7.7"],
     bio: "Peldanyos es uno de los youtubers españoles más queridos.",
     movement: "Peldanyos en el ranking.",
-    movIcon: "🏗️",
+    movIcon: "building-2",
     photoBg: "linear-gradient(135deg,#2c3e50,#3498db)",
   },
   {
@@ -258,7 +260,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Creador", "Humor", "Veterano", "Score: 7.5"],
     bio: "Ibai Llanos es el rey indiscutible del entretenimiento español.",
     movement: "IbaiLlanos en el ranking.",
-    movIcon: "🎮",
+    movIcon: "gamepad-2",
     photoBg: "linear-gradient(135deg,#6c3483,#9b59b6)",
   },
   {
@@ -271,7 +273,7 @@ export const RANKERS: Ranker[] = [
     tagNames: ["Humor", "Creador", "Alta Percepción", "Score: 6.8"],
     bio: "ChiquiIbai ha convertido el humor en su arma de looksmaxing.",
     movement: "ChiquiIbai en el último puesto del ranking.",
-    movIcon: "😂",
+    movIcon: "laugh",
     photoBg: "linear-gradient(135deg,#e74c3c,#c0392b)",
   },
 ];

@@ -1,6 +1,7 @@
 "use client";
 
 import { Avatar } from "@/components/looksmax/Avatar";
+import { Icon, IconLabel } from "@/components/icons";
 import { ActivePage } from "@/components/looksmax/ui/ActivePage";
 import { CountdownDigits } from "@/components/looksmax/ui/CountdownDigits";
 import { HeroSection } from "@/components/looksmax/ui/HeroSection";
@@ -21,7 +22,9 @@ export function RankVotePage({ active }: { active: boolean }) {
         variant="rankvote"
         title={
           <>
-            🗳️ Votar
+            <IconLabel icon="vote" iconSize={28} className="justify-center">
+              Votar
+            </IconLabel>
             <br />
             Ranking
           </>
@@ -36,9 +39,15 @@ export function RankVotePage({ active }: { active: boolean }) {
           {loading || transitioning ? (
             <div className="px-6 py-12 text-center text-[0.95rem] font-bold text-lm-gold">
               <div className="mx-auto mb-4 h-8 w-8 animate-spin-slow rounded-full border-[3px] border-[rgba(232,184,75,0.2)] border-t-lm-gold" />
-              {transitioning
-                ? "✅ Ronda resuelta · Cargando nueva votación…"
-                : "⏳ Cargando votación…"}
+              {transitioning ? (
+                <IconLabel icon="circle-check" iconSize={16} className="justify-center">
+                  Ronda resuelta · Cargando nueva votación…
+                </IconLabel>
+              ) : (
+                <IconLabel icon="hourglass" iconSize={16} className="justify-center">
+                  Cargando votación…
+                </IconLabel>
+              )}
             </div>
           ) : rv ? (
             <RankVoteArena
@@ -50,12 +59,16 @@ export function RankVotePage({ active }: { active: boolean }) {
               onVote={(name) => void vote(name)}
             />
           ) : (
-            <div className="px-6 py-12 text-center text-lm-text2">⏳ Cargando votación…</div>
+            <div className="flex items-center justify-center gap-2 px-6 py-12 text-center text-lm-text2">
+              <Icon name="hourglass" size={16} />
+              Cargando votación…
+            </div>
           )}
         </div>
         <div>
-          <div className="font-display mb-4 text-[1.4rem] tracking-[2px] text-lm-text">
-            📜 Historial de Votaciones
+          <div className="font-display mb-4 flex items-center gap-2 text-[1.4rem] tracking-[2px] text-lm-text">
+            <Icon name="scroll-text" size={22} className="text-lm-gold" />
+            Historial de Votaciones
           </div>
           <div id="rankvoteHistoryList">
             {history.length === 0 ? (
@@ -154,20 +167,28 @@ function RankVoteArena({
       </div>
       <div className="mt-1 flex min-h-8 items-center justify-center" id="rvAction">
         {voted ? (
-          <div className="flex items-center gap-1.5 text-[0.8rem] font-bold text-lm-green2">
-            ✅ Votaste por <strong>{myCandidate}</strong> · El ranking se actualiza al terminar
+          <div className="flex items-center justify-center gap-1.5 text-[0.8rem] font-bold text-lm-green2">
+            <Icon name="circle-check" size={16} />
+            Votaste por <strong>{myCandidate}</strong> · El ranking se actualiza al terminar
           </div>
         ) : voting ? (
-          <div className="text-[0.8rem] text-lm-text2">⏳ Enviando voto…</div>
+          <div className="flex items-center justify-center gap-1.5 text-[0.8rem] text-lm-text2">
+            <Icon name="hourglass" size={14} />
+            Enviando voto…
+          </div>
         ) : (
           <div className="text-[0.73rem] font-semibold text-lm-text2">
-            👆 Toca el nombre para votar · 1 voto por dispositivo/IP
+            <IconLabel icon="pointer" iconSize={12} className="justify-center">
+              Toca el nombre para votar · 1 voto por dispositivo/IP
+            </IconLabel>
           </div>
         )}
       </div>
       <div className="mt-2.5 text-[0.6rem] font-semibold text-lm-text2">
-        🗳️ 1 voto por dispositivo e IP · Ranking actualizado automáticamente · Nueva ronda cada 6
-        horas
+        <IconLabel icon="vote" iconSize={12} className="justify-center">
+          1 voto por dispositivo e IP · Ranking actualizado automáticamente · Nueva ronda cada 6
+          horas
+        </IconLabel>
       </div>
     </>
   );
@@ -198,24 +219,32 @@ function FighterCard({
 }) {
   const up = side === "up";
   return (
-    <div
+    <button
+      type="button"
+      disabled={!canVote}
+      aria-label={`Votar ${up ? "subir" : "bajar"} a ${name}`}
+      aria-pressed={selected}
       className={cn(
-        "relative overflow-hidden rounded-2xl border-2 border-lm-border bg-lm-card px-4 py-5 text-center transition-all duration-250 max-md:rounded-xl max-md:px-2 max-md:py-3.5 max-[400px]:px-1.5 max-[400px]:py-2.5",
+        "lm-focus-ring relative block w-full overflow-hidden rounded-2xl border-2 border-lm-border bg-lm-card px-4 py-5 text-center transition-all duration-250 max-md:rounded-xl max-md:px-2 max-md:py-3.5 max-[400px]:px-1.5 max-[400px]:py-2.5",
+        !canVote && "lm-vote-disabled cursor-not-allowed",
         canVote && "cursor-pointer hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)]",
         canVote && up && "hover:border-[rgba(46,204,113,0.7)] hover:bg-[rgba(46,204,113,0.07)]",
         canVote && !up && "hover:border-[rgba(255,71,87,0.7)] hover:bg-[rgba(255,71,87,0.07)]",
         selected && up && "border-lm-green2 bg-[rgba(46,204,113,0.13)] shadow-[0_0_28px_rgba(46,204,113,0.25)] -translate-y-1",
         selected && !up && "border-lm-red2 bg-[rgba(255,71,87,0.13)] shadow-[0_0_28px_rgba(255,71,87,0.2)] -translate-y-1",
-        selected &&
-          "after:absolute after:right-2.5 after:top-2.5 after:text-[1.1rem] after:font-black after:content-['✓']",
-        selected && up && "after:text-lm-green2",
-        selected && !up && "after:text-lm-red2",
       )}
-      role={canVote ? "button" : undefined}
-      tabIndex={canVote ? 0 : undefined}
-      onClick={() => canVote && onVote()}
-      onKeyDown={(e) => e.key === "Enter" && canVote && onVote()}
+      onClick={() => onVote()}
     >
+      {selected && (
+        <Icon
+          name="check"
+          size={18}
+          className={cn(
+            "absolute right-2.5 top-2.5",
+            up ? "text-lm-green2" : "text-lm-red2",
+          )}
+        />
+      )}
       <div className="mx-auto mb-2 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border-2 border-lm-border bg-lm-bg3 text-[2rem] max-md:h-16 max-md:w-16 max-md:text-[1.6rem] max-[400px]:h-[54px] max-[400px]:w-[54px] max-[400px]:text-[1.4rem]">
         <Avatar name={name} size={80} />
       </div>
@@ -260,12 +289,20 @@ function FighterCard({
           up ? "text-lm-green2" : "text-lm-red2",
         )}
       >
-        {voted ? `${pct}%` : canVote ? "👆 Votar" : "—"}
+        {voted ? (
+          `${pct}%`
+        ) : canVote ? (
+          <IconLabel icon="pointer" iconSize={12} className="justify-center">
+            Votar
+          </IconLabel>
+        ) : (
+          "—"
+        )}
       </div>
       <div className="text-[0.6rem] font-semibold text-lm-text2">
         {voted ? `${votes} voto${votes !== 1 ? "s" : ""}` : ""}
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -295,7 +332,7 @@ function HistoryRow({
   if (h.winner === "empate") {
     return (
       <div className="mb-2 flex flex-wrap items-center gap-3 rounded-[10px] border border-lm-border bg-lm-card px-4 py-3">
-        🗳️{" "}
+        <Icon name="vote" size={14} className="text-lm-text2" />
         <span className="font-bold text-lm-text2">Sin votos · Empate</span>
         <span className="text-[0.65rem] font-bold text-lm-text2">0–0</span>
         <span className="text-[0.6rem] font-semibold text-lm-text2">{fmt}</span>
@@ -309,7 +346,8 @@ function HistoryRow({
 
   return (
     <div className="mb-2 flex flex-wrap items-center gap-3 rounded-[10px] border border-lm-border bg-lm-card px-4 py-3">
-      🗳️ <span className="text-[0.85rem] font-extrabold text-lm-green2">▲ {h.winner}{posW}</span>
+      <Icon name="vote" size={14} className="text-lm-text2" />
+      <span className="text-[0.85rem] font-extrabold text-lm-green2">▲ {h.winner}{posW}</span>
       <span className="text-[0.75rem] text-lm-text2">vs</span>
       <span className="text-[0.85rem] font-bold text-lm-red2">
         ▼ {h.loser}
