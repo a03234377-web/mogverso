@@ -34,7 +34,7 @@ Copia `.env.example` a `.env.local`:
 
 ## Imágenes
 
-Coloca las fotos de creadores en `public/img/` (mismas rutas que la web original, p. ej. `kappah.png`, `rubenmaxxing.jpg`). Comprueba con `npm run check:images`. Para intentar bajarlas del sitio donde estaban: `npm run download:images -- --base-url https://tu-dominio.com`. Si las sirves desde un CDN, define `NEXT_PUBLIC_CREATOR_IMAGES_BASE` en `.env.local`.
+Coloca las fotos de creadores en `public/img/` en WebP (p. ej. `kappah.webp`, `rubenmaxxing.webp`). Comprueba con `npm run check:images`. Para intentar bajarlas del sitio donde estaban: `npm run download:images -- --base-url https://tu-dominio.com`. Si las sirves desde un CDN, define `NEXT_PUBLIC_CREATOR_IMAGES_BASE` en `.env.local`.
 
 ## Scripts
 

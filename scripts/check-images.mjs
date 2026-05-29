@@ -26,5 +26,5 @@ for (const f of missing) console.error(`  - ${f}`);
 console.error(
   "\nDescarga automática: npm run download:images -- --base-url https://tu-sitio-original.com",
 );
-console.error("Respeta mayúsculas (p. ej. SergiCabrer.jpeg).");
+console.error("Respeta mayúsculas (p. ej. SergiCabrer.webp).");
 process.exit(1);

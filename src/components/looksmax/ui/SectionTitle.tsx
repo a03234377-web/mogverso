@@ -14,7 +14,7 @@ export function SectionTitle({ children, className, center, id }: SectionTitlePr
       id={id}
       className={cn(
         "font-display text-[clamp(1.4rem,3vw,2rem)] tracking-[3px] text-lm-text",
-        center && "flex items-center justify-center gap-2.5 text-center",
+        center && "flex items-baseline justify-center gap-2.5 text-center",
         className,
       )}
     >

@@ -98,7 +98,7 @@ export function PhaseLabel({
   return (
     <div
       className={cn(
-        "mb-2.5 flex items-center justify-center gap-2 text-[0.65rem] font-black uppercase tracking-[3px]",
+        "mb-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[0.65rem] font-black uppercase tracking-[3px] max-md:text-[0.58rem] max-md:tracking-[1.5px]",
         labelColors[color],
       )}
     >
@@ -124,7 +124,7 @@ export function PhaseTitle({
   return (
     <div
       className={cn(
-        "font-display mb-1 text-[clamp(1.8rem,5vw,4rem)] leading-none tracking-[3px]",
+        "font-display mb-1 text-[clamp(1.8rem,5vw,4rem)] tracking-[3px]",
         titleGradients[color],
         className,
       )}
@@ -191,7 +191,7 @@ function TimerUnit({
     <div className="flex flex-col items-center gap-1">
       <div
         className={cn(
-          "font-display min-w-[65px] rounded-xl px-2 py-0.5 text-center text-[clamp(2rem,6vw,4.5rem)] leading-none max-md:min-w-12 max-md:text-[clamp(1.4rem,5vw,2.8rem)]",
+          "font-display min-w-[65px] rounded-xl px-2 py-0.5 text-center text-[clamp(2rem,6vw,4.5rem)] max-md:min-w-12 max-md:text-[clamp(1.4rem,5vw,2.8rem)]",
           timerNumStyles[color],
         )}
       >

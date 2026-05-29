@@ -125,7 +125,7 @@ function RankVoteArena({
 
   return (
     <>
-      <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-[rgba(46,204,113,0.4)] bg-[rgba(46,204,113,0.12)] px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[1.5px] text-lm-green2">
+      <div className="mb-4 inline-flex max-w-full flex-wrap items-center justify-center gap-x-1.5 gap-y-1 rounded-full border border-[rgba(46,204,113,0.4)] bg-[rgba(46,204,113,0.12)] px-3 py-1 text-[0.65rem] font-extrabold uppercase tracking-[1.5px] text-lm-green2 max-md:text-[0.58rem] max-md:tracking-[1px]">
         <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-green2" />
         VOTACIÓN EN DIRECTO · 6 HORAS
       </div>
@@ -149,7 +149,7 @@ function RankVoteArena({
           selected={myCandidate === rv.p1}
           onVote={() => onVote(rv.p1)}
         />
-        <div className="shrink-0 animate-vs-pulse bg-[linear-gradient(135deg,var(--color-lm-green2),var(--color-lm-gold))] bg-clip-text font-display text-[2.5rem] tracking-[2px] text-transparent max-md:text-[2rem]">
+        <div className="shrink-0 animate-vs-pulse bg-[linear-gradient(135deg,var(--color-lm-green2),var(--color-lm-gold))] bg-clip-text font-display w-fit text-[2.5rem] tracking-[2px] text-transparent max-md:text-[2rem]">
           VS
         </div>
         <FighterCard
@@ -165,7 +165,7 @@ function RankVoteArena({
           onVote={() => onVote(rv.p2)}
         />
       </div>
-      <div className="mt-1 flex min-h-8 items-center justify-center" id="rvAction">
+      <div className="mt-1 text-center" id="rvAction">
         {voted ? (
           <div className="flex items-center justify-center gap-1.5 text-[0.8rem] font-bold text-lm-green2">
             <Icon name="circle-check" size={16} />
@@ -345,18 +345,18 @@ function HistoryRow({
   const posL = h.loserPos && h.loserNewPos ? ` (#${h.loserPos}→#${h.loserNewPos})` : "";
 
   return (
-    <div className="mb-2 flex flex-wrap items-center gap-3 rounded-[10px] border border-lm-border bg-lm-card px-4 py-3">
-      <Icon name="vote" size={14} className="text-lm-text2" />
+    <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-[10px] border border-lm-border bg-lm-card px-4 py-3 max-md:gap-2 max-md:px-3">
+      <Icon name="vote" size={14} className="shrink-0 text-lm-text2" />
       <span className="text-[0.85rem] font-extrabold text-lm-green2">▲ {h.winner}{posW}</span>
       <span className="text-[0.75rem] text-lm-text2">vs</span>
       <span className="text-[0.85rem] font-bold text-lm-red2">
         ▼ {h.loser}
         {posL}
       </span>
-      <span className="ml-auto text-[0.65rem] font-bold text-lm-text2">
+      <span className="text-[0.65rem] font-bold text-lm-text2 max-md:basis-full max-md:text-left md:ml-auto">
         {h.wVotes}–{h.lVotes}
       </span>
-      <span className="text-[0.6rem] font-semibold text-lm-text2">{fmt}</span>
+      <span className="text-[0.6rem] font-semibold text-lm-text2 max-md:basis-full max-md:text-left">{fmt}</span>
     </div>
   );
 }

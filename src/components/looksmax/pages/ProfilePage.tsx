@@ -57,11 +57,11 @@ export function ProfilePage({
           </div>
         </div>
         <div className="min-w-0 flex-1 pt-0.5">
-          <div className="mb-0.5 flex flex-wrap items-center gap-2.5">
-            <div className="font-display text-[clamp(1.5rem,4vw,3rem)] leading-none tracking-[2px] text-lm-text max-md:text-[clamp(1.4rem,5vw,2.2rem)]">
+          <div className="mb-0.5 flex flex-wrap items-center gap-2.5 max-md:justify-center">
+            <div className="font-display text-[clamp(1.5rem,4vw,3rem)] tracking-[2px] text-lm-text max-md:text-[clamp(1.4rem,5vw,2.2rem)]">
               {r.name}
             </div>
-            <div className="flex items-center gap-0.5 rounded-full border border-lm-border bg-[rgba(150,150,150,0.1)] px-2.5 py-0.5 text-[0.7rem] font-extrabold text-lm-text2">
+            <div className="flex items-center gap-0.5 rounded-full border border-lm-border bg-[rgba(150,150,150,0.1)] px-2.5 py-0.5 text-[0.7rem] font-extrabold text-lm-text2 max-md:text-[0.62rem]">
               — Ranking dinámico
             </div>
           </div>
@@ -89,7 +89,7 @@ export function ProfilePage({
           </div>
           <div className="flex gap-3 max-md:justify-center">
             <div className="text-center">
-              <div className="font-display text-[1.4rem] leading-none text-lm-gold">{r.score}</div>
+              <div className="font-display text-[1.4rem] text-lm-gold">{r.score}</div>
               <div className="text-[0.55rem] font-bold uppercase tracking-wider text-lm-text2">
                 Score
               </div>

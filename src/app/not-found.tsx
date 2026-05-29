@@ -23,7 +23,7 @@ export default function NotFound() {
           <p className="mb-2 text-[0.7rem] font-extrabold uppercase tracking-[3px] text-lm-gold">
             LooksMax España
           </p>
-          <h1 className="font-display bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text text-[clamp(4rem,18vw,8rem)] leading-none tracking-[4px] text-transparent">
+          <h1 className="font-display mx-auto w-fit bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text text-[clamp(4rem,18vw,8rem)] tracking-[4px] text-transparent">
             404
           </h1>
           <p className="mt-3 text-[0.85rem] font-semibold uppercase tracking-[2px] text-lm-text2">

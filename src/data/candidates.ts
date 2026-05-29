@@ -15,13 +15,13 @@ export const CANDIDATES: EntryCandidate[] = [
     name: "Franbv",
     sub: "Creador · España",
     icon: "drama",
-    photo: creatorImage("franbeuve.jpeg"),
+    photo: creatorImage("franbeuve.webp"),
   },
   {
     id: "nilojeda",
     name: "Nil Ojeda",
     sub: "Creador · España",
     icon: "gem",
-    photo: creatorImage("nilojeda.png"),
+    photo: creatorImage("nilojeda.webp"),
   },
 ];

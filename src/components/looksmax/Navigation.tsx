@@ -94,9 +94,9 @@ export function DesktopNav({ page, onNavigate, onOpenDiscord }: NavigationProps)
         >
           <Icon name="crown" size={20} />
         </div>
-        <div className="font-display bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold2))] bg-clip-text text-[1.2rem] leading-none tracking-[2px] text-transparent whitespace-nowrap max-md:text-base max-md:tracking-wide">
+        <div className="font-display w-fit bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold2))] bg-clip-text text-[1.2rem] tracking-[2px] text-transparent whitespace-nowrap max-md:text-base max-md:tracking-wide">
           LooksMax<span className="text-lm-gold">ES</span>
-          <span className="block font-sans text-[0.55rem] font-semibold tracking-[2px] text-lm-text2">
+          <span className="block font-sans text-[0.55rem] font-semibold tracking-[2px] text-lm-text2 max-[360px]:hidden">
             España · Ranking
           </span>
         </div>

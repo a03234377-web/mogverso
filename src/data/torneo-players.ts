@@ -9,22 +9,22 @@ import type {
 } from "@/lib/looksmax/types";
 
 export const TORNEO_PLAYERS: TorneoPlayer[] = [
-  { name: "Aaronjaureguii", photo: creatorImage("aaronjaureguii.jpg"), icon: "star" },
-  { name: "Peereira7", photo: creatorImage("peereira7.jpg"), icon: "goal" },
-  { name: "TitoChape", photo: creatorImage("titochape.jpeg"), icon: "cookie" },
-  { name: "RubenMaxxing", photo: creatorImage("rubenmaxxing.jpg"), icon: "microscope" },
-  { name: "Kappah", photo: creatorImage("kappah.png"), icon: "crown" },
-  { name: "Sergi", photo: creatorImage("SergiCabrer.jpeg"), icon: "waves" },
-  { name: "JoseNogales", photo: creatorImage("josenogales.jpeg"), icon: "leaf" },
-  { name: "Franbv", photo: creatorImage("franbeuve.jpeg"), icon: "drama" },
-  { name: "Elcalvo", photo: creatorImage("elcalvo.jpg"), icon: "brain" },
-  { name: "Febron", photo: creatorImage("febron.jpeg"), icon: "dumbbell" },
-  { name: "Didac", photo: creatorImage("didac.png"), icon: "target" },
-  { name: "Giva", photo: creatorImage("giva.jpeg"), icon: "flame" },
-  { name: "Javichu", photo: creatorImage("javichu.jpeg"), icon: "zap" },
-  { name: "Ismael", photo: creatorImage("ismael.jpeg"), icon: "sparkles" },
-  { name: "AlvaroSapo", photo: creatorImage("alvaro.png"), icon: "turtle" },
-  { name: "Hectrollprox", photo: creatorImage("hectroll.png"), icon: "ghost" },
+  { name: "Aaronjaureguii", photo: creatorImage("aaronjaureguii.webp"), icon: "star" },
+  { name: "Peereira7", photo: creatorImage("peereira7.webp"), icon: "goal" },
+  { name: "TitoChape", photo: creatorImage("titochape.webp"), icon: "cookie" },
+  { name: "RubenMaxxing", photo: creatorImage("rubenmaxxing.webp"), icon: "microscope" },
+  { name: "Kappah", photo: creatorImage("kappah.webp"), icon: "crown" },
+  { name: "Sergi", photo: creatorImage("SergiCabrer.webp"), icon: "waves" },
+  { name: "JoseNogales", photo: creatorImage("josenogales.webp"), icon: "leaf" },
+  { name: "Franbv", photo: creatorImage("franbeuve.webp"), icon: "drama" },
+  { name: "Elcalvo", photo: creatorImage("elcalvo.webp"), icon: "brain" },
+  { name: "Febron", photo: creatorImage("febron.webp"), icon: "dumbbell" },
+  { name: "Didac", photo: creatorImage("didac.webp"), icon: "target" },
+  { name: "Giva", photo: creatorImage("giva.webp"), icon: "flame" },
+  { name: "Javichu", photo: creatorImage("javichu.webp"), icon: "zap" },
+  { name: "Ismael", photo: creatorImage("ismael.webp"), icon: "sparkles" },
+  { name: "AlvaroSapo", photo: creatorImage("alvaro.webp"), icon: "turtle" },
+  { name: "Hectrollprox", photo: creatorImage("hectroll.webp"), icon: "ghost" },
 ];
 
 export const OCTAVOS_MATCHES: OctavosMatchDef[] = [

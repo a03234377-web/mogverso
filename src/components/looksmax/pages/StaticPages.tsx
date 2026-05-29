@@ -20,9 +20,17 @@ function PageHeader({
 }) {
   return (
     <div className="mx-auto max-w-[1000px] px-5 pb-4 pt-8 max-md:px-4 max-md:pb-2 max-md:pt-5">
-      <div className="flex items-center gap-2.5 font-display bg-[linear-gradient(135deg,var(--color-lm-text)_0%,var(--color-lm-gold2)_60%,var(--color-lm-gold)_100%)] bg-clip-text text-[clamp(1.6rem,4vw,3.5rem)] tracking-[3px] text-transparent max-md:text-[clamp(1.5rem,6vw,2.2rem)]">
-        {icon && <Icon name={icon} size={28} className="text-lm-gold" />}
-        {title}
+      <div className="flex items-baseline gap-2.5">
+        {icon && (
+          <Icon
+            name={icon}
+            size={28}
+            className="relative top-[0.12em] shrink-0 text-lm-gold"
+          />
+        )}
+        <h1 className="font-display w-fit bg-[linear-gradient(135deg,var(--color-lm-text)_0%,var(--color-lm-gold2)_60%,var(--color-lm-gold)_100%)] bg-clip-text text-[clamp(1.6rem,4vw,3.5rem)] tracking-[3px] text-transparent max-md:text-[clamp(1.5rem,6vw,2.2rem)]">
+          {title}
+        </h1>
       </div>
       <div className="mt-1 text-[0.8rem] font-semibold leading-snug text-lm-text2 max-md:text-[0.75rem]">
         {desc}
@@ -39,7 +47,7 @@ export function NoticiasPage({ active }: { active: boolean }) {
         title="Noticias"
         desc="Lo último del mundo looksmaxer español · Actualizado diariamente"
       />
-      <div className="mx-auto max-w-[1000px] px-5 max-md:px-3">
+      <div className="mx-auto max-w-[1000px] px-5 pb-12 max-md:px-3 max-md:pb-6">
         <div className="animate-breaking-pulse relative mb-6 overflow-hidden rounded-[14px] border border-[rgba(255,71,87,0.35)] bg-[linear-gradient(135deg,rgba(192,57,43,0.15),rgba(255,71,87,0.08))] p-5 max-md:rounded-xl max-md:p-4">
           <div className="mb-2 flex items-center gap-1.5 text-[0.65rem] font-black uppercase tracking-[2px] text-lm-red2">
             <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-red2" />
@@ -63,19 +71,19 @@ export function NoticiasPage({ active }: { active: boolean }) {
             rinoplastia. Hoy es el #1 indiscutible y el caso de estudio más citado de la historia del
             looksmaxing español.
           </div>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-4 max-md:flex-col max-md:gap-3">
             <CompareSide
               label="Antes"
               labelClass="before"
-              img={creatorImage("kappahsub.png")}
+              img={creatorImage("kappahsub.webp")}
               score="Sub-3"
               scoreClass="bad"
             />
-            <div className="font-display text-[2.5rem] text-lm-gold opacity-60">→</div>
+            <div className="font-display text-[2.5rem] text-lm-gold opacity-60 max-md:rotate-90 max-md:text-[2rem]">→</div>
             <CompareSide
               label="Después"
               labelClass="after"
-              img={creatorImage("kappah.png")}
+              img={creatorImage("kappah.webp")}
               score="9.4 CHAD"
               scoreClass="good"
             />
@@ -107,7 +115,7 @@ function CompareSide({
   scoreClass: "bad" | "good";
 }) {
   return (
-    <div className="flex min-w-[140px] max-w-[280px] flex-1 flex-col items-center gap-1.5">
+    <div className="flex min-w-0 max-w-[280px] flex-1 flex-col items-center gap-1.5 max-md:w-full max-md:max-w-[220px]">
       <div
         className={cn(
           "rounded-full px-2.5 py-0.5 text-[0.6rem] font-extrabold uppercase tracking-[1.5px]",
@@ -191,7 +199,7 @@ export function ConsejoPage({ active }: { active: boolean }) {
   return (
     <ActivePage id="page-consejo" active={active}>
       <PageHeader icon="book-open" title="Consejos" desc="Guía diaria para mejorar tu físico y presencia" />
-      <div className="mx-auto max-w-[900px] px-5 max-md:px-3">
+      <div className="mx-auto max-w-[900px] px-5 pb-12 max-md:px-3 max-md:pb-6">
         <div className="mt-4 grid grid-cols-2 gap-3 max-md:grid-cols-1 max-md:gap-2.5">
           <div className="col-span-full flex items-start gap-5 rounded-xl border border-[rgba(232,184,75,0.35)] bg-lm-card p-5 max-md:flex-row">
             <Icon name="sun" size={36} className="shrink-0 text-lm-gold max-md:w-7" />
@@ -293,7 +301,7 @@ export function LexicoPage({ active }: { active: boolean }) {
         title="Léxico"
         desc="Términos esenciales del looksmaxing explicados en español"
       />
-      <div className="mx-auto max-w-[900px] px-5 max-md:px-3">
+      <div className="mx-auto max-w-[900px] px-5 pb-12 max-md:px-3 max-md:pb-6">
         <div className="relative mb-5">
           <Icon
             name="search"

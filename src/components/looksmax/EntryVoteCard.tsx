@@ -49,12 +49,12 @@ export function EntryVoteCard() {
           <div className="mb-3 flex items-center justify-center gap-2 text-[0.7rem] font-extrabold uppercase tracking-[3px] text-lm-gold">
             <Icon name="star" size={12} /> VOTACIÓN CERRADA <Icon name="star" size={12} />
           </div>
-          <div className="animate-hero-entrance font-display mb-2 text-[clamp(2rem,6vw,5rem)] tracking-[4px] bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text text-transparent">
+          <h2 className="animate-hero-entrance font-display mx-auto mb-2 w-fit max-w-full text-[clamp(2rem,6vw,5rem)] tracking-[4px] bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text text-transparent">
             GANADOR
-          </div>
-          <div className="animate-hero-entrance font-display text-[clamp(2.5rem,8vw,7rem)] leading-none tracking-[3px] bg-[linear-gradient(135deg,var(--color-lm-gold2),var(--color-lm-gold),#fff)] bg-clip-text text-transparent">
+          </h2>
+          <h2 className="animate-hero-entrance font-display mx-auto w-fit max-w-full text-[clamp(2.5rem,8vw,7rem)] tracking-[3px] bg-[linear-gradient(135deg,var(--color-lm-gold2),var(--color-lm-gold),#fff)] bg-clip-text text-transparent">
             {winnerC?.name ?? ev.winner}
-          </div>
+          </h2>
           <div className="animate-winner-pop mx-auto my-5 flex h-[130px] w-[130px] items-center justify-center overflow-hidden rounded-full border-[3px] border-lm-gold bg-lm-card2 shadow-[0_0_40px_rgba(232,184,75,0.4)]">
             <CreatorImage
               src={winnerC?.photo ?? ""}
@@ -85,14 +85,14 @@ export function EntryVoteCard() {
       className="relative overflow-hidden rounded-[20px] border border-[rgba(168,85,247,0.35)] bg-[linear-gradient(135deg,rgba(168,85,247,0.08),rgba(59,130,246,0.05))] px-6 py-8 text-center max-md:rounded-2xl max-md:px-3.5 max-md:py-5"
       id="entryVotingCard"
     >
-      <div className="mb-2 flex items-center justify-center gap-2 text-[0.65rem] font-extrabold uppercase tracking-[2px] text-lm-purple">
+      <div className="mb-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[0.65rem] font-extrabold uppercase tracking-[2px] text-lm-purple max-md:text-[0.55rem] max-md:tracking-[1px]">
         <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-purple" />
         VOTACIÓN ABIERTA · CIERRA VIERNES 29 MAYO 22:30
         <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-purple" />
       </div>
-      <div className="font-display mb-1 text-[clamp(1.5rem,4vw,3rem)] tracking-[3px] bg-[linear-gradient(135deg,#fff_0%,#c084fc_60%,var(--color-lm-purple)_100%)] bg-clip-text text-transparent">
+      <h2 className="font-display mx-auto mb-1 w-fit max-w-full text-[clamp(1.5rem,4vw,3rem)] tracking-[3px] bg-[linear-gradient(135deg,#fff_0%,#c084fc_60%,var(--color-lm-purple)_100%)] bg-clip-text text-transparent">
         ¿Quién entra al Ranking?
-      </div>
+      </h2>
       <div className="mb-6 text-[0.78rem] font-semibold text-lm-text2">
         Haz clic directamente en el candidato para votar · Un voto por dispositivo e IP
       </div>
