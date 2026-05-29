@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { CreatorImage } from "@/components/looksmax/CreatorImage";
+import { CreatorIcon, Icon, IconLabel } from "@/components/icons";
+import type { IconName } from "@/types/icons";
 import { getInitialTorneoState, getPlayerByName, PHASES } from "@/data/torneo-players";
 import { ActivePage } from "@/components/looksmax/ui/ActivePage";
 import { HeroSection } from "@/components/looksmax/ui/HeroSection";
@@ -30,7 +32,11 @@ export function TorneoPage({ active }: { active: boolean }) {
     <ActivePage id="page-torneo" active={active}>
       <HeroSection
         variant="torneo"
-        eyebrow="⚽ Torneo Oficial · 16 Participantes"
+        eyebrow={
+          <IconLabel icon="goal" iconSize={14} iconClassName="text-[#ff6b35]">
+            Torneo Oficial · 16 Participantes
+          </IconLabel>
+        }
         title={
           <>
             Torneo
@@ -55,7 +61,9 @@ export function TorneoPage({ active }: { active: boolean }) {
 
       <div className="mx-auto mb-8 max-w-[860px] px-5 max-md:px-3">
         <SectionTitle center className="mb-4">
-          📊 Cuadro del Torneo
+          <IconLabel icon="bar-chart-3" iconSize={20}>
+            Cuadro del Torneo
+          </IconLabel>
         </SectionTitle>
         <TorneoBracket state={state} />
       </div>
@@ -91,7 +99,11 @@ function TorneoPhaseCard({
       <PhaseDisplay>
         <PhaseCard variant="waiting">
           <PhaseLabel color="orange">CARGANDO TORNEO</PhaseLabel>
-          <PhaseTitle color="orange">⏳ Conectando…</PhaseTitle>
+          <PhaseTitle color="orange">
+            <IconLabel icon="hourglass" iconSize={18}>
+              Conectando…
+            </IconLabel>
+          </PhaseTitle>
           <PhaseSub className="mb-0">Por favor espera</PhaseSub>
         </PhaseCard>
       </PhaseDisplay>
@@ -122,10 +134,15 @@ function TorneoPhaseCard({
           <div className="font-display my-1 mb-2.5 bg-[linear-gradient(135deg,var(--color-lm-orange),var(--color-lm-gold2))] bg-clip-text text-[clamp(2.5rem,8vw,6rem)] tracking-[6px] text-transparent">
             EMPIEZA A LAS {horaStr}
           </div>
-          <div className="mb-3.5 text-[0.65rem] font-bold text-lm-text2">📅 {diaStr}</div>
+          <div className="mb-3.5 flex items-center justify-center gap-1.5 text-[0.65rem] font-bold text-lm-text2">
+            <Icon name="calendar" size={14} />
+            {diaStr}
+          </div>
           <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="orange" />
           <div className="mt-3 text-[0.7rem] font-semibold text-lm-text2">
-            ⚡ El torneo arrancará automáticamente a las {horaStr}
+            <IconLabel icon="zap" iconSize={14} className="justify-center">
+              El torneo arrancará automáticamente a las {horaStr}
+            </IconLabel>
           </div>
         </PhaseCard>
       </PhaseDisplay>
@@ -137,7 +154,11 @@ function TorneoPhaseCard({
       <PhaseDisplay>
         <PhaseCard variant="voting">
           <PhaseLabel color="green">CUARTOS EN VIVO · VOTA AHORA</PhaseLabel>
-          <PhaseTitle color="green">🏟️ CUARTOS DE FINAL</PhaseTitle>
+          <PhaseTitle color="green">
+            <IconLabel icon="landmark" iconSize={18}>
+              CUARTOS DE FINAL
+            </IconLabel>
+          </PhaseTitle>
           <PhaseSub>30 minutos de votación · El que más votos tenga pasa a Semifinales</PhaseSub>
           <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="green" />
         </PhaseCard>
@@ -149,8 +170,16 @@ function TorneoPhaseCard({
     return (
       <PhaseDisplay>
         <PhaseCard variant="voting">
-          <PhaseLabel color="gold">⚡ SEMIFINALES EN VIVO · VOTA AHORA ⚡</PhaseLabel>
-          <PhaseTitle color="gold">🏆 SEMIFINALES</PhaseTitle>
+          <PhaseLabel color="gold">
+            <IconLabel icon="zap" iconSize={12}>
+              SEMIFINALES EN VIVO · VOTA AHORA
+            </IconLabel>
+          </PhaseLabel>
+          <PhaseTitle color="gold">
+            <IconLabel icon="trophy" iconSize={18}>
+              SEMIFINALES
+            </IconLabel>
+          </PhaseTitle>
           <PhaseSub>30 minutos de votación · Los ganadores van a la Gran Final</PhaseSub>
           <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="gold" />
         </PhaseCard>
@@ -163,7 +192,11 @@ function TorneoPhaseCard({
       <PhaseDisplay>
         <PhaseCard variant="break">
           <PhaseLabel color="purple">DESCANSO ANTES DE LA GRAN FINAL</PhaseLabel>
-          <PhaseTitle color="purple">👑 FINAL EN</PhaseTitle>
+          <PhaseTitle color="purple">
+            <IconLabel icon="crown" iconSize={18}>
+              FINAL EN
+            </IconLabel>
+          </PhaseTitle>
           <PhaseSub>Las Semifinales han concluido · La Gran Final comienza en breve</PhaseSub>
           <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="purple" />
         </PhaseCard>
@@ -176,7 +209,9 @@ function TorneoPhaseCard({
       <PhaseDisplay>
         <PhaseCard variant="semifinals">
           <PhaseLabel color="gold" pulse>
-            👑 GRAN FINAL EN VIVO 👑
+            <IconLabel icon="crown" iconSize={12}>
+              GRAN FINAL EN VIVO
+            </IconLabel>
           </PhaseLabel>
           <PhaseTitle color="gold">GRAN FINAL</PhaseTitle>
           <PhaseSub>El último enfrentamiento · Solo uno puede ser el Campeón</PhaseSub>
@@ -194,9 +229,15 @@ function TorneoPhaseCard({
       <PhaseDisplay>
         <PhaseCard variant="semifinals">
           <div className="mb-2.5 flex items-center justify-center gap-2 text-[0.65rem] font-black uppercase tracking-[3px] text-lm-gold">
-            <span>🏆</span>TORNEO FINALIZADO<span>🏆</span>
+            <Icon name="trophy" size={14} />
+            TORNEO FINALIZADO
+            <Icon name="trophy" size={14} />
           </div>
-          <PhaseTitle color="gold">👑 CAMPEÓN</PhaseTitle>
+          <PhaseTitle color="gold">
+            <IconLabel icon="crown" iconSize={18}>
+              CAMPEÓN
+            </IconLabel>
+          </PhaseTitle>
           <PhaseSub>El mejor looksmaxer de España ha sido coronado</PhaseSub>
           <div className="my-4 flex flex-col items-center gap-3">
             <div className="flex h-[90px] w-[90px] items-center justify-center overflow-hidden rounded-full border-[3px] border-lm-gold text-[2rem]">
@@ -204,7 +245,7 @@ function TorneoPhaseCard({
                 src={champInfo.photo}
                 alt={champ}
                 className="h-full w-full object-cover"
-                fallback={<span>{champInfo.emoji}</span>}
+                fallback={<CreatorIcon name={champ} icon={champInfo.icon} size={36} />}
               />
             </div>
             <div className="font-display bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text text-[clamp(2rem,7vw,4rem)] tracking-[4px] text-transparent">
@@ -212,8 +253,9 @@ function TorneoPhaseCard({
             </div>
           </div>
           <div className="mt-7 w-full border-t border-[rgba(232,184,75,0.2)] pt-5 text-center">
-            <div className="font-display text-[clamp(1rem,3vw,1.6rem)] text-lm-orange">
-              🔄 NUEVO TORNEO EMPIEZA A LAS 23:00
+            <div className="font-display flex items-center justify-center gap-2 text-[clamp(1rem,3vw,1.6rem)] text-lm-orange">
+              <Icon name="refresh-cw" size={18} />
+              NUEVO TORNEO EMPIEZA A LAS 23:00
             </div>
             <PhaseTimer h={restartCd.h} m={restartCd.m} s={restartCd.s} color="orange" />
           </div>
@@ -260,31 +302,31 @@ function TorneoMatchesSection({
     matches = state.cuartosMatches;
     ids = ["cua_0", "cua_1", "cua_2", "cua_3"];
     round = "cuartos";
-    title = "🏟️ Cuartos de Final — ¡Vota Ahora!";
+    title = "Cuartos de Final — ¡Vota Ahora!";
     show = true;
   } else if (state.phase === phases.SEMIFINALS_VOTING && state.semisMatches) {
     matches = state.semisMatches;
     ids = ["semi_0", "semi_1"];
     round = "semis";
-    title = "🏆 Semifinales — ¡Vota Ahora!";
+    title = "Semifinales — ¡Vota Ahora!";
     show = true;
   } else if (state.phase === phases.FINAL_VOTING && state.finalMatch) {
     matches = { final_0: state.finalMatch };
     ids = ["final_0"];
     round = "final";
-    title = "👑 Gran Final — ¡Vota al Campeón!";
+    title = "Gran Final — ¡Vota al Campeón!";
     show = true;
   } else if (state.phase === phases.TORNEO_ENDED && state.finalMatch) {
     matches = { final_0: state.finalMatch };
     ids = ["final_0"];
     round = "final";
-    title = "👑 Gran Final — Resultado Final";
+    title = "Gran Final — Resultado Final";
     show = true;
   } else if (state.phase === phases.BREAK_FINAL && state.semisMatches) {
     matches = state.semisMatches;
     ids = ["semi_0", "semi_1"];
     round = "semis";
-    title = `✅ Resultados Semifinales — Final en ${formatDuration(breakRemaining.remainingMs)}`;
+    title = `Resultados Semifinales — Final en ${formatDuration(breakRemaining.remainingMs)}`;
     show = true;
   }
 
@@ -345,8 +387,10 @@ function MatchCard({
     (state.phase === PHASES.FINAL_VOTING && round === "final");
   const canVote = isVotingPhase && !isResolved && !myVote;
   const showBars = isResolved || !!myVote;
+  const roundIcon: IconName =
+    round === "cuartos" ? "landmark" : round === "semis" ? "trophy" : "crown";
   const roundLabel =
-    round === "cuartos" ? "Cuartos" : round === "semis" ? "🏆 Semifinal" : "👑 Gran Final";
+    round === "cuartos" ? "Cuartos" : round === "semis" ? "Semifinal" : "Gran Final";
 
   return (
     <div
@@ -358,20 +402,24 @@ function MatchCard({
       data-matchid={match.id}
     >
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-[0.6rem] font-extrabold uppercase tracking-[1.5px] text-lm-text2">
+        <span className="flex items-center gap-1 text-[0.6rem] font-extrabold uppercase tracking-[1.5px] text-lm-text2">
+          <Icon name={roundIcon} size={12} />
           {roundLabel} · Partido {idx + 1}
         </span>
         {isResolved ? (
-          <span className="rounded-full border border-[rgba(232,184,75,0.4)] bg-[rgba(232,184,75,0.15)] px-2 py-0.5 text-[0.58rem] font-black tracking-wide text-lm-gold">
-            ✅ Terminado
+          <span className="flex items-center gap-1 rounded-full border border-[rgba(232,184,75,0.4)] bg-[rgba(232,184,75,0.15)] px-2 py-0.5 text-[0.58rem] font-black tracking-wide text-lm-gold">
+            <Icon name="circle-check" size={12} />
+            Terminado
           </span>
         ) : isVotingPhase ? (
-          <span className="rounded-full border border-[rgba(46,204,113,0.4)] bg-[rgba(46,204,113,0.15)] px-2 py-0.5 text-[0.58rem] font-black tracking-wide text-lm-green2">
-            🔴 EN VIVO
+          <span className="flex items-center gap-1 rounded-full border border-[rgba(46,204,113,0.4)] bg-[rgba(46,204,113,0.15)] px-2 py-0.5 text-[0.58rem] font-black tracking-wide text-lm-green2">
+            <Icon name="radio" size={12} className="text-lm-red2" />
+            EN VIVO
           </span>
         ) : (
-          <span className="rounded-full border border-lm-border bg-[rgba(150,150,150,0.1)] px-2 py-0.5 text-[0.58rem] font-black tracking-wide text-lm-text2">
-            ⏳ Pendiente
+          <span className="flex items-center gap-1 rounded-full border border-lm-border bg-[rgba(150,150,150,0.1)] px-2 py-0.5 text-[0.58rem] font-black tracking-wide text-lm-text2">
+            <Icon name="hourglass" size={12} />
+            Pendiente
           </span>
         )}
       </div>
@@ -406,12 +454,13 @@ function MatchCard({
       </div>
       {myVote && !isResolved && (
         <div className="mt-2 text-center text-[0.65rem] font-bold text-lm-green2">
-          ✅ Votaste por <strong>{myVote}</strong>
+          <Icon name="circle-check" size={14} className="inline" /> Votaste por{" "}
+          <strong>{myVote}</strong>
         </div>
       )}
       {isResolved && match.winner && (
         <div className="mt-2.5 rounded-[10px] border-[1.5px] border-[rgba(232,184,75,0.6)] bg-[rgba(232,184,75,0.15)] px-4 py-2 text-center text-[0.7rem] font-extrabold uppercase tracking-[1.5px] text-lm-gold">
-          🏆 GANADOR ·{" "}
+          <Icon name="trophy" size={14} className="inline text-lm-gold" /> GANADOR ·{" "}
           <span className="mt-0.5 block font-display text-[1.1rem] tracking-[3px] text-white">
             {match.winner}
           </span>
@@ -434,7 +483,7 @@ function MatchSide({
   onVote,
 }: {
   player: string;
-  info: { photo: string; emoji: string };
+  info: { photo: string; icon: IconName };
   pct: number;
   votes: number;
   showBars: boolean;
@@ -445,22 +494,24 @@ function MatchSide({
   onVote: () => void;
 }) {
   return (
-    <div
+    <button
+      type="button"
+      disabled={!canVote}
+      aria-label={`Votar por ${player}`}
+      aria-pressed={votedFor}
       className={cn(
-        "relative cursor-pointer rounded-xl border-2 border-lm-border bg-lm-bg3 px-2.5 py-2.5 text-center transition-all duration-200 max-md:px-2.5 max-md:py-3",
-        canVote && "hover:-translate-y-0.5",
+        "lm-focus-ring relative block w-full rounded-xl border-2 border-lm-border bg-lm-bg3 px-2.5 py-2.5 text-center transition-all duration-200 max-md:px-2.5 max-md:py-3",
+        !canVote && "lm-vote-disabled cursor-not-allowed",
+        canVote && "cursor-pointer hover:-translate-y-0.5",
         isWinner && "border-lm-gold2 bg-[rgba(232,184,75,0.12)] shadow-[0_0_16px_rgba(232,184,75,0.2)]",
         isLoser && "border-[rgba(255,71,87,0.35)] opacity-70",
         votedFor && "border-lm-green2 bg-[rgba(46,204,113,0.1)]",
       )}
-      role={canVote ? "button" : undefined}
-      tabIndex={canVote ? 0 : undefined}
-      onClick={() => canVote && onVote()}
-      onKeyDown={(e) => e.key === "Enter" && canVote && onVote()}
+      onClick={() => onVote()}
     >
       {isWinner && (
-        <div className="absolute -right-1.5 -top-1.5 flex h-[22px] w-[22px] items-center justify-center rounded-full bg-lm-gold2 text-[0.75rem]">
-          👑
+        <div className="absolute -right-1.5 -top-1.5 flex h-[22px] w-[22px] items-center justify-center rounded-full bg-lm-gold2 text-black">
+          <Icon name="crown" size={12} />
         </div>
       )}
       <div className="mx-auto mb-1.5 flex h-[50px] w-[50px] items-center justify-center overflow-hidden rounded-full border-2 border-lm-border bg-lm-bg2 text-[1.3rem] max-md:h-[46px] max-md:w-[46px]">
@@ -468,7 +519,7 @@ function MatchSide({
           src={info.photo}
           alt={player}
           className="h-full w-full rounded-full object-cover"
-          fallback={<span>{info.emoji}</span>}
+          fallback={<CreatorIcon name={player} icon={info.icon} size={22} />}
         />
       </div>
       <div className="font-display mb-0.5 text-[0.95rem] tracking-wide text-lm-text max-md:text-[0.82rem]">
@@ -488,9 +539,12 @@ function MatchSide({
           </div>
         </>
       ) : canVote ? (
-        <div className="mt-1 text-[0.6rem] font-extrabold text-lm-green2">👆 Votar</div>
+        <div className="mt-1 flex items-center justify-center gap-1 text-[0.6rem] font-extrabold text-lm-green2">
+          <Icon name="pointer" size={12} />
+          Votar
+        </div>
       ) : null}
-    </div>
+    </button>
   );
 }
 
@@ -554,7 +608,7 @@ function TorneoBracket({ state }: { state: TorneoState | null }) {
           ))
         ) : (
           <div className="flex items-center gap-1.5 rounded-lg border border-[rgba(232,184,75,0.4)] bg-lm-card px-2 py-1.5 opacity-40">
-            <span>👑</span>
+            <Icon name="crown" size={12} className="text-lm-gold" />
             <div className="max-w-[75px] truncate text-[0.6rem] font-extrabold text-lm-gold">
               Por decidir
             </div>
@@ -597,7 +651,7 @@ function BracketSlot({
           src={p.photo}
           alt={p.name}
           className="h-full w-full rounded-full object-cover"
-          fallback={<span>{p.emoji}</span>}
+          fallback={<CreatorIcon name={p.name} icon={p.icon} size={12} />}
         />
       </div>
       <div
@@ -606,7 +660,14 @@ function BracketSlot({
           gold && "text-lm-gold2",
         )}
       >
-        {gold ? `👑 ${p.name}` : p.name}
+        {gold ? (
+          <span className="flex items-center gap-1">
+            <Icon name="crown" size={10} />
+            {p.name}
+          </span>
+        ) : (
+          p.name
+        )}
       </div>
     </div>
   );

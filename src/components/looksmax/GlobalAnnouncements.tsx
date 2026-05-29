@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/components/icons";
 import type { Announcement } from "@/lib/firebase/client";
 
 export function GlobalAnnouncements({ items }: { items: Announcement[] }) {
@@ -17,7 +18,7 @@ export function GlobalAnnouncements({ items }: { items: Announcement[] }) {
           }}
         >
           <div className="flex w-full items-center justify-center gap-4 text-center">
-            <span className="text-[2rem]">{ann.icon}</span>
+            <Icon name={ann.icon} size={32} className="text-lm-gold" />
             <span className="text-[1.35rem] font-black leading-snug tracking-wide text-lm-text">
               {ann.text}
             </span>
@@ -33,13 +34,14 @@ function DismissButton() {
   return (
     <button
       type="button"
-      className="ann-close absolute right-[18px] top-1/2 -translate-y-1/2 cursor-pointer border-none bg-transparent text-[1.4rem] font-black text-lm-text2"
+      className="lm-focus-ring ann-close absolute right-[18px] top-1/2 flex -translate-y-1/2 cursor-pointer items-center rounded-md border-none bg-transparent p-1 text-lm-text2"
       onClick={(e) => {
         const el = e.currentTarget.closest(".lm-global-ann");
         el?.remove();
       }}
+      aria-label="Cerrar anuncio"
     >
-      ✕
+      <Icon name="x" size={22} />
     </button>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { getRankerFallback, getRankerPhoto } from "@/data/avatars";
+import { CreatorIcon } from "@/components/icons";
+import { getRankerPhoto } from "@/data/avatars";
 
 type AvatarProps = {
   name: string;
@@ -17,7 +18,6 @@ export function Avatar({
   rounded = "full",
 }: AvatarProps) {
   const src = getRankerPhoto(name);
-  const fb = getRankerFallback(name);
   const [failed, setFailed] = useState(false);
   const radius = rounded === "full" ? "50%" : "12px";
 
@@ -26,7 +26,6 @@ export function Avatar({
       <span
         className={className}
         style={{
-          fontSize: size * 0.55,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -34,7 +33,7 @@ export function Avatar({
           height: "100%",
         }}
       >
-        {fb}
+        <CreatorIcon name={name} size={Math.round(size * 0.55)} />
       </span>
     );
   }
@@ -52,7 +51,6 @@ export function Avatar({
 
 export function ProfileAvatar({ name, photoBg }: { name: string; photoBg: string }) {
   const src = getRankerPhoto(name);
-  const fb = getRankerFallback(name);
   const [failed, setFailed] = useState(false);
 
   return (
@@ -68,7 +66,7 @@ export function ProfileAvatar({ name, photoBg }: { name: string; photoBg: string
           onError={() => setFailed(true)}
         />
       ) : (
-        <div className="text-[4rem]">{fb}</div>
+        <CreatorIcon name={name} size={56} className="text-lm-gold" />
       )}
     </div>
   );

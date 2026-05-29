@@ -49,6 +49,73 @@
   --lm-bottom-nav-height: 0px;
   --lm-selection-bg: #ffd166;
   --lm-selection-color: #07090f;
+  --lm-focus-ring: var(--color-lm-gold2);
+  --lm-focus-offset: 2px;
+  --lm-focus-width: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+:focus-visible {
+  outline: var(--lm-focus-width) solid var(--lm-focus-ring);
+  outline-offset: var(--lm-focus-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :focus-visible {
+    transition: none;
+  }
+}
+
+@utility lm-focus-ring {
+  outline: none;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 var(--lm-focus-width) var(--lm-focus-ring),
+      0 0 0 calc(var(--lm-focus-width) + var(--lm-focus-offset)) var(--color-lm-bg);
+  }
+}
+
+@utility lm-focus-ring-on-gold {
+  outline: none;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 var(--lm-focus-width) var(--color-lm-bg),
+      0 0 0 calc(var(--lm-focus-width) + var(--lm-focus-offset)) var(--lm-focus-ring);
+  }
+}
+
+.lm-skip-link {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  z-index: 10000;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.lm-skip-link:focus-visible {
+  left: 1rem;
+  top: 1rem;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;
+  background: var(--color-lm-card);
+  border: 1px solid var(--color-lm-border2);
+  color: var(--color-lm-text);
+  font-family: var(--font-syne), sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
 }
 
 @media (max-width: 768px) {

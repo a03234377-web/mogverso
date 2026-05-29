@@ -4,13 +4,24 @@ import { useMemo, useState } from "react";
 import { creatorImage } from "@/data/creator-images";
 import { LEXICO } from "@/data/lexico";
 import { CreatorImage } from "@/components/looksmax/CreatorImage";
+import { CreatorIcon, Icon, IconLabel } from "@/components/icons";
+import type { IconName } from "@/types/icons";
 import { ActivePage } from "@/components/looksmax/ui/ActivePage";
 import { cn } from "@/lib/cn";
 
-function PageHeader({ title, desc }: { title: string; desc: string }) {
+function PageHeader({
+  icon,
+  title,
+  desc,
+}: {
+  icon?: IconName;
+  title: string;
+  desc: string;
+}) {
   return (
     <div className="mx-auto max-w-[1000px] px-5 pb-4 pt-8 max-md:px-4 max-md:pb-2 max-md:pt-5">
-      <div className="font-display bg-[linear-gradient(135deg,var(--color-lm-text)_0%,var(--color-lm-gold2)_60%,var(--color-lm-gold)_100%)] bg-clip-text text-[clamp(1.6rem,4vw,3.5rem)] tracking-[3px] text-transparent max-md:text-[clamp(1.5rem,6vw,2.2rem)]">
+      <div className="flex items-center gap-2.5 font-display bg-[linear-gradient(135deg,var(--color-lm-text)_0%,var(--color-lm-gold2)_60%,var(--color-lm-gold)_100%)] bg-clip-text text-[clamp(1.6rem,4vw,3.5rem)] tracking-[3px] text-transparent max-md:text-[clamp(1.5rem,6vw,2.2rem)]">
+        {icon && <Icon name={icon} size={28} className="text-lm-gold" />}
         {title}
       </div>
       <div className="mt-1 text-[0.8rem] font-semibold leading-snug text-lm-text2 max-md:text-[0.75rem]">
@@ -24,14 +35,17 @@ export function NoticiasPage({ active }: { active: boolean }) {
   return (
     <ActivePage id="page-noticias" active={active}>
       <PageHeader
-        title="📰 Noticias"
+        icon="newspaper"
+        title="Noticias"
         desc="Lo último del mundo looksmaxer español · Actualizado diariamente"
       />
       <div className="mx-auto max-w-[1000px] px-5 max-md:px-3">
         <div className="animate-breaking-pulse relative mb-6 overflow-hidden rounded-[14px] border border-[rgba(255,71,87,0.35)] bg-[linear-gradient(135deg,rgba(192,57,43,0.15),rgba(255,71,87,0.08))] p-5 max-md:rounded-xl max-md:p-4">
           <div className="mb-2 flex items-center gap-1.5 text-[0.65rem] font-black uppercase tracking-[2px] text-lm-red2">
             <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-red2" />
-            🚨 BREAKING NEWS 🚨
+            <IconLabel icon="siren" iconSize={12}>
+              BREAKING NEWS
+            </IconLabel>
           </div>
           <div className="font-display text-[clamp(1.1rem,2.5vw,2.2rem)] leading-tight tracking-[1.5px] text-lm-text max-md:text-[clamp(1rem,4.5vw,1.5rem)]">
             KAPPAH: DE SUB-HUMAN A CHAD ABSOLUTO — LA TRANSFORMACIÓN QUE PARTIÓ EL FORO EN DOS
@@ -68,11 +82,11 @@ export function NoticiasPage({ active }: { active: boolean }) {
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3 max-md:grid-cols-1 max-md:gap-2.5">
-          <NoticiaCard cat="ranking" catLabel="🏆 Rankings" title="Kappah defiende el #1 con score histórico de 9.4" body="El TikToker más transformado de la comunidad española consolida su reinado." tag="RANKING" time="hace 1h" />
-          <NoticiaCard cat="ascension" catLabel="📈 Ascensión" title="RubenMaxxing sube al #2 con nuevo análisis viral" body="Su vídeo de análisis facial supera las 200K vistas y la comunidad lo nombra referente técnico." tag="ANÁLISIS" time="hace 3h" />
-          <NoticiaCard cat="ascension" catLabel="🍪 Podio" title="TitoChape asciende al #3 — el cookie en el podio" body="TitoChape sube al Top 3 con una temporada impresionante." tag="PODIO" time="hace 2h" />
-          <NoticiaCard cat="ascension" catLabel="🌟 Entradas Nuevas" title="Franbv y Nil Ojeda: los nuevos candidatos al ranking" body="Dos de los debuts más esperados de la temporada. ¡Vota quién entra primero!" tag="DEBUT" time="hace 1h" />
-          <NoticiaCard cat="comunidad" catLabel="💬 Comunidad" title="JordiWild, Peldanyos, IbaiLlanos y ChiquiIbai en el ranking" body="Los creadores más reconocidos de España generan debate histórico en la comunidad." tag="TIKTOKER" time="hace 8h" />
+          <NoticiaCard cat="ranking" catIcon="trophy" catLabel="Rankings" title="Kappah defiende el #1 con score histórico de 9.4" body="El TikToker más transformado de la comunidad española consolida su reinado." tag="RANKING" time="hace 1h" />
+          <NoticiaCard cat="ascension" catIcon="trending-up" catLabel="Ascensión" title="RubenMaxxing sube al #2 con nuevo análisis viral" body="Su vídeo de análisis facial supera las 200K vistas y la comunidad lo nombra referente técnico." tag="ANÁLISIS" time="hace 3h" />
+          <NoticiaCard cat="ascension" catIcon="cookie" catLabel="Podio" title="TitoChape asciende al #3 — el cookie en el podio" body="TitoChape sube al Top 3 con una temporada impresionante." tag="PODIO" time="hace 2h" />
+          <NoticiaCard cat="ascension" catIcon="sparkles" catLabel="Entradas Nuevas" title="Franbv y Nil Ojeda: los nuevos candidatos al ranking" body="Dos de los debuts más esperados de la temporada. ¡Vota quién entra primero!" tag="DEBUT" time="hace 1h" />
+          <NoticiaCard cat="comunidad" catIcon="message-circle" catLabel="Comunidad" title="JordiWild, Peldanyos, IbaiLlanos y ChiquiIbai en el ranking" body="Los creadores más reconocidos de España generan debate histórico en la comunidad." tag="TIKTOKER" time="hace 8h" />
         </div>
       </div>
     </ActivePage>
@@ -110,9 +124,7 @@ function CompareSide({
           alt={label}
           className="block h-full w-full object-cover object-top"
           fallback={
-            <span className="flex h-full w-full items-center justify-center text-4xl opacity-40">
-              👤
-            </span>
+            <CreatorIcon name="" size={40} className="opacity-40" />
           }
         />
       </div>
@@ -137,6 +149,7 @@ const noticiaCatColors: Record<string, string> = {
 
 function NoticiaCard({
   cat,
+  catIcon,
   catLabel,
   title,
   body,
@@ -144,6 +157,7 @@ function NoticiaCard({
   time,
 }: {
   cat: string;
+  catIcon: IconName;
   catLabel: string;
   title: string;
   body: string;
@@ -151,13 +165,14 @@ function NoticiaCard({
   time: string;
 }) {
   return (
-    <div className="cursor-pointer rounded-xl border border-lm-border bg-lm-card p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-lm-border2">
+    <div className="rounded-xl border border-lm-border bg-lm-card p-4">
       <div
         className={cn(
-          "mb-1.5 text-[0.6rem] font-extrabold uppercase tracking-[1.5px]",
+          "mb-1.5 flex items-center gap-1 text-[0.6rem] font-extrabold uppercase tracking-[1.5px]",
           noticiaCatColors[cat] ?? "text-lm-text2",
         )}
       >
+        <Icon name={catIcon} size={12} />
         {catLabel}
       </div>
       <div className="mb-1.5 text-[0.95rem] font-extrabold leading-snug">{title}</div>
@@ -175,14 +190,15 @@ function NoticiaCard({
 export function ConsejoPage({ active }: { active: boolean }) {
   return (
     <ActivePage id="page-consejo" active={active}>
-      <PageHeader title="📖 Consejos" desc="Guía diaria para mejorar tu físico y presencia" />
+      <PageHeader icon="book-open" title="Consejos" desc="Guía diaria para mejorar tu físico y presencia" />
       <div className="mx-auto max-w-[900px] px-5 max-md:px-3">
         <div className="mt-4 grid grid-cols-2 gap-3 max-md:grid-cols-1 max-md:gap-2.5">
           <div className="col-span-full flex items-start gap-5 rounded-xl border border-[rgba(232,184,75,0.35)] bg-lm-card p-5 max-md:flex-row">
-            <div className="shrink-0 text-[2.2rem] max-md:text-[1.8rem]">☀️</div>
+            <Icon name="sun" size={36} className="shrink-0 text-lm-gold max-md:w-7" />
             <div>
-              <div className="mb-1.5 text-[0.6rem] font-extrabold uppercase tracking-[1.5px] text-lm-gold">
-                ⭐ Consejo del Día
+              <div className="mb-1.5 flex items-center gap-1 text-[0.6rem] font-extrabold uppercase tracking-[1.5px] text-lm-gold">
+                <Icon name="star" size={12} />
+                Consejo del Día
               </div>
               <h3 className="mb-1.5 text-[0.9rem] font-extrabold leading-snug max-md:text-[0.88rem]">
                 La Regla del 3–6–9 en Hidratación Cutánea
@@ -201,10 +217,10 @@ export function ConsejoPage({ active }: { active: boolean }) {
               </div>
             </div>
           </div>
-          <ConsejoCard cat="gym" catLabel="💪 Gym" title="Mewing + Mordida" body="El mewing correcto sin una oclusión trabajada es la mitad del trabajo. Consulta a un ortodoncista." tag="JAW" />
-          <ConsejoCard cat="nutricion" catLabel="🥩 Nutrición" title="Proteína + Colágeno" body="2g de proteína por kg de peso, más 10g de colágeno hidrolizado con vitamina C en ayunas." tag="DIETA" />
-          <ConsejoCard cat="estilo" catLabel="👔 Estilo" title="El Ajuste es el Rey" body="Una camiseta de 15€ bien ajustada supera a cualquier pieza de lujo talla L." tag="ROPA" />
-          <ConsejoCard cat="mente" catLabel="🧠 Mentalidad" title="El Proceso es el Resultado" body="Los mejores looksmaxers ejecutan el protocolo, documentan cada 30 días y confían en el proceso." tag="PSICOLOGÍA" />
+          <ConsejoCard cat="gym" catIcon="dumbbell" catLabel="Gym" title="Mewing + Mordida" body="El mewing correcto sin una oclusión trabajada es la mitad del trabajo. Consulta a un ortodoncista." tag="JAW" />
+          <ConsejoCard cat="nutricion" catIcon="beef" catLabel="Nutrición" title="Proteína + Colágeno" body="2g de proteína por kg de peso, más 10g de colágeno hidrolizado con vitamina C en ayunas." tag="DIETA" />
+          <ConsejoCard cat="estilo" catIcon="shirt" catLabel="Estilo" title="El Ajuste es el Rey" body="Una camiseta de 15€ bien ajustada supera a cualquier pieza de lujo talla L." tag="ROPA" />
+          <ConsejoCard cat="mente" catIcon="brain" catLabel="Mentalidad" title="El Proceso es el Resultado" body="Los mejores looksmaxers ejecutan el protocolo, documentan cada 30 días y confían en el proceso." tag="PSICOLOGÍA" />
         </div>
       </div>
     </ActivePage>
@@ -221,12 +237,14 @@ const consejoCatColors: Record<string, string> = {
 
 function ConsejoCard({
   cat,
+  catIcon,
   catLabel,
   title,
   body,
   tag,
 }: {
   cat: string;
+  catIcon: IconName;
   catLabel: string;
   title: string;
   body: string;
@@ -236,10 +254,11 @@ function ConsejoCard({
     <div className="rounded-xl border border-lm-border bg-lm-card p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-lm-border2">
       <div
         className={cn(
-          "mb-1.5 text-[0.6rem] font-extrabold uppercase tracking-[1.5px]",
+          "mb-1.5 flex items-center gap-1 text-[0.6rem] font-extrabold uppercase tracking-[1.5px]",
           consejoCatColors[cat] ?? "text-lm-text2",
         )}
       >
+        <Icon name={catIcon} size={12} />
         {catLabel}
       </div>
       <h3 className="mb-1.5 text-[0.9rem] font-extrabold leading-snug">{title}</h3>
@@ -270,21 +289,24 @@ export function LexicoPage({ active }: { active: boolean }) {
   return (
     <ActivePage id="page-lexico" active={active}>
       <PageHeader
-        title="📚 Léxico"
+        icon="book-marked"
+        title="Léxico"
         desc="Términos esenciales del looksmaxing explicados en español"
       />
       <div className="mx-auto max-w-[900px] px-5 max-md:px-3">
         <div className="relative mb-5">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lm-text2">
-            🔍
-          </span>
+          <Icon
+            name="search"
+            size={16}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lm-text2"
+          />
           <input
             type="text"
             placeholder="Buscar término..."
             id="lexicoInput"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full cursor-text rounded-[10px] border border-lm-border bg-lm-card py-3 pl-10 pr-4 font-sans text-[0.9rem] text-lm-text outline-none transition-colors duration-300 focus:border-lm-border2 max-md:min-h-11 max-md:text-base"
+            className="lm-focus-ring w-full cursor-text rounded-[10px] border border-lm-border bg-lm-card py-3 pl-10 pr-4 font-sans text-[0.9rem] text-lm-text outline-none transition-colors duration-300 focus-visible:border-lm-border2 max-md:min-h-11 max-md:text-base"
           />
         </div>
         <div

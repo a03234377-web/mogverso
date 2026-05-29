@@ -9,22 +9,22 @@ import type {
 } from "@/lib/looksmax/types";
 
 export const TORNEO_PLAYERS: TorneoPlayer[] = [
-  { name: "Aaronjaureguii", photo: creatorImage("aaronjaureguii.jpg"), emoji: "⭐" },
-  { name: "Peereira7", photo: creatorImage("peereira7.jpg"), emoji: "⚽" },
-  { name: "TitoChape", photo: creatorImage("titochape.jpeg"), emoji: "🍪" },
-  { name: "RubenMaxxing", photo: creatorImage("rubenmaxxing.jpg"), emoji: "🔬" },
-  { name: "Kappah", photo: creatorImage("kappah.png"), emoji: "👑" },
-  { name: "Sergi", photo: creatorImage("SergiCabrer.jpeg"), emoji: "🌊" },
-  { name: "JoseNogales", photo: creatorImage("josenogales.jpeg"), emoji: "🌿" },
-  { name: "Franbv", photo: creatorImage("franbeuve.jpeg"), emoji: "🎭" },
-  { name: "Elcalvo", photo: creatorImage("elcalvo.jpg"), emoji: "🧠" },
-  { name: "Febron", photo: creatorImage("febron.jpeg"), emoji: "💪" },
-  { name: "Didac", photo: creatorImage("didac.png"), emoji: "🎯" },
-  { name: "Giva", photo: creatorImage("giva.jpeg"), emoji: "🔥" },
-  { name: "Javichu", photo: creatorImage("javichu.jpeg"), emoji: "⚡" },
-  { name: "Ismael", photo: creatorImage("ismael.jpeg"), emoji: "🌟" },
-  { name: "AlvaroSapo", photo: creatorImage("alvaro.png"), emoji: "🐸" },
-  { name: "Hectrollprox", photo: creatorImage("hectroll.png"), emoji: "👾" },
+  { name: "Aaronjaureguii", photo: creatorImage("aaronjaureguii.jpg"), icon: "star" },
+  { name: "Peereira7", photo: creatorImage("peereira7.jpg"), icon: "goal" },
+  { name: "TitoChape", photo: creatorImage("titochape.jpeg"), icon: "cookie" },
+  { name: "RubenMaxxing", photo: creatorImage("rubenmaxxing.jpg"), icon: "microscope" },
+  { name: "Kappah", photo: creatorImage("kappah.png"), icon: "crown" },
+  { name: "Sergi", photo: creatorImage("SergiCabrer.jpeg"), icon: "waves" },
+  { name: "JoseNogales", photo: creatorImage("josenogales.jpeg"), icon: "leaf" },
+  { name: "Franbv", photo: creatorImage("franbeuve.jpeg"), icon: "drama" },
+  { name: "Elcalvo", photo: creatorImage("elcalvo.jpg"), icon: "brain" },
+  { name: "Febron", photo: creatorImage("febron.jpeg"), icon: "dumbbell" },
+  { name: "Didac", photo: creatorImage("didac.png"), icon: "target" },
+  { name: "Giva", photo: creatorImage("giva.jpeg"), icon: "flame" },
+  { name: "Javichu", photo: creatorImage("javichu.jpeg"), icon: "zap" },
+  { name: "Ismael", photo: creatorImage("ismael.jpeg"), icon: "sparkles" },
+  { name: "AlvaroSapo", photo: creatorImage("alvaro.png"), icon: "turtle" },
+  { name: "Hectrollprox", photo: creatorImage("hectroll.png"), icon: "ghost" },
 ];
 
 export const OCTAVOS_MATCHES: OctavosMatchDef[] = [
@@ -69,7 +69,7 @@ export function getPlayerByName(name: string): TorneoPlayer {
     TORNEO_PLAYERS.find((p) => p.name === name) ?? {
       name,
       photo: "",
-      emoji: "❓",
+      icon: "help-circle",
     }
   );
 }

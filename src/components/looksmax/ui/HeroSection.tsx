@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 type HeroSectionProps = {
-  eyebrow?: string;
+  eyebrow?: ReactNode;
   title: ReactNode;
   subtitle?: string;
   badges?: ReactNode;

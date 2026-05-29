@@ -1,6 +1,7 @@
 "use client";
 
 import { ProfileAvatar } from "@/components/looksmax/Avatar";
+import { Icon } from "@/components/icons";
 import { ActivePage } from "@/components/looksmax/ui/ActivePage";
 import { RANKERS } from "@/data/rankers";
 import { cn } from "@/lib/cn";
@@ -43,7 +44,7 @@ export function ProfilePage({
     <ActivePage id="page-profile" active>
       <button
         type="button"
-        className="ml-5 mt-6 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-lm-border bg-lm-card px-3.5 py-2 font-sans text-[0.75rem] font-bold tracking-[0.8px] text-lm-text2 transition-all duration-200 hover:-translate-x-1 hover:border-lm-border2 hover:text-lm-text max-md:ml-4"
+        className="lm-focus-ring ml-5 mt-6 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-lm-border bg-lm-card px-3.5 py-2 font-sans text-[0.75rem] font-bold tracking-[0.8px] text-lm-text2 transition-all duration-200 hover:-translate-x-1 hover:border-lm-border2 hover:text-lm-text max-md:ml-4"
         onClick={onBack}
       >
         ← Volver al Ranking
@@ -100,16 +101,16 @@ export function ProfilePage({
         <div className="flex flex-col gap-4">
           <div className="rounded-[14px] border border-lm-border bg-lm-card p-5 transition-all duration-300 hover:border-lm-border2">
             <div className="mb-3 flex items-center gap-1.5 text-[0.85rem] font-extrabold tracking-[0.8px] text-lm-text">
-              <span>📋</span> Biografía
+              <Icon name="clipboard-list" size={16} className="text-lm-gold" /> Biografía
             </div>
             <div className="font-serif text-[0.95rem] leading-relaxed text-lm-text2">{r.bio}</div>
           </div>
           <div className="rounded-[14px] border border-lm-border bg-lm-card p-5 transition-all duration-300 hover:border-lm-border2">
             <div className="mb-3 flex items-center gap-1.5 text-[0.85rem] font-extrabold tracking-[0.8px] text-lm-text">
-              <span>📈</span> Último Movimiento
+              <Icon name="trending-up" size={16} className="text-lm-green2" /> Último Movimiento
             </div>
             <div className="flex items-start gap-3">
-              <div className="mt-0.5 shrink-0 text-[1.1rem]">{r.movIcon}</div>
+              <Icon name={r.movIcon} size={18} className="mt-0.5 shrink-0 text-lm-gold" />
               <div className="font-serif text-[0.9rem] leading-relaxed text-lm-text2">
                 {r.movement}
               </div>
