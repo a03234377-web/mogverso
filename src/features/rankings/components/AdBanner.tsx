@@ -1,6 +1,11 @@
 "use client";
 
-import { loadAdSenseScript, whenIdle } from "@/lib/adsense/load-script";
+import {
+  isAdSenseEnabled,
+  loadAdSenseScript,
+  whenIdle,
+  whenNearViewport,
+} from "@/lib/adsense/load-script";
 import { cn } from "@/lib/cn";
 import { useEffect, useRef, useState } from "react";
 
@@ -25,7 +30,7 @@ export function AdBanner({ clientId }: AdBannerProps) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (!clientId) return;
+    if (!isAdSenseEnabled(clientId)) return;
 
     const slot = slotRef.current;
     if (!slot) return;
@@ -76,24 +81,29 @@ export function AdBanner({ clientId }: AdBannerProps) {
       }, FILL_TIMEOUT_MS);
     };
 
-    const cancelIdle = whenIdle(() => {
-      void loadAdSenseScript(clientId)
-        .then(startObservers)
-        .catch(() => {
-          /* AdSense opcional: fallo silencioso */
-        });
+    let cleanupIdle = () => {};
+
+    const cancelNearViewport = whenNearViewport(slot, () => {
+      cleanupIdle = whenIdle(() => {
+        void loadAdSenseScript(clientId)
+          .then(startObservers)
+          .catch(() => {
+            /* AdSense opcional: fallo silencioso */
+          });
+      });
     });
 
     return () => {
       cancelled = true;
-      cancelIdle();
+      cancelNearViewport();
+      cleanupIdle();
       resizeObserver?.disconnect();
       window.clearInterval(poll);
       window.clearTimeout(timeout);
     };
   }, [clientId]);
 
-  if (!clientId) return null;
+  if (!isAdSenseEnabled(clientId)) return null;
 
   return (
     <div
