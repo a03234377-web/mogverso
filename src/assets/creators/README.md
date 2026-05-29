@@ -8,18 +8,6 @@ import { creatorImage } from "@/assets/creators";
 const photo = creatorImage("kappah.webp");
 ```
 
-## Comprobar
+Coloca los `.webp` en esta carpeta. Respeta mayúsculas (`SergiCabrer.webp`).
 
-```bash
-npm run check:images
-```
-
-## Descargar desde el sitio original
-
-```bash
-npm run download:images -- --base-url https://tu-dominio.com
-```
-
-Los archivos se guardan aquí (`src/assets/creators/`). Respeta mayúsculas (`SergiCabrer.webp`).
-
-Tras añadir un `.webp` nuevo, regístralo en `index.ts` con un `import` estático.
+Tras añadir un archivo nuevo, regístralo en `index.ts` con un `import` estático y entrégalo en `CREATOR_IMAGES`.

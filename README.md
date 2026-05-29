@@ -34,7 +34,7 @@ Copia `.env.example` a `.env.local`:
 
 ## Imágenes
 
-Coloca las fotos de creadores en `public/img/` en WebP (p. ej. `kappah.webp`, `rubenmaxxing.webp`). Comprueba con `npm run check:images`. Para intentar bajarlas del sitio donde estaban: `npm run download:images -- --base-url https://tu-dominio.com`. Si las sirves desde un CDN, define `NEXT_PUBLIC_CREATOR_IMAGES_BASE` en `.env.local`.
+Las fotos de creadores viven en `src/assets/creators/` como WebP importados en código (`creatorImage()` en `index.ts`). Ver `src/assets/creators/README.md`.
 
 ## Scripts
 
@@ -67,7 +67,8 @@ src/
   lib/firebase/  # Cliente Firebase
   lib/looksmax/  # Lógica pura (ranking, tipos)
 firebase/        # Reglas RTDB de ejemplo (ver README)
-public/img/      # Imágenes de creadores
+public/          # Assets estáticos (SVG, etc.)
+src/assets/      # Imágenes importadas (creadores WebP)
 docs/            # Documentación
 ```
 
