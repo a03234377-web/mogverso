@@ -29,11 +29,7 @@ function LooksMaxRoot({ legacyHtml }: { legacyHtml: string }) {
 
   return (
     <>
-      <div
-        ref={setRootEl}
-        id="looksmax-root"
-        className="looksmax-app"
-      />
+      <div ref={setRootEl} id="looksmax-root" className="looksmax-app" />
       {rootEl && (
         <Suspense fallback={null}>
           <LegacyBootstrap root={rootEl} legacyHtml={legacyHtml} />

@@ -10,11 +10,11 @@ Comando para **sincronizar documentación del proyecto** con el estado real del 
 
 ## Alcance actual
 
-| Archivo | Contenido esperado |
-| :--- | :--- |
-| `README.md` | Qué es mogverso, stack, cómo arrancar (`npm run dev`), variables de entorno, deploy |
-| `AGENTS.md` | Reglas Next.js 16 (mantener; no duplicar en README) |
-| Comentarios en código | Solo si el usuario pide documentar un módulo concreto |
+| Archivo               | Contenido esperado                                                                  |
+| :-------------------- | :---------------------------------------------------------------------------------- |
+| `README.md`           | Qué es mogverso, stack, cómo arrancar (`npm run dev`), variables de entorno, deploy |
+| `AGENTS.md`           | Reglas Next.js 16 (mantener; no duplicar en README)                                 |
+| Comentarios en código | Solo si el usuario pide documentar un módulo concreto                               |
 
 ## Proceso
 

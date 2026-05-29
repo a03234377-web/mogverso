@@ -19,12 +19,12 @@ Cuando sea posible:
 
 ## Factores y prioridades
 
-| Nivel | Criterio |
-| :--- | :--- |
-| **P0** | Build roto, secretos en git, Firebase mal configurado en prod, rutas críticas inaccesibles |
+| Nivel  | Criterio                                                                                                     |
+| :----- | :----------------------------------------------------------------------------------------------------------- |
+| **P0** | Build roto, secretos en git, Firebase mal configurado en prod, rutas críticas inaccesibles                   |
 | **P1** | Hidratación/SSR, listeners Firebase sin cleanup, votación/ranking inconsistente, `'use client'` mal aplicado |
-| **P2** | Lint, tipos, CSS duplicado, componentes monolíticos, README desactualizado |
-| **P3** | Nitpicks de estilo, optimizaciones prematuras |
+| **P2** | Lint, tipos, CSS duplicado, componentes monolíticos, README desactualizado                                   |
+| **P3** | Nitpicks de estilo, optimizaciones prematuras                                                                |
 
 ### Áreas a revisar
 
@@ -40,15 +40,19 @@ Cuando sea posible:
 
 ```markdown
 ## Resumen ejecutivo
+
 …
 
 ## P0 — Crítico
+
 - [ ] **Título** — ruta — impacto — fix sugerido
 
 ## P1 — Alto
+
 …
 
 ## Comprobaciones ejecutadas
+
 - `npm run lint`: …
 - `npm run build`: …
 ```

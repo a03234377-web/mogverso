@@ -25,12 +25,12 @@ Abre [http://localhost:3000](http://localhost:3000).
 
 Copia `.env.example` a `.env.local`:
 
-| Variable | Descripción |
-| --- | --- |
-| `NEXT_PUBLIC_FIREBASE_*` | Credenciales del proyecto Firebase |
-| `NEXT_PUBLIC_ADSENSE_CLIENT` | ID de cliente AdSense (opcional) |
-| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | Clave reCAPTCHA v3 (opcional) |
-| `NEXT_PUBLIC_SITE_URL` | URL pública (metadatos SEO) |
+| Variable                         | Descripción                        |
+| -------------------------------- | ---------------------------------- |
+| `NEXT_PUBLIC_FIREBASE_*`         | Credenciales del proyecto Firebase |
+| `NEXT_PUBLIC_ADSENSE_CLIENT`     | ID de cliente AdSense (opcional)   |
+| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | Clave reCAPTCHA v3 (opcional)      |
+| `NEXT_PUBLIC_SITE_URL`           | URL pública (metadatos SEO)        |
 
 ## Imágenes
 
@@ -38,13 +38,13 @@ Coloca las fotos de creadores en `public/img/` (mismas rutas que la web original
 
 ## Scripts
 
-| Comando | Descripción |
-| --- | --- |
-| `npm run dev` | Servidor de desarrollo |
-| `npm run build` | Build de producción |
-| `npm run start` | Servidor de producción |
-| `npm run lint` | ESLint |
-| `npm run format` | Prettier (formatear) |
+| Comando          | Descripción                    |
+| ---------------- | ------------------------------ |
+| `npm run dev`    | Servidor de desarrollo         |
+| `npm run build`  | Build de producción            |
+| `npm run start`  | Servidor de producción         |
+| `npm run lint`   | ESLint                         |
+| `npm run format` | Prettier (formatear)           |
 | `npm run mdlint` | markdownlint en archivos `.md` |
 
 ## Despliegue en Vercel

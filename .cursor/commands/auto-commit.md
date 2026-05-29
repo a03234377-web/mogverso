@@ -40,24 +40,24 @@ Optional body explaining why, in English.
 
 ## Tipos y scopes habituales
 
-| Tipo | Uso |
-| :--- | :--- |
-| `feat` | Nueva funcionalidad o pantalla migrada |
-| `fix` | Bug o regresión |
+| Tipo       | Uso                                     |
+| :--------- | :-------------------------------------- |
+| `feat`     | Nueva funcionalidad o pantalla migrada  |
+| `fix`      | Bug o regresión                         |
 | `refactor` | Sin cambio de comportamiento observable |
-| `style` | Solo CSS/markup, sin lógica |
-| `docs` | README, comentarios de arquitectura |
-| `chore` | Tooling, `.cursor/`, deps menores |
-| `build` | Next config, PostCSS, ESLint |
+| `style`    | Solo CSS/markup, sin lógica             |
+| `docs`     | README, comentarios de arquitectura     |
+| `chore`    | Tooling, `.cursor/`, deps menores       |
+| `build`    | Next config, PostCSS, ESLint            |
 
-| Scope | Cuándo |
-| :--- | :--- |
-| `app` | Rutas en `src/app/` |
-| `components` | `src/components/` |
-| `firebase` | Cliente y reglas de datos |
-| `styles` | `globals.css`, `looksmax.css` |
-| `cursor` | `.cursor/` |
-| `config` | `next.config.ts`, `tsconfig.json`, ESLint |
+| Scope        | Cuándo                                    |
+| :----------- | :---------------------------------------- |
+| `app`        | Rutas en `src/app/`                       |
+| `components` | `src/components/`                         |
+| `firebase`   | Cliente y reglas de datos                 |
+| `styles`     | `globals.css`, `looksmax.css`             |
+| `cursor`     | `.cursor/`                                |
+| `config`     | `next.config.ts`, `tsconfig.json`, ESLint |
 
 ## Crear el commit
 

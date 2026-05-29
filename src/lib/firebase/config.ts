@@ -10,8 +10,6 @@ export const firebaseConfig = {
 
 export function isFirebaseConfigured(): boolean {
   return Boolean(
-    firebaseConfig.apiKey &&
-      firebaseConfig.databaseURL &&
-      firebaseConfig.projectId,
+    firebaseConfig.apiKey && firebaseConfig.databaseURL && firebaseConfig.projectId,
   );
 }
