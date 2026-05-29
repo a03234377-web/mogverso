@@ -38,14 +38,16 @@ Coloca las fotos de creadores en `public/img/` (mismas rutas que la web original
 
 ## Scripts
 
-| Comando          | Descripción                    |
-| ---------------- | ------------------------------ |
-| `npm run dev`    | Servidor de desarrollo         |
-| `npm run build`  | Build de producción            |
-| `npm run start`  | Servidor de producción         |
-| `npm run lint`   | ESLint                         |
-| `npm run format` | Prettier (formatear)           |
-| `npm run mdlint` | markdownlint en archivos `.md` |
+| Comando                | Descripción                    |
+| ---------------------- | ------------------------------ |
+| `npm run dev`          | Servidor de desarrollo         |
+| `npm run build`        | Build de producción            |
+| `npm run start`        | Servidor de producción         |
+| `npm run lint`         | ESLint                         |
+| `npm run typecheck`    | TypeScript (`tsc --noEmit`)    |
+| `npm run format`       | Prettier (formatear)           |
+| `npm run format:check` | Comprueba formato Prettier     |
+| `npm run mdlint`       | markdownlint en archivos `.md` |
 
 ## Despliegue en Vercel
 
@@ -61,6 +63,7 @@ src/
   components/    # LooksMaxApp (shell de la aplicación)
   data/          # Datos estáticos tipados (rankers)
   lib/firebase/  # Cliente Firebase en TypeScript
+firebase/        # Reglas RTDB de ejemplo (ver README)
 public/
   legacy-body.html   # Marcado HTML de la app original
   legacy/app-runtime.js  # Lógica de UI/votaciones/torneo
@@ -73,6 +76,7 @@ docs/                # Documentación
 - [Arquitectura](./docs/arquitectura.md)
 - [Desarrollo](./docs/desarrollo.md)
 - [Despliegue](./docs/despliegue.md)
+- [Firebase (reglas RTDB)](./firebase/README.md)
 
 ## Capa legacy
 
