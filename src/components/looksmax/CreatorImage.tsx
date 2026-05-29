@@ -2,8 +2,9 @@
 
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { publicAsset } from "@/lib/asset-path";
+import { cn } from "@/lib/cn";
 
-type CreatorPhotoProps = {
+type CreatorImageProps = {
   src: string;
   alt: string;
   className?: string;
@@ -11,13 +12,14 @@ type CreatorPhotoProps = {
   fallback?: ReactNode;
 };
 
-export function CreatorPhoto({
+/** Imagen de creador con URL normalizada y fallback si falla la carga. */
+export function CreatorImage({
   src,
   alt,
   className,
   style,
   fallback = null,
-}: CreatorPhotoProps) {
+}: CreatorImageProps) {
   const [failed, setFailed] = useState(false);
   const url = publicAsset(src);
 
@@ -29,7 +31,7 @@ export function CreatorPhoto({
     <img
       src={url}
       alt={alt}
-      className={className}
+      className={cn(className)}
       style={style}
       onError={() => setFailed(true)}
     />

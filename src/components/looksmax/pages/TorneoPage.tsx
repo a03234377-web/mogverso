@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { CreatorImage } from "@/components/looksmax/CreatorImage";
 import { getInitialTorneoState, getPlayerByName, PHASES } from "@/data/torneo-players";
 import { ActivePage } from "@/components/looksmax/ui/ActivePage";
 import { HeroSection } from "@/components/looksmax/ui/HeroSection";
@@ -199,11 +200,12 @@ function TorneoPhaseCard({
           <PhaseSub>El mejor looksmaxer de España ha sido coronado</PhaseSub>
           <div className="my-4 flex flex-col items-center gap-3">
             <div className="flex h-[90px] w-[90px] items-center justify-center overflow-hidden rounded-full border-[3px] border-lm-gold text-[2rem]">
-              {champInfo.photo ? (
-                <img src={champInfo.photo} alt={champ} className="h-full w-full object-cover" />
-              ) : (
-                champInfo.emoji
-              )}
+              <CreatorImage
+                src={champInfo.photo}
+                alt={champ}
+                className="h-full w-full object-cover"
+                fallback={<span>{champInfo.emoji}</span>}
+              />
             </div>
             <div className="font-display bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text text-[clamp(2rem,7vw,4rem)] tracking-[4px] text-transparent">
               {champ}
@@ -462,11 +464,12 @@ function MatchSide({
         </div>
       )}
       <div className="mx-auto mb-1.5 flex h-[50px] w-[50px] items-center justify-center overflow-hidden rounded-full border-2 border-lm-border bg-lm-bg2 text-[1.3rem] max-md:h-[46px] max-md:w-[46px]">
-        {info.photo ? (
-          <img src={info.photo} alt={player} className="h-full w-full rounded-full object-cover" />
-        ) : (
-          <span>{info.emoji}</span>
-        )}
+        <CreatorImage
+          src={info.photo}
+          alt={player}
+          className="h-full w-full rounded-full object-cover"
+          fallback={<span>{info.emoji}</span>}
+        />
       </div>
       <div className="font-display mb-0.5 text-[0.95rem] tracking-wide text-lm-text max-md:text-[0.82rem]">
         {player}
@@ -590,11 +593,12 @@ function BracketSlot({
       )}
     >
       <div className="flex h-[22px] w-[22px] shrink-0 items-center justify-center overflow-hidden rounded-full border border-lm-border bg-lm-bg3 text-[0.7rem]">
-        {p.photo ? (
-          <img src={p.photo} alt={p.name} className="h-full w-full rounded-full object-cover" />
-        ) : (
-          <span>{p.emoji}</span>
-        )}
+        <CreatorImage
+          src={p.photo}
+          alt={p.name}
+          className="h-full w-full rounded-full object-cover"
+          fallback={<span>{p.emoji}</span>}
+        />
       </div>
       <div
         className={cn(

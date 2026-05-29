@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FALLBACK, FOTOS } from "@/data/avatars";
+import { getRankerFallback, getRankerPhoto } from "@/data/avatars";
 
 type AvatarProps = {
   name: string;
@@ -16,8 +16,8 @@ export function Avatar({
   className = "",
   rounded = "full",
 }: AvatarProps) {
-  const src = FOTOS[name];
-  const fb = FALLBACK[name] ?? "👤";
+  const src = getRankerPhoto(name);
+  const fb = getRankerFallback(name);
   const [failed, setFailed] = useState(false);
   const radius = rounded === "full" ? "50%" : "12px";
 
@@ -51,8 +51,8 @@ export function Avatar({
 }
 
 export function ProfileAvatar({ name, photoBg }: { name: string; photoBg: string }) {
-  const src = FOTOS[name];
-  const fb = FALLBACK[name] ?? "👤";
+  const src = getRankerPhoto(name);
+  const fb = getRankerFallback(name);
   const [failed, setFailed] = useState(false);
 
   return (

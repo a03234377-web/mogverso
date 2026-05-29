@@ -34,7 +34,7 @@ Copia `.env.example` a `.env.local`:
 
 ## Imágenes
 
-Coloca las fotos de creadores en `public/img/` (mismas rutas que la web original, p. ej. `kappah.png`, `rubenmaxxing.jpg`).
+Coloca las fotos de creadores en `public/img/` (mismas rutas que la web original, p. ej. `kappah.png`, `rubenmaxxing.jpg`). Comprueba con `npm run check:images`. Si las sirves desde un CDN, define `NEXT_PUBLIC_CREATOR_IMAGES_BASE` en `.env.local`.
 
 ## Scripts
 
