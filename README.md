@@ -74,3 +74,6 @@ docs/                # Documentación
 - [Desarrollo](./docs/desarrollo.md)
 - [Despliegue](./docs/despliegue.md)
 
+## Capa legacy
+
+El marcado y la lógica de la SPA original están en `public/legacy-body.html` y `public/legacy/app-runtime.js`.
