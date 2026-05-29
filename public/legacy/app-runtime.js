@@ -1392,6 +1392,8 @@ function startEntryVoteTimer(ev) {
 }
 
 async function loadAllData() {
+    if (window._loadAllDataStarted) return;
+    window._loadAllDataStarted = true;
     const {db,ref,onValue,get,DEVICE_ID} = window.FB;
     let cachedOverrides={}, cachedMovements={};
     function rebuildUI() { buildRanking(cachedOverrides,cachedMovements); }
