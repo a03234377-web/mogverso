@@ -58,7 +58,7 @@ export function RankingsPage({
         }
       />
 
-      <div className="mx-auto mt-7 flex flex-wrap items-start justify-center gap-5 px-5 max-md:mt-3 max-md:flex-col max-md:gap-3 max-md:px-4">
+      <div className="mb-10 mx-auto mt-7 flex flex-wrap items-start justify-center gap-5 px-5 max-md:mt-3 max-md:flex-col max-md:gap-3 max-md:px-4">
         <div className="flex w-[220px] flex-col items-center gap-2.5 max-md:w-full max-md:flex-row max-md:gap-3.5">
           <button
             type="button"

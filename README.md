@@ -2,6 +2,8 @@
 
 Ranking oficial de looksmaxing en España, migrado a **Next.js** para despliegue en **Vercel**.
 
+![Vista previa de LooksMax España — rankings, torneo en vivo y votaciones](./src/app/opengraph-image.png)
+
 ## Stack
 
 - [Next.js](https://nextjs.org/) 16 (App Router)
