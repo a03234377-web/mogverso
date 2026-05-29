@@ -12,9 +12,6 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    "public/legacy/**",
-    "public/legacy-body.html",
-    "**/app-runtime.js",
   ]),
 ]);
 

@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "mdlint": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#.next\"",
-    "react:doctor": "react-doctor . --full --verbose"
+    "react:doctor": "react-doctor . --full --verbose",
+    "check:images": "node scripts/check-images.mjs"
   },
   "dependencies": {
     "firebase": "^12.14.0",

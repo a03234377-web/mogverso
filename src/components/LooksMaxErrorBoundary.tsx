@@ -12,10 +12,10 @@ type State = {
 
 function LooksMaxErrorDisplay({ message }: { message: string }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#07090f] p-6 text-center text-[#f0ece0]">
+    <div className="flex min-h-screen items-center justify-center bg-lm-bg p-6 text-center text-lm-text">
       <div>
-        <p className="mb-2 text-xl font-bold text-[#ff4757]">⚠️ Error</p>
-        <p className="text-sm text-[#8a8070]">{message}</p>
+        <p className="mb-2 text-xl font-bold text-lm-red2">⚠️ Error</p>
+        <p className="text-sm text-lm-text2">{message}</p>
       </div>
     </div>
   );

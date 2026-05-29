@@ -1,0 +1,16 @@
+export const TICKER_ITEMS: string[] = [
+  "🌊 SergiCabrer en el Top 4 — una entrada explosiva",
+  "🔥 Kappah lidera el ranking con score 9.4",
+  "🚀 RubenMaxxing en el #2 con análisis viral",
+  "🍪 TitoChape asciende al #3 — el cookie en el podio",
+  "⭐ Aaronjaureguii en el Top 7",
+  "⚽ Peereira7 debuta directamente en el Top 5",
+  "💪 Febron debuta en el Top 6 — el peso pesado ha llegado",
+  "🎙️ JordiWild en el ranking",
+  "🏗️ Peldanyos debuta en el ranking",
+  "🎮 IbaiLlanos — el debate más grande del foro",
+  "😂 ChiquiIbai en el Top 13",
+  "🗳️ VOTA quién sube en el ranking — ¡decides tú!",
+  "⚽ TORNEO EN VIVO — ¡Vota los partidos ahora!",
+  "🎭 Franbv vs 💎 Nil Ojeda — ¡Vota quién entra al ranking!",
+];

@@ -37,7 +37,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className={`${bebas.variable} ${syne.variable}`}>
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen overflow-x-hidden bg-lm-bg font-sans text-lm-text antialiased select-text pb-[calc(var(--lm-bottom-nav-height)+env(safe-area-inset-bottom,0px))] max-md:text-base">
+        {children}
+      </body>
     </html>
   );
 }

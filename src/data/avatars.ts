@@ -1,0 +1,51 @@
+import { creatorImage } from "@/data/creator-images";
+
+/** Rutas de foto por nombre de ranker */
+export const FOTOS: Record<string, string> = {
+  Kappah: creatorImage("kappah.png"),
+  RubenMaxxing: creatorImage("rubenmaxxing.jpg"),
+  SergiCabrer: creatorImage("SergiCabrer.jpeg"),
+  JoseNogales: creatorImage("josenogales.jpeg"),
+  TitoChape: creatorImage("titochape.jpeg"),
+  Aaronjaureguii: creatorImage("aaronjaureguii.jpg"),
+  AlejandroAle: creatorImage("alejandroale.png"),
+  JordiWild: creatorImage("jordiwild.jpg"),
+  Peldanyos: creatorImage("peldanyos.jpg"),
+  IbaiLlanos: creatorImage("ibaillanos.jpg"),
+  ChiquiIbai: creatorImage("chiquiibai.jpg"),
+  Peereira7: creatorImage("peereira7.jpg"),
+  Franbeuve: creatorImage("franbeuve.jpeg"),
+  Febron: creatorImage("febron.jpeg"),
+  Elcalvo: creatorImage("elcalvo.jpg"),
+  Didac: creatorImage("didac.png"),
+  Javichu: creatorImage("javichu.jpeg"),
+  Ismael: creatorImage("ismael.jpeg"),
+  AlvaroSapo: creatorImage("alvaro.png"),
+  Hectrollprox: creatorImage("hectroll.png"),
+  Giva: creatorImage("giva.jpeg"),
+};
+
+/** Emoji fallback cuando no hay foto */
+export const FALLBACK: Record<string, string> = {
+  Kappah: "👑",
+  RubenMaxxing: "🔬",
+  SergiCabrer: "🌊",
+  JoseNogales: "🌿",
+  TitoChape: "🍪",
+  Aaronjaureguii: "⭐",
+  AlejandroAle: "😄",
+  JordiWild: "🎙️",
+  Peldanyos: "🏗️",
+  IbaiLlanos: "🎮",
+  ChiquiIbai: "😂",
+  Peereira7: "⚽",
+  Franbeuve: "🎭",
+  Febron: "💪",
+  Elcalvo: "🧠",
+  Didac: "🎯",
+  Javichu: "⚡",
+  Ismael: "🌟",
+  AlvaroSapo: "🐸",
+  Hectrollprox: "👾",
+  Giva: "🔥",
+};

@@ -1,7 +1,281 @@
 @import "tailwindcss";
-@import "./looksmax.css";
 
 @theme inline {
   --font-sans: var(--font-syne);
   --font-display: var(--font-bebas);
+
+  --color-lm-bg: #07090f;
+  --color-lm-bg2: #0c0f18;
+  --color-lm-bg3: #111622;
+  --color-lm-card: #131a26;
+  --color-lm-card2: #192030;
+  --color-lm-gold: #e8b84b;
+  --color-lm-gold2: #ffd166;
+  --color-lm-gold3: #c8960a;
+  --color-lm-red: #c0392b;
+  --color-lm-red2: #ff4757;
+  --color-lm-green: #1a7a4a;
+  --color-lm-green2: #2ecc71;
+  --color-lm-accent: #b8860b;
+  --color-lm-purple: #a855f7;
+  --color-lm-blue: #3b82f6;
+  --color-lm-orange: #f97316;
+  --color-lm-text: #f0ece0;
+  --color-lm-text2: #8a8070;
+  --color-lm-border: rgba(232, 184, 75, 0.15);
+  --color-lm-border2: rgba(232, 184, 75, 0.35);
+
+  --animate-spin-slow: spin 0.8s linear infinite;
+  --animate-ticker: ticker 40s linear infinite;
+  --animate-logo-pulse: logoPulse 3s ease-in-out infinite;
+  --animate-blink: blink 1s step-end infinite;
+  --animate-row-slide: rowSlide 0.5s ease both;
+  --animate-fade-up: fadeUp 0.4s ease both;
+  --animate-hero-entrance: heroEntrance 0.9s cubic-bezier(0.16, 1, 0.3, 1) both 0.1s;
+  --animate-pulse-soft: pulse 2s infinite;
+  --animate-vs-pulse: vsPulse 1.5s ease-in-out infinite;
+  --animate-breaking-pulse: breakingPulse 3s ease-in-out infinite;
+  --animate-modal-crown: modalCrownBounce 0.6s cubic-bezier(0.16, 1, 0.3, 1) both 0.15s;
+  --animate-winner-pop: winnerPop 0.6s cubic-bezier(0.16, 1, 0.3, 1) both 0.2s;
+  --animate-orb-float-1: orbFloat1 14s ease-in-out infinite;
+  --animate-orb-float-2: orbFloat2 18s ease-in-out infinite;
+  --animate-orb-float-3: orbFloat3 16s ease-in-out infinite;
+  --animate-particle-float: particleFloat linear infinite;
+}
+
+:root {
+  --lm-nav-height: 60px;
+  --lm-ticker-height: 32px;
+  --lm-bottom-nav-height: 0px;
+  --lm-selection-bg: #ffd166;
+  --lm-selection-color: #07090f;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --lm-nav-height: 52px;
+    --lm-ticker-height: 28px;
+    --lm-bottom-nav-height: 68px;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+::selection {
+  background-color: var(--lm-selection-bg);
+  color: var(--lm-selection-color);
+  text-shadow: none;
+}
+
+::-moz-selection {
+  background-color: var(--lm-selection-bg);
+  color: var(--lm-selection-color);
+  text-shadow: none;
+}
+
+input::selection,
+textarea::selection {
+  background-color: var(--lm-selection-bg);
+  color: var(--lm-selection-color);
+}
+
+input::-moz-selection,
+textarea::-moz-selection {
+  background-color: var(--lm-selection-bg);
+  color: var(--lm-selection-color);
+}
+
+.grecaptcha-badge {
+  visibility: hidden !important;
+}
+
+.lm-vote-disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.particle {
+  animation-name: particleFloat;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbFloat1 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(40px, -30px) scale(1.08);
+  }
+  66% {
+    transform: translate(-25px, 40px) scale(0.94);
+  }
+}
+
+@keyframes orbFloat2 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  40% {
+    transform: translate(-50px, 30px) scale(1.1);
+  }
+  70% {
+    transform: translate(30px, -40px) scale(0.9);
+  }
+}
+
+@keyframes orbFloat3 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(35px, 25px) scale(1.05);
+  }
+  75% {
+    transform: translate(-30px, -20px) scale(0.97);
+  }
+}
+
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes logoPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 16px rgba(232, 184, 75, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(232, 184, 75, 0.5);
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes rowSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes winnerPop {
+  from {
+    transform: scale(0) rotate(-20deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+@keyframes breakingPulse {
+  0%,
+  100% {
+    border-color: rgba(255, 71, 87, 0.35);
+  }
+  50% {
+    border-color: rgba(255, 71, 87, 0.6);
+  }
+}
+
+@keyframes modalCrownBounce {
+  from {
+    transform: scale(0) rotate(-20deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroEntrance {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes vsPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes particleFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(100vh) translateX(0) scale(0);
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20vh) translateX(var(--drift)) scale(1);
+  }
 }

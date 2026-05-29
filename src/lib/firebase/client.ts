@@ -49,6 +49,14 @@ export type FirebaseBridge = {
   ) => Promise<boolean>;
 };
 
+export type Announcement = {
+  type: string;
+  text: string;
+  icon: string;
+  bg: string;
+  border: string;
+};
+
 declare global {
   interface Window {
     FB?: FirebaseBridge;
@@ -58,6 +66,11 @@ declare global {
 
 let app: FirebaseApp | null = null;
 let db: Database | null = null;
+let bridge: FirebaseBridge | null = null;
+
+export function getFirebaseBridge(): FirebaseBridge | null {
+  return bridge;
+}
 
 function getDeviceId(): string {
   if (typeof window === "undefined") return "dev_ssr";
@@ -96,118 +109,110 @@ async function getIPHash(): Promise<string> {
   return cachedIPHash;
 }
 
-function getRankedNamesFromOverrides(overrides: Record<string, number>): string[] {
-  const names = (window.RANKERS ?? []).map((r) => r.name);
-  if (!overrides || Object.keys(overrides).length === 0) return [...names];
-  return [...names]
-    .map((n, i) => ({
-      name: n,
-      pos: overrides[n] !== undefined ? Number(overrides[n]) : i,
-    }))
-    .sort((a, b) => a.pos - b.pos)
-    .map((x) => x.name);
+const ANNOUNCEMENT_COLORS: Record<
+  string,
+  { bg: string; border: string; icon: string }
+> = {
+  info: {
+    bg: "rgba(59,130,246,.16)",
+    border: "rgba(59,130,246,.55)",
+    icon: "ℹ️",
+  },
+  warning: {
+    bg: "rgba(249,115,22,.16)",
+    border: "rgba(249,115,22,.55)",
+    icon: "⚠️",
+  },
+  success: {
+    bg: "rgba(46,204,113,.14)",
+    border: "rgba(46,204,113,.55)",
+    icon: "🏆",
+  },
+  emergency: {
+    bg: "rgba(255,71,87,.16)",
+    border: "rgba(255,71,87,.65)",
+    icon: "🚨",
+  },
+};
+
+function createGetRankedNamesFromOverrides(rankers: Ranker[]) {
+  return function getRankedNamesFromOverrides(
+    overrides: Record<string, number>,
+  ): string[] {
+    const names = rankers.map((r) => r.name);
+    if (!overrides || Object.keys(overrides).length === 0) return [...names];
+    return [...names]
+      .map((n, i) => ({
+        name: n,
+        pos: overrides[n] !== undefined ? Number(overrides[n]) : i,
+      }))
+      .sort((a, b) => a.pos - b.pos)
+      .map((x) => x.name);
+  };
 }
 
-let unsubscribeAnnouncements: (() => void) | null = null;
-
-function subscribeAnnouncements(database: Database): void {
-  unsubscribeAnnouncements?.();
-  unsubscribeAnnouncements = onValue(ref(database, "announcements"), (snap) => {
-    document.querySelectorAll(".lm-global-ann").forEach((el) => el.remove());
-    if (!snap.exists()) return;
-
-    const anns = snap.val() as Record<
-      string,
-      {
-        active?: boolean;
-        expiresAt?: number;
-        ts?: number;
-        type?: string;
-        text?: string;
-      }
-    >;
-    const now = Date.now();
-
-    const active = Object.values(anns)
-      .filter((a) => a.active && (!a.expiresAt || a.expiresAt > now))
-      .sort((a, b) => (b.ts || 0) - (a.ts || 0));
-
-    const colors: Record<string, { bg: string; border: string; icon: string }> = {
-      info: {
-        bg: "rgba(59,130,246,.16)",
-        border: "rgba(59,130,246,.55)",
-        icon: "ℹ️",
-      },
-      warning: {
-        bg: "rgba(249,115,22,.16)",
-        border: "rgba(249,115,22,.55)",
-        icon: "⚠️",
-      },
-      success: {
-        bg: "rgba(46,204,113,.14)",
-        border: "rgba(46,204,113,.55)",
-        icon: "🏆",
-      },
-      emergency: {
-        bg: "rgba(255,71,87,.16)",
-        border: "rgba(255,71,87,.65)",
-        icon: "🚨",
-      },
-    };
-
-    active.forEach((ann) => {
-      const c = colors[ann.type ?? ""] ?? colors.info;
-      const el = document.createElement("div");
-      el.className = "lm-global-ann";
-      el.style.cssText = `
-      background:${c.bg};
-      border-bottom:2px solid ${c.border};
-      padding:1.3rem 2rem;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      position:relative;
-      z-index:200;
-      backdrop-filter:blur(12px);
-      animation:fadeUp .3s ease;
-    `;
-      const row = document.createElement("div");
-      row.style.cssText =
-        "display:flex;align-items:center;justify-content:center;gap:1rem;width:100%;text-align:center;";
-      const icon = document.createElement("span");
-      icon.style.fontSize = "2rem";
-      icon.textContent = c.icon;
-      const text = document.createElement("span");
-      text.style.cssText =
-        "font-size:1.35rem;font-weight:900;letter-spacing:.5px;color:var(--text);line-height:1.4;";
-      text.textContent = ann.text ?? "";
-      row.append(icon, text);
-      const btn = document.createElement("button");
-      btn.className = "ann-close";
-      btn.type = "button";
-      btn.textContent = "✕";
-      el.append(row, btn);
-      btn.style.cssText = `
-      position:absolute;right:18px;top:50%;transform:translateY(-50%);
-      background:none;border:none;color:var(--text2);font-size:1.4rem;font-weight:900;cursor:pointer;transition:.2s;
-    `;
-      btn.onclick = () => el.remove();
-      const ticker = document.querySelector(".ticker-wrap");
-      if (ticker) ticker.after(el);
-      else document.body.prepend(el);
+function parseActiveAnnouncements(
+  raw: Record<
+    string,
+    {
+      active?: boolean;
+      expiresAt?: number;
+      ts?: number;
+      type?: string;
+      text?: string;
+    }
+  >,
+): Announcement[] {
+  const now = Date.now();
+  return Object.values(raw)
+    .filter((a) => a.active && (!a.expiresAt || a.expiresAt > now))
+    .sort((a, b) => (b.ts || 0) - (a.ts || 0))
+    .map((ann) => {
+      const c = ANNOUNCEMENT_COLORS[ann.type ?? ""] ?? ANNOUNCEMENT_COLORS.info;
+      return {
+        type: ann.type ?? "info",
+        text: ann.text ?? "",
+        icon: c.icon,
+        bg: c.bg,
+        border: c.border,
+      };
     });
+}
+
+export function subscribeAnnouncements(
+  database: Database,
+  callback: (announcements: Announcement[]) => void,
+): () => void {
+  return onValue(ref(database, "announcements"), (snap) => {
+    if (!snap.exists()) {
+      callback([]);
+      return;
+    }
+    callback(
+      parseActiveAnnouncements(
+        snap.val() as Parameters<typeof parseActiveAnnouncements>[0],
+      ),
+    );
   });
 }
 
-export async function initFirebaseClient(): Promise<boolean> {
+export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
   if (!isFirebaseConfigured()) {
     console.warn("[LooksMax] Firebase no configurado. Copia .env.example a .env.local");
     return false;
   }
 
-  if (typeof window !== "undefined" && window.FB) {
+  if (bridge) {
     return true;
   }
+
+  if (typeof window !== "undefined" && window.FB) {
+    bridge = window.FB;
+    return true;
+  }
+
+  const rankersList = rankers ?? window.RANKERS ?? [];
+  const getRankedNamesFromOverrides = createGetRankedNamesFromOverrides(rankersList);
 
   if (!app) {
     app = initializeApp(firebaseConfig);
@@ -217,7 +222,7 @@ export async function initFirebaseClient(): Promise<boolean> {
   if (!db) return false;
 
   async function createNewRVRound() {
-    const names = (window.RANKERS ?? []).map((r) => r.name);
+    const names = rankersList.map((r) => r.name);
     const i1 = Math.floor(Math.random() * names.length);
     let i2: number;
     do {
@@ -343,7 +348,7 @@ export async function initFirebaseClient(): Promise<boolean> {
       newRanked[loserIdx] = tmp;
     }
 
-    (window.RANKERS ?? []).forEach((r) => {
+    rankersList.forEach((r) => {
       if (!newRanked.includes(r.name)) newRanked.push(r.name);
     });
 
@@ -684,7 +689,7 @@ export async function initFirebaseClient(): Promise<boolean> {
     }
   }
 
-  window.FB = {
+  bridge = {
     db,
     ref,
     get,
@@ -710,7 +715,10 @@ export async function initFirebaseClient(): Promise<boolean> {
     atomicAdvanceTorneoPhase,
   };
 
-  subscribeAnnouncements(db);
-  window.dispatchEvent(new Event("firebase-ready"));
+  if (typeof window !== "undefined") {
+    window.FB = bridge;
+    window.dispatchEvent(new Event("firebase-ready"));
+  }
+
   return true;
 }

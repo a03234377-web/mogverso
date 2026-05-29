@@ -60,15 +60,15 @@ Coloca las fotos de creadores en `public/img/` (mismas rutas que la web original
 ```text
 src/
   app/           # Layout, estilos globales, página principal
-  components/    # LooksMaxApp (shell de la aplicación)
-  data/          # Datos estáticos tipados (rankers)
-  lib/firebase/  # Cliente Firebase en TypeScript
+  components/    # LooksMaxApp y UI React (looksmax/)
+  contexts/      # FirebaseProvider
+  data/          # Rankers, léxico, torneo, avatares
+  hooks/         # Ranking, votaciones, torneo
+  lib/firebase/  # Cliente Firebase
+  lib/looksmax/  # Lógica pura (ranking, tipos)
 firebase/        # Reglas RTDB de ejemplo (ver README)
-public/
-  legacy-body.html   # Marcado HTML de la app original
-  legacy/app-runtime.js  # Lógica de UI/votaciones/torneo
-  img/               # Imágenes de creadores
-docs/                # Documentación
+public/img/      # Imágenes de creadores
+docs/            # Documentación
 ```
 
 ## Documentación
@@ -77,7 +77,3 @@ docs/                # Documentación
 - [Desarrollo](./docs/desarrollo.md)
 - [Despliegue](./docs/despliegue.md)
 - [Firebase (reglas RTDB)](./firebase/README.md)
-
-## Capa legacy
-
-El marcado y la lógica de la SPA original están en `public/legacy-body.html` y `public/legacy/app-runtime.js`.
