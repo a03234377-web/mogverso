@@ -34,4 +34,10 @@ El comando por defecto es `npm run build`. La configuración en `vercel.json` so
 ## Notas
 
 - No subas `.env.local` al repositorio.
-- Las reglas de Firebase deben permitir lectura/escritura según tu modelo de votación (considera validación en servidor para producción seria).
+- Despliega reglas RTDB desde `firebase/database.rules.example.json` (ver `firebase/README.md`). Ajusta antes de producción; la resolución de rondas y el torneo requieren privilegios de admin o backend.
+
+## Firebase rules
+
+1. Copia `firebase/database.rules.example.json` a `database.rules.json` en la raíz del proyecto Firebase (o pégalo en la consola).
+2. Revisa que las rutas coincidan con tu base de datos.
+3. Para votación robusta, planifica Route Handlers en Next.js además de reglas estrictas.
