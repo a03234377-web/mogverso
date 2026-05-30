@@ -50,7 +50,7 @@ export function EntryVoteCard() {
             <Icon name="trophy" size={24} />
             <Icon name="sparkles" size={24} />
           </div>
-          <div className="mb-3 flex items-center justify-center gap-2 text-base font-extrabold tracking-[3px] text-lm-gold uppercase">
+          <div className="mb-3 flex items-center justify-center gap-2 lm-type-label text-lm-gold">
             <Icon name="star" size={12} /> VOTACIÓN CERRADA{" "}
             <Icon name="star" size={12} />
           </div>
@@ -102,7 +102,7 @@ export function EntryVoteCard() {
       className="relative overflow-hidden rounded-[20px] border border-[rgba(168,85,247,0.35)] bg-[linear-gradient(135deg,rgba(168,85,247,0.08),rgba(59,130,246,0.05))] px-6 py-8 text-center max-md:rounded-2xl max-md:px-3.5 max-md:py-5"
       id="entryVotingCard"
     >
-      <div className="mb-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm font-extrabold tracking-[2px] text-lm-purple uppercase max-md:text-sm max-md:tracking-[1px]">
+      <div className="mb-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 lm-type-label text-lm-purple max-md:text-sm">
         <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-purple" />
         VOTACIÓN ABIERTA · CIERRA EN 2 HORAS
         <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-purple" />
@@ -156,7 +156,7 @@ export function EntryVoteCard() {
                   fallback={<CreatorIcon name={c.name} icon={c.icon} size={28} />}
                 />
               </div>
-              <div className="mb-0.5 font-display text-[1.2rem] tracking-[1.5px] text-lm-text">
+              <div className="mb-0.5 font-sans text-lg font-bold tracking-tight text-lm-text">
                 {c.name}
               </div>
               <div className="mb-3 text-sm font-semibold text-lm-text2">{c.sub}</div>
@@ -166,7 +166,7 @@ export function EntryVoteCard() {
                   style={{ width: voted ? `${pct}%` : "0%" }}
                 />
               </div>
-              <div className="text-base font-extrabold text-lm-purple">
+              <div className="text-base font-bold text-lm-purple">
                 {voted ? (
                   `${pct}%`
                 ) : (

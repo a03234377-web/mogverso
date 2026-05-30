@@ -260,7 +260,7 @@ function TorneoPhaseCard({
     return (
       <PhaseDisplay>
         <PhaseCard variant="semifinals">
-          <div className="mb-2.5 flex items-center justify-center gap-2 text-sm font-black tracking-[3px] text-lm-gold uppercase">
+          <div className="mb-2.5 flex items-center justify-center gap-2 lm-type-label text-lm-gold">
             <Icon name="trophy" size={14} />
             TORNEO FINALIZADO
             <Icon name="trophy" size={14} />
@@ -443,7 +443,7 @@ function MatchCard({
       data-matchid={match.id}
     >
       <div className="mb-3 flex items-center justify-between">
-        <span className="flex items-center gap-1 text-sm font-extrabold tracking-[1.5px] text-lm-text2 uppercase">
+        <span className="flex items-center gap-1 lm-type-label text-lm-text2">
           <Icon name={roundIcon} size={12} />
           {roundLabel} · Partido {idx + 1}
         </span>
@@ -477,7 +477,7 @@ function MatchCard({
           votedFor={myVote === match.p1}
           onVote={() => onVote(match.p1)}
         />
-        <div className="shrink-0 bg-[linear-gradient(135deg,var(--color-lm-green2),var(--color-lm-gold))] bg-clip-text font-display text-[1.4rem] text-transparent">
+        <div className="shrink-0 bg-[linear-gradient(135deg,var(--color-lm-green2),var(--color-lm-gold))] bg-clip-text lm-type-score text-xl text-transparent">
           VS
         </div>
         <MatchSide
@@ -500,9 +500,9 @@ function MatchCard({
         </div>
       )}
       {isResolved && match.winner && (
-        <div className="mt-2.5 rounded-[10px] border-[1.5px] border-[rgba(232,184,75,0.6)] bg-[rgba(232,184,75,0.15)] px-4 py-2 text-center text-base font-extrabold tracking-[1.5px] text-lm-gold uppercase">
+        <div className="mt-2.5 rounded-[10px] border-[1.5px] border-[rgba(232,184,75,0.6)] bg-[rgba(232,184,75,0.15)] px-4 py-2 text-center lm-type-label text-lm-gold">
           <Icon name="trophy" size={14} className="inline text-lm-gold" /> GANADOR ·{" "}
-          <span className="mt-0.5 block font-display text-[1.1rem] tracking-[3px] text-white">
+          <span className="mt-0.5 block font-sans text-base font-bold tracking-tight text-white">
             {match.winner}
           </span>
         </div>
@@ -565,7 +565,7 @@ function MatchSide({
           fallback={<CreatorIcon name={player} icon={info.icon} size={22} />}
         />
       </div>
-      <div className="mb-0.5 font-display text-base tracking-wide text-lm-text max-md:text-base">
+      <div className="mb-0.5 font-sans text-base font-bold tracking-tight text-lm-text max-md:text-base">
         {player}
       </div>
       {showBars ? (
@@ -576,13 +576,13 @@ function MatchSide({
               style={{ width: `${pct}%` }}
             />
           </div>
-          <div className="text-sm font-extrabold text-lm-green2">{pct}%</div>
+          <div className="text-sm font-bold text-lm-green2">{pct}%</div>
           <div className="text-sm text-lm-text2">
             {votes} voto{votes !== 1 ? "s" : ""}
           </div>
         </>
       ) : canVote ? (
-        <div className="mt-1 flex items-center justify-center gap-1 text-sm font-extrabold text-lm-green2">
+        <div className="mt-1 flex items-center justify-center gap-1 text-sm font-bold text-lm-green2">
           <Icon name="pointer" size={12} />
           Votar
         </div>
@@ -602,7 +602,7 @@ function TorneoBracket({ state }: { state: TorneoState | null }) {
   return (
     <div className="flex gap-2 overflow-x-auto pb-3" id="torneoBracketGrid">
       <div className="flex min-w-[110px] shrink-0 flex-col gap-1.5">
-        <div className="mb-1 border-b border-lm-border py-1 text-center text-sm font-extrabold tracking-[1.5px] text-lm-text2 uppercase">
+        <div className="mb-1 border-b border-lm-border py-1 text-center lm-type-label text-lm-text2">
           Cuartos de Final
         </div>
         {(["cua_0", "cua_1", "cua_2", "cua_3"] as const).flatMap((matchId) => {
@@ -623,7 +623,7 @@ function TorneoBracket({ state }: { state: TorneoState | null }) {
         })}
       </div>
       <div className="flex min-w-[110px] shrink-0 flex-col gap-1.5">
-        <div className="mb-1 border-b border-lm-border py-1 text-center text-sm font-extrabold tracking-[1.5px] text-lm-text2 uppercase">
+        <div className="mb-1 border-b border-lm-border py-1 text-center lm-type-label text-lm-text2">
           Semifinales
         </div>
         {[0, 1, 2, 3].map((i) => {
@@ -641,7 +641,7 @@ function TorneoBracket({ state }: { state: TorneoState | null }) {
         })}
       </div>
       <div className="flex min-w-[110px] shrink-0 flex-col gap-1.5">
-        <div className="mb-1 border-b border-lm-border py-1 text-center text-sm font-extrabold tracking-[1.5px] text-lm-gold uppercase">
+        <div className="mb-1 border-b border-lm-border py-1 text-center lm-type-label text-lm-gold">
           Final
         </div>
         {champion ? (
@@ -653,7 +653,7 @@ function TorneoBracket({ state }: { state: TorneoState | null }) {
         ) : (
           <div className="flex items-center gap-1.5 rounded-lg border border-[rgba(232,184,75,0.4)] bg-lm-card px-2 py-1.5 opacity-40">
             <Icon name="crown" size={12} className="text-lm-gold" />
-            <div className="max-w-[75px] truncate text-sm font-extrabold text-lm-gold">
+            <div className="max-w-[75px] truncate text-sm font-bold text-lm-gold">
               Por decidir
             </div>
           </div>
@@ -677,7 +677,7 @@ function BracketSlot({
   if (tbd) {
     return (
       <div className="flex items-center gap-1.5 rounded-lg border border-lm-border bg-lm-card px-2 py-1.5 opacity-40">
-        <div className="max-w-[75px] truncate text-sm font-extrabold text-lm-text2">
+        <div className="max-w-[75px] truncate text-sm font-bold text-lm-text2">
           — TBD
         </div>
       </div>
@@ -703,7 +703,7 @@ function BracketSlot({
       </div>
       <div
         className={cn(
-          "max-w-[75px] truncate text-sm font-extrabold text-lm-text",
+          "max-w-[75px] truncate text-sm font-bold text-lm-text",
           gold && "text-lm-gold2",
         )}
       >

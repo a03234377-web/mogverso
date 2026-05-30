@@ -15,7 +15,7 @@ export function MoversCard({ title, titleIcon, variant, movers }: MoversCardProp
     <div className="rounded-[14px] border border-lm-border bg-lm-card px-5 py-4">
       <div
         className={cn(
-          "mb-3 flex items-center gap-1.5 text-base font-extrabold tracking-[1.5px] uppercase",
+          "mb-3 flex items-center gap-1.5 lm-type-label text-base",
           variant === "up" ? "text-lm-green2" : "text-lm-red2",
         )}
       >
@@ -39,7 +39,7 @@ export function MoversCard({ title, titleIcon, variant, movers }: MoversCardProp
               </div>
               <div
                 className={cn(
-                  "flex items-center gap-1 rounded-full px-2 py-0.5 text-base font-extrabold whitespace-nowrap",
+                  "flex items-center gap-1 rounded-full px-2 py-0.5 text-sm font-bold whitespace-nowrap",
                   variant === "up"
                     ? "bg-[rgba(46,204,113,0.15)] text-lm-green2"
                     : "bg-[rgba(255,71,87,0.15)] text-lm-red2",

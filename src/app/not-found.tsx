@@ -21,13 +21,11 @@ export default function NotFound() {
         </div>
 
         <div>
-          <p className="mb-2 text-base font-extrabold tracking-[3px] text-lm-gold uppercase">
-            LooksMax España
-          </p>
+          <p className="mb-2 lm-type-label text-lm-gold">LooksMax España</p>
           <h1 className="mx-auto w-fit bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text font-display text-[clamp(4rem,18vw,8rem)] tracking-[4px] text-transparent">
             404
           </h1>
-          <p className="mt-3 text-base font-semibold tracking-[2px] text-lm-text2 uppercase">
+          <p className="mt-3 text-base font-semibold tracking-wide text-lm-text2">
             Página no encontrada
           </p>
         </div>
@@ -39,7 +37,7 @@ export default function NotFound() {
 
         <Link
           href="/"
-          className="inline-flex items-center gap-2 rounded-lg bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold3))] px-6 py-3 text-base font-extrabold tracking-[0.8px] text-black uppercase transition-transform hover:scale-[1.04]"
+          className="inline-flex items-center gap-2 rounded-lg bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold3))] px-6 py-3 font-sans text-base font-bold text-black transition-transform hover:scale-[1.04]"
         >
           <Icon name="trophy" size={16} className="text-black" />
           Volver al inicio

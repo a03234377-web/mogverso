@@ -13,8 +13,18 @@ import { cn } from "@/lib/cn";
 
 export function RankVotePage() {
   const { fb } = useFirebase();
-  const { rv, myVote, overrides, history, loading, transitioning, voting, vote } =
-    useRankVote(true);
+  const {
+    rv,
+    myVote,
+    overrides,
+    history,
+    loading,
+    transitioning,
+    healError,
+    voting,
+    vote,
+    retryHeal,
+  } = useRankVote(true);
 
   return (
     <ActivePage id="page-rankvote" active>
@@ -48,6 +58,18 @@ export function RankVotePage() {
                   Cargando votación…
                 </IconLabel>
               )}
+              {healError && (
+                <div className="mx-auto mt-4 max-w-md text-sm leading-relaxed font-semibold text-lm-red2">
+                  {healError}
+                  <button
+                    type="button"
+                    className="mt-3 block w-full cursor-pointer rounded-lg border border-lm-border2 bg-lm-card px-4 py-2 text-sm font-bold text-lm-gold lm-focus-ring"
+                    onClick={() => void retryHeal()}
+                  >
+                    Reintentar
+                  </button>
+                </div>
+              )}
             </div>
           ) : rv ? (
             <RankVoteArena
@@ -66,7 +88,7 @@ export function RankVotePage() {
           )}
         </div>
         <div>
-          <div className="mb-4 flex items-center gap-2 font-display text-[1.4rem] tracking-[2px] text-lm-text">
+          <div className="mb-4 flex items-center gap-2 font-sans text-xl font-bold tracking-tight text-lm-text">
             <Icon name="scroll-text" size={22} className="text-lm-gold" />
             Historial de Votaciones
           </div>
@@ -138,11 +160,11 @@ function RankVoteArena({
 
   return (
     <>
-      <div className="mb-4 inline-flex max-w-full flex-wrap items-center justify-center gap-x-1.5 gap-y-1 rounded-full border border-[rgba(46,204,113,0.4)] bg-[rgba(46,204,113,0.12)] px-3 py-1 text-sm font-extrabold tracking-[1.5px] text-lm-green2 uppercase max-md:text-sm max-md:tracking-[1px]">
+      <div className="mb-4 inline-flex max-w-full flex-wrap items-center justify-center gap-x-1.5 gap-y-1 rounded-full border border-[rgba(46,204,113,0.4)] bg-[rgba(46,204,113,0.12)] px-3 py-1 font-sans text-sm font-bold tracking-wide text-lm-green2 uppercase">
         <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-green2" />
         VOTACIÓN EN DIRECTO · 3 HORAS
       </div>
-      <div className="mb-0.5 font-display text-[clamp(1.2rem,3vw,2.5rem)] tracking-[2px] text-lm-text">
+      <div className="mb-0.5 font-sans text-xl font-bold tracking-tight text-lm-text lg:text-2xl">
         ¿Quién merece subir en el ranking?
       </div>
       <div className="mb-5 text-base font-semibold text-lm-text2">
@@ -162,7 +184,7 @@ function RankVoteArena({
           selected={myCandidate === rv.p1}
           onVote={() => onVote(rv.p1)}
         />
-        <div className="w-fit shrink-0 animate-vs-pulse bg-[linear-gradient(135deg,var(--color-lm-green2),var(--color-lm-gold))] bg-clip-text font-display text-[2.5rem] tracking-[2px] text-transparent max-md:text-[2rem]">
+        <div className="w-fit shrink-0 font-sans text-2xl font-bold tracking-tight text-lm-gold max-md:text-xl">
           VS
         </div>
         <FighterCard
@@ -273,7 +295,7 @@ function FighterCard({
       </div>
       <div
         className={cn(
-          "mb-0.5 font-display text-[1.25rem] tracking-[1.5px] max-[400px]:text-base max-md:text-base",
+          "mb-0.5 font-sans text-lg font-bold tracking-tight max-[400px]:text-base max-md:text-base",
           up ? "text-lm-green2" : "text-lm-red2",
         )}
       >
@@ -282,12 +304,12 @@ function FighterCard({
       <div className="mb-1 text-sm font-semibold text-lm-text2 max-md:text-sm">
         {ranker.sub}
       </div>
-      <div className="mb-2 text-base font-extrabold text-lm-gold max-md:text-sm">
+      <div className="mb-2 font-sans text-sm font-semibold text-lm-gold max-md:text-sm">
         Puesto #{idx} · Score {ranker.score}
       </div>
       <div
         className={cn(
-          "mb-2 inline-block rounded-full px-2 py-0.5 text-sm font-extrabold tracking-[0.8px]",
+          "mb-2 inline-block rounded-full px-2 py-0.5 font-sans text-sm font-semibold",
           up
             ? "border border-[rgba(46,204,113,0.35)] bg-[rgba(46,204,113,0.15)] text-lm-green2"
             : "border border-[rgba(255,71,87,0.35)] bg-[rgba(255,71,87,0.15)] text-lm-red2",
@@ -309,7 +331,7 @@ function FighterCard({
       </div>
       <div
         className={cn(
-          "text-base font-extrabold",
+          "font-sans text-base font-semibold",
           up ? "text-lm-green2" : "text-lm-red2",
         )}
       >
@@ -371,12 +393,12 @@ function HistoryRow({
   return (
     <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-[10px] border border-lm-border bg-lm-card px-4 py-3 max-md:gap-2 max-md:px-3">
       <Icon name="vote" size={14} className="shrink-0 text-lm-text2" />
-      <span className="text-base font-extrabold text-lm-green2">
+      <span className="font-sans text-base font-semibold text-lm-green2">
         ▲ {h.winner}
         {posW}
       </span>
-      <span className="text-base text-lm-text2">vs</span>
-      <span className="text-base font-bold text-lm-red2">
+      <span className="font-sans text-base text-lm-text2">vs</span>
+      <span className="font-sans text-base font-semibold text-lm-red2">
         ▼ {h.loser}
         {posL}
       </span>

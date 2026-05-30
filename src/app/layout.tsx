@@ -1,5 +1,5 @@
 import type { Viewport } from "next";
-import { Bebas_Neue, Syne } from "next/font/google";
+import { Bebas_Neue, Lora, Syne } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { WebSiteJsonLd } from "@/lib/seo/json-ld";
@@ -22,6 +22,14 @@ const syne = Syne({
   preload: false,
 });
 
+const lora = Lora({
+  weight: ["400", "500", "600"],
+  subsets: ["latin"],
+  variable: "--font-lora",
+  display: "swap",
+  preload: false,
+});
+
 export const metadata = rootLayoutMetadata();
 
 export const viewport: Viewport = {
@@ -37,7 +45,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${bebas.variable} ${syne.variable}`}
+      className={`${bebas.variable} ${syne.variable} ${lora.variable}`}
       suppressHydrationWarning
     >
       <body

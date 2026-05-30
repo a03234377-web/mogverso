@@ -138,9 +138,7 @@ function MoreMenu({
       className="fixed right-3 left-3 z-[200] rounded-2xl border border-lm-border2 bg-lm-card p-3 shadow-[0_-8px_32px_rgba(0,0,0,0.5)]"
       style={{ bottom: "calc(var(--lm-bottom-nav-height) + 0.5rem)" }}
     >
-      <div className="mb-2.5 px-1.5 text-sm font-extrabold tracking-[2px] text-lm-text2 uppercase">
-        Más secciones
-      </div>
+      <div className="mb-2.5 px-1.5 lm-type-label text-lm-text2">Más secciones</div>
       <MoreLinkItem
         href={LOOKSMAX_PATHS.consejo}
         icon="book-open"
@@ -159,9 +157,7 @@ function MoreMenu({
       >
         <Icon name="star" size={20} className="text-lm-gold" />
         <div>
-          <div className="text-base font-extrabold text-lm-gold">
-            Unirse a la comunidad
-          </div>
+          <div className="text-base font-bold text-lm-gold">Unirse a la comunidad</div>
           <div className="text-sm text-lm-text2">Discord exclusivo</div>
         </div>
       </button>
@@ -191,7 +187,7 @@ function MoreLinkItem({
     >
       <Icon name={icon} size={20} className="text-lm-gold" />
       <div>
-        <div className="text-base font-extrabold text-lm-text">{title}</div>
+        <div className="text-base font-bold text-lm-text">{title}</div>
         <div className="text-sm text-lm-text2">{sub}</div>
       </div>
     </Link>
