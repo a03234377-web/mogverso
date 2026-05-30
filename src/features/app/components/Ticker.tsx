@@ -7,7 +7,7 @@ export function Ticker() {
   const items = [...TICKER_ITEMS, ...TICKER_ITEMS];
 
   return (
-    <div className="relative z-[101] flex h-[var(--lm-ticker-height)] items-center overflow-hidden border-b border-lm-border bg-[rgba(232,184,75,0.06)]">
+    <div className="relative z-[101] flex h-[var(--lm-ticker-height)] items-center overflow-hidden border-b border-lm-border bg-[rgba(232,184,75,0.06)] max-md:hidden">
       <div className="flex h-full shrink-0 items-center gap-1 bg-lm-gold px-3 text-base font-extrabold tracking-[1.5px] whitespace-nowrap text-black">
         <IconLabel icon="flame" iconSize={14} iconClassName="text-black">
           NOTICIAS
