@@ -111,8 +111,8 @@ export function EntryVoteCard() {
         ¿Quién entra al Ranking?
       </h2>
       <div className="mb-6 text-base font-semibold text-lm-text2">
-        Haz clic directamente en el candidato para votar · Un voto por dispositivo e IP · El
-        que más votos tenga entra al ranking
+        Haz clic directamente en el candidato para votar · Un voto por dispositivo e IP
+        · El que más votos tenga entra al ranking
       </div>
       <CountdownDigits h={cd.h} m={cd.m} s={cd.s} variant="purple" className="mb-6" />
       <div
