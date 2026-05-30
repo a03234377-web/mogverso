@@ -2,6 +2,7 @@
 
 @theme inline {
   --font-sans: var(--font-syne);
+  --font-serif: var(--font-lora);
   --font-display: var(--font-bebas);
 
   --color-lm-bg: #07090f;
@@ -148,10 +149,36 @@ body {
   line-height: var(--lm-line-body);
 }
 
-/* Bebas Neue: evitar recorte vertical de glifos */
+/* Bebas: solo titulares de marca / ceremonia (no párrafos ni UI densa) */
 .font-display {
   line-height: 1.12;
   overflow: visible;
+}
+
+/* Syne: títulos de sección y UI */
+@utility lm-type-section {
+  font-family: var(--font-syne), sans-serif;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+@utility lm-type-label {
+  font-family: var(--font-syne), sans-serif;
+  font-size: var(--lm-text-meta);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: var(--lm-line-snug);
+  text-transform: uppercase;
+}
+
+@utility lm-type-score {
+  font-family: var(--font-syne), sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: normal;
+  line-height: 1.2;
 }
 
 @utility lm-text-body {

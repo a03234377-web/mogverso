@@ -46,15 +46,21 @@ pnpm run mdlint
 
 ## Reglas de Firebase
 
-La app espera rutas como:
+Copia el JSON de [`docs/firebase-rules.json`](firebase-rules.json) en Firebase Console → Realtime Database → **Reglas** → Publicar.
 
-- `rankOverrides`, `rankMovements`, `rankMovementsUp`, `rankMovementsDown` (pilas de 5)
-- `rankvote/current`, `rankvoteHistory`, `rankvoteVotes/`
-- `entryVote/current`, `entryVotes/`
-- `torneo/state`, `torneoVotes/`
-- `announcements`
+La app necesita escritura en:
 
-Ajusta las reglas de seguridad en Firebase según tu entorno (desarrollo vs producción).
+| Ruta | Uso |
+| :--- | :--- |
+| `rankvote/current` | Crear ronda cada 3 h, `resolved`, `resolving` |
+| `rankvote/current/votes/*` | Incrementar votos (validado) |
+| `rankOverrides`, `rankMovements`, `rankMovementsUp`, `rankMovementsDown` | Ranking y pilas de movimientos |
+| `rankvoteHistory/*` | Historial (solo creación, `!data.exists()`) |
+| `rankvoteVotes/*`, `entryVotes/*`, `torneoVotes/*` | Anti-fraude por dispositivo/IP |
+| `entryVote/current` | Votación de entrada |
+| `torneo/state` | Fases del torneo y votos de partidos |
+
+Solo desarrollo local abierto: [`firebase-rules-dev.example.json`](firebase-rules-dev.example.json).
 
 ## Depuración
 

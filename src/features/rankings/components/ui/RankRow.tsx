@@ -63,7 +63,7 @@ export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
     >
       <div
         className={cn(
-          "flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] font-display text-[1.1rem]",
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] lm-type-score text-[1.05rem]",
           rankNumStyles[nc],
         )}
       >
@@ -73,7 +73,7 @@ export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
         <Avatar name={ranker.name} size={40} />
       </div>
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-1.5 text-base leading-snug font-extrabold">
+        <div className="flex flex-wrap items-center gap-1.5 text-base leading-snug font-bold">
           {ranker.name}
           {movBadge}
         </div>
@@ -83,10 +83,8 @@ export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
       </div>
       <div className="flex shrink-0 items-center gap-2.5">
         <div className="text-right">
-          <div className="font-display text-[1.3rem] text-lm-gold">{ranker.score}</div>
-          <div className="text-sm leading-snug tracking-wider text-lm-text2 uppercase">
-            Score
-          </div>
+          <div className="lm-type-score text-xl text-lm-gold">{ranker.score}</div>
+          <div className="lm-type-label text-lm-text2">Score</div>
         </div>
         <div className="text-base text-lm-text2 transition-all duration-200 group-hover:translate-x-1 group-hover:text-lm-gold max-md:hidden">
           ›

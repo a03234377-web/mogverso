@@ -31,7 +31,7 @@ export function HeroSection({
       {eyebrow && (
         <div
           className={cn(
-            "mb-3 text-base leading-snug font-extrabold tracking-[2px] uppercase",
+            "mb-3 lm-type-label text-base leading-snug",
             variant === "torneo" ? "text-[#ff6b35]" : "text-lm-gold",
           )}
         >
@@ -40,13 +40,13 @@ export function HeroSection({
       )}
       <h1
         className={cn(
-          "mx-auto w-fit max-w-full font-display tracking-[4px] max-[360px]:tracking-[1px] max-md:tracking-[2px]",
+          "mx-auto w-fit max-w-full max-[360px]:tracking-[0.02em] max-md:tracking-[0.04em]",
           variant === "default" &&
-            "animate-hero-entrance bg-[linear-gradient(135deg,#fff_0%,var(--color-lm-gold2)_40%,var(--color-lm-gold)_70%,var(--color-lm-gold3)_100%)] bg-clip-text text-[clamp(2.4rem,8vw,9rem)] text-transparent",
+            "animate-hero-entrance bg-[linear-gradient(135deg,#fff_0%,var(--color-lm-gold2)_40%,var(--color-lm-gold)_70%,var(--color-lm-gold3)_100%)] bg-clip-text font-display text-[clamp(2.4rem,8vw,9rem)] tracking-[4px] text-transparent",
           variant === "torneo" &&
-            "bg-[linear-gradient(135deg,#fff_0%,#ff9f5b_40%,#ff6b35_70%,var(--color-lm-gold)_100%)] bg-clip-text text-[clamp(2.4rem,9vw,8rem)] text-transparent",
+            "bg-[linear-gradient(135deg,#fff_0%,#ff9f5b_40%,#ff6b35_70%,var(--color-lm-gold)_100%)] bg-clip-text font-display text-[clamp(2.4rem,9vw,8rem)] tracking-[4px] text-transparent",
           variant === "rankvote" &&
-            "bg-[linear-gradient(135deg,var(--color-lm-green2),#3bde8f,var(--color-lm-gold))] bg-clip-text text-[clamp(2rem,7vw,6rem)] text-transparent",
+            "bg-[linear-gradient(135deg,var(--color-lm-green2),#3bde8f,var(--color-lm-gold))] bg-clip-text font-sans text-[clamp(1.75rem,6vw,3.25rem)] font-bold tracking-tight text-transparent",
         )}
       >
         {title}
@@ -54,7 +54,7 @@ export function HeroSection({
       {subtitle && (
         <div
           className={cn(
-            "mt-2 font-semibold tracking-[2px] text-lm-text2 uppercase",
+            "mt-2 font-sans font-semibold tracking-wide text-lm-text2 uppercase",
             variant === "default" && "text-[clamp(0.85rem,1.8vw,1.25rem)]",
             variant === "torneo" && "text-[clamp(0.72rem,2.5vw,0.8rem)] max-md:px-2",
             variant === "rankvote" && "text-[clamp(0.68rem,2.5vw,0.78rem)] max-md:px-2",

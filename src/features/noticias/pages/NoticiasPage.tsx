@@ -16,16 +16,17 @@ export function NoticiasPage() {
         icon="newspaper"
         title="Noticias"
         desc="Lo último del mundo looksmaxer español · Actualizado diariamente"
+        variant="readable"
       />
       <div className="mx-auto max-w-[1000px] px-5 pb-12 max-md:px-3 max-md:pb-6">
         <div className="relative mb-6 animate-breaking-pulse overflow-hidden rounded-[14px] border border-[rgba(255,71,87,0.35)] bg-[linear-gradient(135deg,rgba(192,57,43,0.15),rgba(255,71,87,0.08))] p-5 max-md:rounded-xl max-md:p-4">
-          <div className="mb-2 flex items-center gap-1.5 text-sm font-black tracking-[2px] text-lm-red2 uppercase">
+          <div className="mb-2 flex items-center gap-1.5 lm-type-label text-lm-red2">
             <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-red2" />
             <IconLabel icon="siren" iconSize={12}>
               BREAKING NEWS
             </IconLabel>
           </div>
-          <div className="font-display text-[clamp(1.1rem,2.5vw,2.2rem)] leading-tight tracking-[1.5px] text-lm-text max-md:text-[clamp(1rem,4.5vw,1.5rem)]">
+          <div className="font-sans text-[clamp(1.15rem,2.5vw,1.75rem)] leading-snug font-bold tracking-tight text-lm-text max-md:text-[clamp(1.05rem,4.5vw,1.35rem)]">
             KAPPAH: DE SUB-HUMAN A CHAD ABSOLUTO — LA TRANSFORMACIÓN QUE PARTIÓ EL FORO
             EN DOS
           </div>
@@ -51,7 +52,7 @@ export function NoticiasPage() {
               score="Sub-3"
               scoreClass="bad"
             />
-            <div className="font-display text-[2.5rem] text-lm-gold opacity-60 max-md:rotate-90 max-md:text-[2rem]">
+            <div className="font-sans text-3xl font-bold text-lm-gold opacity-60 max-md:rotate-90 max-md:text-2xl">
               →
             </div>
             <CompareSide
@@ -132,7 +133,7 @@ function CompareSide({
     <div className="flex max-w-[280px] min-w-0 flex-1 flex-col items-center gap-1.5 max-md:w-full max-md:max-w-[220px]">
       <div
         className={cn(
-          "rounded-full px-2.5 py-0.5 text-sm font-extrabold tracking-[1.5px] uppercase",
+          "rounded-full px-2.5 py-0.5 lm-type-label",
           labelClass === "before"
             ? "border border-[rgba(255,71,87,0.3)] bg-[rgba(255,71,87,0.15)] text-lm-red2"
             : "border border-[rgba(46,204,113,0.3)] bg-[rgba(46,204,113,0.15)] text-lm-green2",
@@ -151,7 +152,7 @@ function CompareSide({
       </div>
       <div
         className={cn(
-          "font-display text-base tracking-[1.5px]",
+          "lm-type-score text-base",
           scoreClass === "bad" ? "text-lm-red2" : "text-lm-green2",
         )}
       >
@@ -189,14 +190,14 @@ function NoticiaCard({
     <div className="rounded-xl border border-lm-border bg-lm-card p-4">
       <div
         className={cn(
-          "mb-1.5 flex items-center gap-1 text-sm font-extrabold tracking-[1.5px] uppercase",
+          "mb-1.5 flex items-center gap-1 lm-type-label",
           noticiaCatColors[cat] ?? "text-lm-text2",
         )}
       >
         <Icon name={catIcon} size={12} />
         {catLabel}
       </div>
-      <div className="mb-1.5 text-base leading-snug font-extrabold">{title}</div>
+      <div className="mb-1.5 text-base leading-snug font-bold">{title}</div>
       <div className="font-serif text-base leading-normal text-lm-text2">{body}</div>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-1.5 text-sm font-semibold text-lm-text2">
         <span className="rounded-full border border-lm-border bg-lm-bg3 px-1.5 py-0.5 text-sm font-bold">

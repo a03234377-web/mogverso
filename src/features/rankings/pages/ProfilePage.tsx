@@ -51,16 +51,16 @@ export function ProfilePage({ profileIndex, rankPosition }: ProfilePageProps) {
       <div className="mx-auto mt-4 flex max-w-[1000px] items-start gap-6 px-5 max-md:flex-col max-md:items-center max-md:gap-4 max-md:px-4 max-md:text-center">
         <div className="relative shrink-0">
           <ProfileAvatar name={r.name} photoBg={r.photoBg} />
-          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full border-2 border-lm-bg bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold3))] px-2.5 py-0.5 font-display text-base tracking-[1.5px] whitespace-nowrap text-black">
+          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full border-2 border-lm-bg bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold3))] px-2.5 py-0.5 lm-type-score text-sm whitespace-nowrap text-black">
             #{rank}
           </div>
         </div>
         <div className="min-w-0 flex-1 pt-0.5">
           <div className="mb-0.5 flex flex-wrap items-center gap-2.5 max-md:justify-center">
-            <div className="font-display text-[clamp(1.5rem,4vw,3rem)] tracking-[2px] text-lm-text max-md:text-[clamp(1.4rem,5vw,2.2rem)]">
+            <div className="font-sans text-[clamp(1.5rem,4vw,2.25rem)] font-bold tracking-tight text-lm-text max-md:text-[clamp(1.35rem,5vw,1.85rem)]">
               {r.name}
             </div>
-            <div className="flex items-center gap-0.5 rounded-full border border-lm-border bg-[rgba(150,150,150,0.1)] px-2.5 py-0.5 text-base font-extrabold text-lm-text2 max-md:text-sm">
+            <div className="flex items-center gap-0.5 rounded-full border border-lm-border bg-[rgba(150,150,150,0.1)] px-2.5 py-0.5 text-sm font-semibold text-lm-text2 max-md:text-sm">
               — Ranking dinámico
             </div>
           </div>
@@ -88,10 +88,8 @@ export function ProfilePage({ profileIndex, rankPosition }: ProfilePageProps) {
           </div>
           <div className="flex gap-3 max-md:justify-center">
             <div className="text-center">
-              <div className="font-display text-[1.4rem] text-lm-gold">{r.score}</div>
-              <div className="text-sm font-bold tracking-wider text-lm-text2 uppercase">
-                Score
-              </div>
+              <div className="lm-type-score text-2xl text-lm-gold">{r.score}</div>
+              <div className="lm-type-label text-lm-text2">Score</div>
             </div>
           </div>
         </div>
@@ -99,7 +97,7 @@ export function ProfilePage({ profileIndex, rankPosition }: ProfilePageProps) {
       <div className="mx-auto max-w-[1000px] px-5 pt-5 pb-12 max-md:px-4 max-md:pb-20">
         <div className="flex flex-col gap-4">
           <div className="rounded-[14px] border border-lm-border bg-lm-card p-5 transition-all duration-300 hover:border-lm-border2">
-            <div className="mb-3 flex items-center gap-1.5 text-base font-extrabold tracking-[0.8px] text-lm-text">
+            <div className="mb-3 flex items-center gap-1.5 text-base font-bold text-lm-text">
               <Icon name="clipboard-list" size={16} className="text-lm-gold" />{" "}
               Biografía
             </div>
@@ -108,7 +106,7 @@ export function ProfilePage({ profileIndex, rankPosition }: ProfilePageProps) {
             </div>
           </div>
           <div className="rounded-[14px] border border-lm-border bg-lm-card p-5 transition-all duration-300 hover:border-lm-border2">
-            <div className="mb-3 flex items-center gap-1.5 text-base font-extrabold tracking-[0.8px] text-lm-text">
+            <div className="mb-3 flex items-center gap-1.5 text-base font-bold text-lm-text">
               <Icon name="trending-up" size={16} className="text-lm-green2" /> Último
               Movimiento
             </div>

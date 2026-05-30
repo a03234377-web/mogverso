@@ -39,6 +39,14 @@ function dedupeHistory(rows: RvHistoryRow[]): RvHistoryRow[] {
   });
 }
 
+function formatHealError(err: unknown): string {
+  const msg = err instanceof Error ? err.message : String(err);
+  if (/PERMISSION_DENIED|permission_denied/i.test(msg)) {
+    return "Firebase denegó la escritura. Revisa las reglas RTDB en la consola del proyecto.";
+  }
+  return msg || "No se pudo crear la nueva ronda";
+}
+
 export function useRankVote(active: boolean) {
   const { fb } = useFirebase();
   const [rv, setRv] = useState<RankVoteRound | null>(null);
@@ -47,10 +55,20 @@ export function useRankVote(active: boolean) {
   const [history, setHistory] = useState<RvHistoryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [transitioning, setTransitioning] = useState(false);
+  const [healError, setHealError] = useState<string | null>(null);
   const [voting, setVoting] = useState(false);
-  const resolvingRef = useRef(false);
   const resolveInFlightRef = useRef<Promise<void> | null>(null);
-  const rvIdRef = useRef<string | null>(null);
+
+  const requestNewRound = useCallback(async () => {
+    if (!fb) return;
+    try {
+      await fb.ensureRVExists();
+      setHealError(null);
+    } catch (err) {
+      console.error("[LooksMax] ensureRVExists:", err);
+      setHealError(formatHealError(err));
+    }
+  }, [fb]);
 
   const runResolve = useCallback(
     async (round: Record<string, unknown>) => {
@@ -59,12 +77,13 @@ export function useRankVote(active: boolean) {
         await resolveInFlightRef.current.catch(() => {});
         return;
       }
-      resolvingRef.current = true;
       const task = fb
         .resolveRVIfNeeded(round)
-        .catch(console.error)
+        .catch((err) => {
+          console.error("[LooksMax] resolveRVIfNeeded:", err);
+          setHealError(formatHealError(err));
+        })
         .finally(() => {
-          resolvingRef.current = false;
           resolveInFlightRef.current = null;
         });
       resolveInFlightRef.current = task;
@@ -80,11 +99,8 @@ export function useRankVote(active: boolean) {
       const arenaActive = active;
 
       if (!round) {
-        if (!resolvingRef.current) {
-          resolvingRef.current = true;
-          await fb.ensureRVExists().catch(console.error);
-          resolvingRef.current = false;
-        }
+        if (arenaActive) setTransitioning(true);
+        await requestNewRound();
         return;
       }
 
@@ -92,23 +108,19 @@ export function useRankVote(active: boolean) {
 
       if (round.resolved === true) {
         if (arenaActive) setTransitioning(true);
-        rvIdRef.current = null;
-        if (!resolvingRef.current) {
-          resolvingRef.current = true;
-          await fb.ensureRVExists().catch(console.error);
-          resolvingRef.current = false;
-        }
+        setRv(null);
+        await requestNewRound();
         return;
       }
 
       if (round.endTime <= now) {
         if (arenaActive) setTransitioning(true);
-        if (!resolvingRef.current) await runResolve(round as Record<string, unknown>);
+        await runResolve(round as Record<string, unknown>);
         return;
       }
 
       setTransitioning(false);
-      rvIdRef.current = round.id;
+      setHealError(null);
       setRv(round);
 
       const [ovSnap, myVoteSnap] = await Promise.all([
@@ -123,19 +135,18 @@ export function useRankVote(active: boolean) {
       );
       setLoading(false);
     },
-    [fb, active, runResolve],
+    [fb, active, runResolve, requestNewRound],
   );
 
   useEffect(() => {
     if (!fb || !active) return;
-    rvIdRef.current = null;
 
     let unsubRv: (() => void) | undefined;
     let unsubHist: (() => void) | undefined;
     let cancelled = false;
 
     void (async () => {
-      await fb.ensureRVExists();
+      await requestNewRound();
       if (cancelled) return;
       const { db, ref, onValue } = fb;
       unsubRv = onValue(ref(db, "rankvote/current"), (snap) => {
@@ -161,7 +172,15 @@ export function useRankVote(active: boolean) {
       unsubRv?.();
       unsubHist?.();
     };
-  }, [fb, active, handleSnapshot]);
+  }, [fb, active, handleSnapshot, requestNewRound]);
+
+  useEffect(() => {
+    if (!fb || !active || !transitioning) return;
+    const id = setInterval(() => {
+      void requestNewRound();
+    }, 3000);
+    return () => clearInterval(id);
+  }, [fb, active, transitioning, requestNewRound]);
 
   const vote = useCallback(
     async (name: string) => {
@@ -188,7 +207,7 @@ export function useRankVote(active: boolean) {
     if (rv.endTime <= Date.now()) return;
 
     const id = setInterval(() => {
-      if (rv.endTime <= Date.now() && !resolvingRef.current) {
+      if (rv.endTime <= Date.now()) {
         setTransitioning(true);
         void runResolve(rv as Record<string, unknown>);
       }
@@ -203,7 +222,9 @@ export function useRankVote(active: boolean) {
     history,
     loading,
     transitioning,
+    healError,
     voting,
     vote,
+    retryHeal: requestNewRound,
   };
 }

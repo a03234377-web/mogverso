@@ -30,12 +30,12 @@ function BrandLink({
       </div>
       <div
         id="logo-container"
-        className="lm-logo-scroll min-w-0 leading-tight max-md:hidden"
+        className="lm-logo-scroll hidden min-w-0 leading-tight lg:block"
         style={{ "--logo-opacity": logoOpacity } as CSSProperties}
         aria-hidden={isLogoInteractive ? undefined : true}
         tabIndex={isLogoInteractive ? undefined : -1}
       >
-        <div className="bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold2))] bg-clip-text font-display text-[1.35rem] tracking-[2px] text-transparent">
+        <div className="bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold2))] bg-clip-text font-display text-[1.35rem] tracking-[0.06em] text-transparent">
           LooksMax<span className="text-lm-gold">ES</span>
         </div>
         <span className="block font-sans text-sm font-semibold tracking-wide text-lm-text2 max-lg:hidden">
@@ -49,15 +49,18 @@ function BrandLink({
 function NavBadge({
   children,
   variant,
+  className,
 }: {
   children: string;
   variant: "live" | "hot";
+  className?: string;
 }) {
   return (
     <span
       className={cn(
-        "rounded-full px-1.5 py-0.5 text-[0.6875rem] leading-none font-black tracking-wide text-white uppercase",
+        "inline-flex rounded-full px-1.5 py-0.5 text-[0.6875rem] leading-none font-black tracking-wide text-white uppercase",
         variant === "live" ? "animate-pulse-soft bg-lm-orange" : "bg-lm-red2",
+        className,
       )}
     >
       {children}
@@ -79,7 +82,7 @@ export function LooksMaxHeader({ page, onOpenDiscord }: LooksMaxHeaderProps) {
         aria-hidden
       />
       <nav
-        className="mx-auto flex h-[var(--lm-nav-height)] max-w-[1400px] items-center justify-between gap-3 px-4 md:gap-4 md:px-5"
+        className="mx-auto flex h-[var(--lm-nav-height)] max-w-[1400px] min-w-0 items-center justify-between gap-2 px-3 md:gap-2 md:px-4 lg:gap-3 lg:px-5"
         aria-label="Navegación principal"
       >
         <BrandLink logoOpacity={logoOpacity} isLogoInteractive={isLogoInteractive} />
@@ -89,11 +92,11 @@ export function LooksMaxHeader({ page, onOpenDiscord }: LooksMaxHeaderProps) {
         </div>
 
         <div
-          className="hidden min-w-0 flex-1 items-center justify-center md:flex lg:max-w-2xl xl:max-w-3xl"
+          className="hidden min-w-0 flex-1 basis-0 items-center justify-center overflow-hidden md:flex"
           id="desktopTabs"
           aria-label="Secciones"
         >
-          <div className="scrollbar-none flex max-w-full items-center gap-0.5 overflow-x-auto rounded-full border border-lm-border bg-lm-bg2/90 p-1">
+          <div className="scrollbar-none flex w-full max-w-full items-center gap-0.5 overflow-x-auto rounded-full border border-lm-border bg-lm-bg2/90 p-0.5 md:p-1">
             {DESKTOP_TABS.map((tab) => {
               const active = page === tab.id;
               return (
@@ -102,8 +105,10 @@ export function LooksMaxHeader({ page, onOpenDiscord }: LooksMaxHeaderProps) {
                   href={LOOKSMAX_PATHS[tab.id]}
                   id={`nav-desktop-${tab.id}`}
                   aria-current={active ? "page" : undefined}
+                  aria-label={tab.label}
+                  title={tab.label}
                   className={cn(
-                    "group relative flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 font-sans text-sm font-bold whitespace-nowrap no-underline lm-focus-ring transition-colors duration-200 lg:px-3.5 lg:text-[0.9375rem]",
+                    "group relative flex shrink-0 cursor-pointer items-center gap-1 rounded-full px-2 py-1.5 font-sans text-sm font-bold whitespace-nowrap no-underline lm-focus-ring transition-colors duration-200 md:gap-1.5 md:px-2.5 md:py-2 lg:px-3.5 lg:text-[0.9375rem]",
                     active
                       ? "bg-[linear-gradient(135deg,rgba(232,184,75,0.22),rgba(232,184,75,0.08))] text-lm-gold shadow-[inset_0_0_0_1px_rgba(232,184,75,0.35)]"
                       : "text-lm-text2 hover:text-lm-gold2",
@@ -119,11 +124,11 @@ export function LooksMaxHeader({ page, onOpenDiscord }: LooksMaxHeaderProps) {
                         : "text-lm-text2 opacity-80 group-hover:text-lm-gold2 group-hover:opacity-100",
                     )}
                   />
-                  <span className="max-xl:hidden">{tab.label}</span>
-                  <span className="xl:hidden">{tab.label.split(" ")[0]}</span>
+                  <span className="hidden lg:inline">{tab.label}</span>
                   {tab.badge && (
                     <NavBadge
                       variant={tab.badgeClass === "tab-badge-new" ? "live" : "hot"}
+                      className="hidden xl:inline-flex"
                     >
                       {tab.badge}
                     </NavBadge>
@@ -144,7 +149,7 @@ export function LooksMaxHeader({ page, onOpenDiscord }: LooksMaxHeaderProps) {
           <button
             type="button"
             aria-label="Unirse a la comunidad"
-            className="flex cursor-pointer items-center gap-1.5 rounded-full border border-[rgba(232,184,75,0.35)] bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold3))] px-3.5 py-2 font-sans text-sm leading-none font-bold tracking-normal text-black shadow-[0_0_16px_rgba(232,184,75,0.25)] lm-focus-ring-on-gold transition-all duration-200 hover:scale-[1.03] hover:shadow-[0_0_22px_rgba(232,184,75,0.4)] max-md:px-3 max-md:py-1.5"
+            className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-[rgba(232,184,75,0.35)] bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold3))] px-2.5 py-1.5 font-sans text-sm leading-none font-bold tracking-normal text-black shadow-[0_0_16px_rgba(232,184,75,0.25)] lm-focus-ring-on-gold transition-all duration-200 hover:scale-[1.03] hover:shadow-[0_0_22px_rgba(232,184,75,0.4)] md:px-3 md:py-2 lg:px-3.5"
             onClick={onOpenDiscord}
           >
             <Icon name="star" size={16} className="text-black" />

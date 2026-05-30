@@ -62,7 +62,7 @@ export function RankingsPage({
         <div className="flex w-[220px] flex-col items-center gap-2.5 max-md:w-full max-md:flex-row max-md:gap-3.5">
           <button
             type="button"
-            className="min-h-[58px] w-full cursor-pointer rounded-[14px] border-none bg-[linear-gradient(135deg,var(--color-lm-green2),var(--color-lm-gold))] px-8 py-3 font-display text-[1.3rem] tracking-[2px] text-black shadow-[0_0_24px_rgba(46,204,113,0.35)] lm-focus-ring-on-gold transition-all duration-250 hover:scale-105 max-md:min-h-[50px] max-md:flex-1 max-md:rounded-xl max-md:px-4 max-md:py-2.5 max-md:text-[1.05rem]"
+            className="min-h-[58px] w-full cursor-pointer rounded-[14px] border-none bg-[linear-gradient(135deg,var(--color-lm-green2),var(--color-lm-gold))] px-8 py-3 font-sans text-lg font-bold text-black shadow-[0_0_24px_rgba(46,204,113,0.35)] lm-focus-ring-on-gold transition-all duration-250 hover:scale-105 max-md:min-h-[50px] max-md:flex-1 max-md:rounded-xl max-md:px-4 max-md:py-2.5 max-md:text-base"
             onClick={() => navigate("rankvote")}
           >
             <Icon name="vote" size={18} className="inline text-black" /> VOTAR RANKING
@@ -74,7 +74,7 @@ export function RankingsPage({
         <div className="flex w-[220px] flex-col items-center gap-2.5 max-md:w-full max-md:flex-row max-md:gap-3.5">
           <button
             type="button"
-            className="min-h-[58px] w-full cursor-pointer rounded-[14px] border-none bg-[linear-gradient(135deg,#ff6b35,var(--color-lm-gold))] px-8 py-3 font-display text-[1.3rem] tracking-[2px] text-black shadow-[0_0_24px_rgba(255,107,53,0.35)] lm-focus-ring-on-gold transition-all duration-250 hover:scale-105 max-md:min-h-[50px] max-md:flex-1 max-md:rounded-xl max-md:px-4 max-md:py-2.5 max-md:text-[1.05rem]"
+            className="min-h-[58px] w-full cursor-pointer rounded-[14px] border-none bg-[linear-gradient(135deg,#ff6b35,var(--color-lm-gold))] px-8 py-3 font-sans text-lg font-bold text-black shadow-[0_0_24px_rgba(255,107,53,0.35)] lm-focus-ring-on-gold transition-all duration-250 hover:scale-105 max-md:min-h-[50px] max-md:flex-1 max-md:rounded-xl max-md:px-4 max-md:py-2.5 max-md:text-base"
             onClick={() => navigate("torneo")}
           >
             <Icon name="goal" size={18} className="inline text-black" /> TORNEO EN VIVO
@@ -87,7 +87,7 @@ export function RankingsPage({
 
       <div className="mx-auto max-w-[700px] px-5 pt-2 pb-6 max-md:px-4 max-md:pt-1 max-md:pb-4">
         <div className="relative overflow-hidden rounded-2xl border border-lm-border2 bg-[linear-gradient(135deg,rgba(232,184,75,0.06),rgba(232,184,75,0.02))] px-4 py-6 text-center">
-          <div className="mb-4 text-sm font-extrabold tracking-[2px] text-lm-text2 uppercase">
+          <div className="mb-4 lm-type-label text-lm-text2">
             <IconLabel icon="hourglass" iconSize={14} className="justify-center">
               Próxima Actualización del Ranking
             </IconLabel>
@@ -140,7 +140,7 @@ export function RankingsPage({
 
       <div className="mx-auto mb-6 flex max-w-[1100px] items-center gap-4 px-5 max-md:flex-col max-md:gap-2 max-md:px-3">
         <div className="h-px flex-1 bg-lm-border max-md:hidden" />
-        <div className="text-center text-sm leading-snug font-extrabold tracking-[2px] text-lm-text2 uppercase max-md:max-w-full max-md:text-sm max-md:tracking-[1px] md:whitespace-nowrap">
+        <div className="text-center lm-type-label leading-snug text-lm-text2 max-md:max-w-full md:whitespace-nowrap">
           <IconLabel
             icon="vote"
             iconSize={12}

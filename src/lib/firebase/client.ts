@@ -207,11 +207,19 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
   }
 
   if (bridge) {
+    if (typeof window !== "undefined") {
+      void bridge.ensureRVExists().catch((err) => {
+        console.error("[LooksMax] ensureRVExists (cached bridge):", err);
+      });
+    }
     return true;
   }
 
   if (typeof window !== "undefined" && window.FB) {
     bridge = window.FB;
+    void bridge.ensureRVExists().catch((err) => {
+      console.error("[LooksMax] ensureRVExists (window.FB):", err);
+    });
     return true;
   }
 
@@ -224,6 +232,17 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
   }
 
   if (!db) return false;
+
+  let rankVoteHealChain: Promise<void> = Promise.resolve();
+
+  function enqueueRankVoteHeal<T>(fn: () => Promise<T>): Promise<T> {
+    const task = rankVoteHealChain.then(fn, fn);
+    rankVoteHealChain = task.then(
+      () => undefined,
+      () => undefined,
+    );
+    return task;
+  }
 
   async function createNewRVRound() {
     const names = rankersList.map((r) => r.name);
@@ -245,19 +264,51 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
     return newRV;
   }
 
-  async function ensureRVExists() {
+  async function ensureActiveRVRoundOnServer() {
+    const snap = await get(ref(db!, "rankvote/current"));
+    if (!snap.exists()) {
+      await createNewRVRound();
+      return;
+    }
+    const rv = snap.val() as {
+      resolved?: boolean;
+      endTime: number;
+    };
+    if (rv.resolved !== true && rv.endTime > Date.now()) return;
+    await createNewRVRound();
+  }
+
+  async function ensureRVExistsInternal() {
     const snap = await get(ref(db!, "rankvote/current"));
     if (snap.exists()) {
-      const rv = snap.val() as { resolved?: boolean; endTime: number };
-      if (rv.resolved) {
+      const rv = snap.val() as {
+        resolved?: boolean;
+        endTime: number;
+        resolving?: boolean;
+      };
+      if (rv.resolved === true) {
         await createNewRVRound();
         return;
       }
       if (rv.endTime > Date.now()) return;
-      await resolveRVIfNeeded(rv as Record<string, unknown>);
+      if (rv.resolving === true) {
+        await set(ref(db!, "rankvote/current/resolving"), false);
+      }
+      await resolveRVIfNeededInternal(rv as Record<string, unknown>);
+      const verify = await get(ref(db!, "rankvote/current"));
+      if (!verify.exists()) {
+        await createNewRVRound();
+        return;
+      }
+      const v = verify.val() as { resolved?: boolean; endTime: number };
+      if (v.resolved === true) await createNewRVRound();
     } else {
       await createNewRVRound();
     }
+  }
+
+  async function ensureRVExists() {
+    return enqueueRankVoteHeal(ensureRVExistsInternal);
   }
 
   async function claimRankVoteResolution(): Promise<boolean> {
@@ -289,8 +340,12 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
     await set(ref(db!, `rankvoteHistory/${roundId}`), { ...entry, id: roundId });
   }
 
-  async function resolveRVIfNeeded(rv: Record<string, unknown>) {
-    if (!rv || rv.resolved) return;
+  async function resolveRVIfNeededInternal(rv: Record<string, unknown>) {
+    if (!rv) return;
+    if (rv.resolved === true) {
+      await createNewRVRound();
+      return;
+    }
     if ((rv.endTime as number) > Date.now()) return;
 
     if (!(await claimRankVoteResolution())) return;
@@ -301,7 +356,10 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
       return;
     }
     const fresh = freshSnap.val() as Record<string, unknown>;
-    if (fresh.resolved) return;
+    if (fresh.resolved === true) {
+      await createNewRVRound();
+      return;
+    }
 
     const roundId = rankVoteRoundId(fresh);
     const ovSnap = await get(ref(db!, "rankOverrides"));
@@ -315,17 +373,22 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
     const tsNow = Date.now();
 
     if (v1 === 0 && v2 === 0) {
-      await Promise.all([
-        writeRankVoteHistory(roundId, {
-          winner: "empate",
-          loser: "empate",
-          wVotes: 0,
-          lVotes: 0,
-          ts: tsNow,
-        }),
-        set(ref(db!, "rankvote/current/resolved"), true),
-      ]);
-      await createNewRVRound();
+      try {
+        await Promise.all([
+          writeRankVoteHistory(roundId, {
+            winner: "empate",
+            loser: "empate",
+            wVotes: 0,
+            lVotes: 0,
+            ts: tsNow,
+          }),
+          set(ref(db!, "rankvote/current/resolved"), true),
+        ]);
+      } catch (err) {
+        console.warn("[LooksMax] tie resolve partial fail:", err);
+      } finally {
+        await ensureActiveRVRoundOnServer();
+      }
       return;
     }
 
@@ -339,18 +402,23 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
     let loserIdx = ranked.indexOf(loser);
 
     if (winnerIdx === -1 || loserIdx === -1) {
-      await Promise.all([
-        writeRankVoteHistory(roundId, {
-          winner,
-          loser,
-          wVotes,
-          lVotes,
-          error: "not_found",
-          ts: tsNow,
-        }),
-        set(ref(db!, "rankvote/current/resolved"), true),
-      ]);
-      await createNewRVRound();
+      try {
+        await Promise.all([
+          writeRankVoteHistory(roundId, {
+            winner,
+            loser,
+            wVotes,
+            lVotes,
+            error: "not_found",
+            ts: tsNow,
+          }),
+          set(ref(db!, "rankvote/current/resolved"), true),
+        ]);
+      } catch (err) {
+        console.warn("[LooksMax] not_found resolve partial fail:", err);
+      } finally {
+        await ensureActiveRVRoundOnServer();
+      }
       return;
     }
 
@@ -436,9 +504,8 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
       batch.rankMovementsDown = downStack;
     }
 
-    await Promise.all([
-      update(ref(db!, "/"), batch),
-      writeRankVoteHistory(roundId, {
+    try {
+      await writeRankVoteHistory(roundId, {
         winner,
         loser,
         wVotes,
@@ -448,10 +515,28 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
         winnerNewPos: winnerFinalIdx + 1,
         loserNewPos: loserFinalIdx + 1,
         ts: tsNow,
-      }),
-      set(ref(db!, "rankvote/current/resolved"), true),
-    ]);
-    await createNewRVRound();
+      });
+    } catch (err) {
+      console.warn("[LooksMax] rankvoteHistory write failed:", err);
+    }
+
+    try {
+      await update(ref(db!, "/"), batch);
+      await set(ref(db!, "rankvote/current/resolved"), true);
+    } catch (err) {
+      console.warn("[LooksMax] ranking batch update failed:", err);
+      try {
+        await set(ref(db!, "rankvote/current/resolved"), true);
+      } catch {
+        /* ignore */
+      }
+    } finally {
+      await ensureActiveRVRoundOnServer();
+    }
+  }
+
+  async function resolveRVIfNeeded(rv: Record<string, unknown>) {
+    return enqueueRankVoteHeal(() => resolveRVIfNeededInternal(rv));
   }
 
   async function castRVVoteDB(name: string) {
@@ -777,6 +862,9 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
   if (typeof window !== "undefined") {
     window.FB = bridge;
     window.dispatchEvent(new Event("firebase-ready"));
+    void ensureRVExists().catch((err) => {
+      console.error("[LooksMax] ensureRVExists on init:", err);
+    });
   }
 
   return true;

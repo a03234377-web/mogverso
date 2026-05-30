@@ -30,13 +30,13 @@ export function DiscordModalContent() {
       </div>
       <div
         id="discord-modal-title"
-        className="mb-1 bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2)_50%,var(--color-lm-gold)_100%)] bg-clip-text text-center font-display text-[clamp(1.5rem,5vw,2.4rem)] leading-tight tracking-[3px] text-transparent max-md:text-[clamp(1.8rem,5vw,2.6rem)]"
+        className="mb-1 bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2)_50%,var(--color-lm-gold)_100%)] bg-clip-text text-center font-sans text-[clamp(1.35rem,5vw,2rem)] leading-tight font-bold tracking-tight text-transparent max-md:text-[clamp(1.5rem,5vw,2.2rem)]"
       >
         Únete a la
         <br />
         Comunidad
       </div>
-      <div className="mb-5 text-center text-base font-bold tracking-[1.5px] text-lm-gold uppercase">
+      <div className="mb-5 text-center lm-type-label text-lm-gold">
         ES Looksmaxer · Miembros Exclusivos
       </div>
       <div className="mb-5 h-px bg-[linear-gradient(90deg,transparent,var(--color-lm-border2),transparent)]" />
@@ -49,7 +49,7 @@ export function DiscordModalContent() {
             aria-hidden
           />
           <div>
-            <strong className="mb-0.5 block text-base font-extrabold text-lm-text">
+            <strong className="mb-0.5 block text-base font-bold text-lm-text">
               Añade tu creador al ranking
             </strong>
             <span className="text-base leading-snug font-semibold text-lm-text2">
@@ -66,7 +66,7 @@ export function DiscordModalContent() {
             aria-hidden
           />
           <div>
-            <strong className="mb-0.5 block text-base font-extrabold text-lm-text">
+            <strong className="mb-0.5 block text-base font-bold text-lm-text">
               Influye en las votaciones
             </strong>
             <span className="text-base leading-snug font-semibold text-lm-text2">
@@ -83,7 +83,7 @@ export function DiscordModalContent() {
             aria-hidden
           />
           <div>
-            <strong className="mb-0.5 block text-base font-extrabold text-lm-text">
+            <strong className="mb-0.5 block text-base font-bold text-lm-text">
               Ventajas exclusivas de miembro
             </strong>
             <span className="text-base leading-snug font-semibold text-lm-text2">
@@ -93,12 +93,12 @@ export function DiscordModalContent() {
         </div>
       </div>
       <div className="rounded-[14px] border border-[rgba(88,101,242,0.4)] bg-[linear-gradient(135deg,rgba(88,101,242,0.15),rgba(88,101,242,0.05))] px-4 py-4 text-center">
-        <div className="mb-1 flex items-center justify-center gap-1.5 text-sm font-extrabold tracking-[1.5px] text-[#7289da] uppercase">
+        <div className="mb-1 flex items-center justify-center gap-1.5 lm-type-label text-[#7289da]">
           <Icon name="message-circle" size={14} />
           Únete a nuestro servidor de Discord
         </div>
         <a
-          className="mt-1.5 inline-flex items-center gap-2 rounded-[10px] border-none bg-[linear-gradient(135deg,#5865f2,#7289da)] px-5 py-2.5 font-sans text-base font-extrabold tracking-wide text-white no-underline lm-focus-ring transition-all duration-250 hover:scale-[1.04] hover:shadow-[0_0_20px_rgba(88,101,242,0.4)] max-md:min-h-12 max-md:px-5 max-md:py-3 max-md:text-base"
+          className="mt-1.5 inline-flex items-center gap-2 rounded-[10px] border-none bg-[linear-gradient(135deg,#5865f2,#7289da)] px-5 py-2.5 font-sans text-base font-bold text-white no-underline lm-focus-ring transition-all duration-250 hover:scale-[1.04] hover:shadow-[0_0_20px_rgba(88,101,242,0.4)] max-md:min-h-12 max-md:px-5 max-md:py-3 max-md:text-base"
           href="https://discord.gg/QfnJkJy8jw"
           target="_blank"
           rel="noopener noreferrer"

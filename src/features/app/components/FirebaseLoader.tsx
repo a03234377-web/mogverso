@@ -26,10 +26,10 @@ export function FirebaseLoader() {
       ) : (
         <>
           <div className="h-12 w-12 animate-spin-slow rounded-full border-[3px] border-lm-border2 border-t-lm-gold select-none" />
-          <div className="font-display text-[1.1rem] tracking-[3px] text-lm-gold">
+          <div className="font-sans text-base font-bold tracking-tight text-lm-gold">
             Conectando a Firebase
           </div>
-          <div className="text-sm font-semibold tracking-[1.5px] text-lm-text2 uppercase">
+          <div className="lm-type-label text-lm-text2">
             Cargando datos en tiempo real…
           </div>
         </>

@@ -97,7 +97,7 @@ export function PhaseLabel({
   return (
     <div
       className={cn(
-        "mb-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm font-black tracking-[3px] uppercase max-md:text-sm max-md:tracking-[1.5px]",
+        "mb-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 lm-type-label max-md:text-sm",
         labelColors[color],
       )}
     >
@@ -165,7 +165,7 @@ export function PhaseTimer({
       <TimerUnit value={h} label="Horas" color={color} />
       <div
         className={cn(
-          "mb-3 animate-blink font-display text-[2.5rem] opacity-50 max-md:text-[clamp(1.4rem,5vw,2.8rem)]",
+          "mb-3 animate-blink font-sans text-2xl font-bold opacity-50 max-md:text-xl",
           timerSepColors[color],
         )}
       >
@@ -174,7 +174,7 @@ export function PhaseTimer({
       <TimerUnit value={m} label="Min" color={color} />
       <div
         className={cn(
-          "mb-3 animate-blink font-display text-[2.5rem] opacity-50 max-md:text-[clamp(1.4rem,5vw,2.8rem)]",
+          "mb-3 animate-blink font-sans text-2xl font-bold opacity-50 max-md:text-xl",
           timerSepColors[color],
         )}
       >
@@ -198,15 +198,13 @@ function TimerUnit({
     <div className="flex flex-col items-center gap-1">
       <div
         className={cn(
-          "min-w-[65px] rounded-xl px-2 py-0.5 text-center font-display text-[clamp(2rem,6vw,4.5rem)] max-md:min-w-12 max-md:text-[clamp(1.4rem,5vw,2.8rem)]",
+          "min-w-[65px] rounded-xl px-2 py-0.5 text-center lm-type-score text-[clamp(1.75rem,5vw,3.25rem)] max-md:min-w-12 max-md:text-[clamp(1.35rem,5vw,2.25rem)]",
           timerNumStyles[color],
         )}
       >
         {value}
       </div>
-      <div className="text-sm font-extrabold tracking-[1.5px] text-lm-text2 uppercase">
-        {label}
-      </div>
+      <div className="lm-type-label text-lm-text2">{label}</div>
     </div>
   );
 }

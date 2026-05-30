@@ -19,14 +19,14 @@ export function ConsejoPage() {
           <div className="col-span-full flex items-start gap-5 rounded-xl border border-[rgba(232,184,75,0.35)] bg-lm-card p-5 max-md:flex-row">
             <Icon name="sun" size={36} className="shrink-0 text-lm-gold max-md:w-7" />
             <div>
-              <div className="mb-1.5 flex items-center gap-1 text-sm font-extrabold tracking-[1.5px] text-lm-gold uppercase">
+              <div className="mb-1.5 flex items-center gap-1 text-sm font-bold tracking-wide text-lm-gold uppercase">
                 <Icon name="star" size={12} />
                 Consejo del Día
               </div>
-              <h3 className="mb-1.5 text-base leading-snug font-extrabold max-md:text-base">
+              <h3 className="mb-1.5 font-sans text-lg leading-snug font-bold text-lm-text">
                 La Regla del 3–6–9 en Hidratación Cutánea
               </h3>
-              <p className="font-serif text-base leading-normal text-lm-text2">
+              <p className="font-serif text-base leading-relaxed text-lm-text2">
                 Aplica hidratante con SPF 30+ por la mañana, ácido hialurónico al
                 mediodía, y retinol por la noche. La consistencia supera a cualquier
                 producto milagroso.
@@ -106,15 +106,17 @@ function ConsejoCard({
     <div className="rounded-xl border border-lm-border bg-lm-card p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-lm-border2">
       <div
         className={cn(
-          "mb-1.5 flex items-center gap-1 text-sm font-extrabold tracking-[1.5px] uppercase",
+          "mb-1.5 flex items-center gap-1 text-sm font-bold tracking-wide uppercase",
           consejoCatColors[cat] ?? "text-lm-text2",
         )}
       >
         <Icon name={catIcon} size={12} />
         {catLabel}
       </div>
-      <h3 className="mb-1.5 text-base leading-snug font-extrabold">{title}</h3>
-      <p className="font-serif text-base leading-normal text-lm-text2">{body}</p>
+      <h3 className="mb-1.5 font-sans text-base leading-snug font-bold text-lm-text">
+        {title}
+      </h3>
+      <p className="font-serif text-base leading-relaxed text-lm-text2">{body}</p>
       <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
         <span className="rounded-full border border-lm-border bg-lm-bg3 px-1.5 py-0.5 text-sm font-bold text-lm-text2">
           {tag}

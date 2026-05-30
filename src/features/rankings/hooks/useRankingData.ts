@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import {
   buildRankedList,
@@ -17,16 +17,40 @@ import type {
 export function useRankingData() {
   const { fb, ready } = useFirebase();
   const [overrides, setOverrides] = useState<RankOverrides>({});
-  /** Evita mostrar el orden fijo de RANKERS antes del primer snapshot de Firebase. */
   const [overridesReady, setOverridesReady] = useState(false);
   const [movements, setMovements] = useState<RankMovements>({});
   const [movementsUp, setMovementsUp] = useState<MoverStack>({});
   const [movementsDown, setMovementsDown] = useState<MoverStack>({});
   const [rankVoteEnd, setRankVoteEnd] = useState<number | null>(null);
+  const healInFlightRef = useRef(false);
+
+  const healRankVoteRound = useCallback(
+    async (rv?: RankVoteRound) => {
+      if (!fb || healInFlightRef.current) return;
+      healInFlightRef.current = true;
+      try {
+        const now = Date.now();
+        if (rv && !rv.resolved && rv.endTime <= now) {
+          await fb.resolveRVIfNeeded(rv as Record<string, unknown>);
+        } else {
+          await fb.ensureRVExists();
+        }
+      } catch (err) {
+        console.error("[LooksMax] heal rankvote round:", err);
+      } finally {
+        healInFlightRef.current = false;
+      }
+    },
+    [fb],
+  );
 
   useEffect(() => {
     if (!fb) return;
     const { db, ref, onValue } = fb;
+
+    void fb.ensureRVExists().catch((err) => {
+      console.error("[LooksMax] ensureRVExists (rankings):", err);
+    });
 
     const unsubO = onValue(ref(db, "rankOverrides"), (snap) => {
       setOverrides(snap.exists() ? (snap.val() as RankOverrides) : {});
@@ -41,18 +65,28 @@ export function useRankingData() {
     const unsubDown = onValue(ref(db, "rankMovementsDown"), (snap) => {
       setMovementsDown(snap.exists() ? (snap.val() as MoverStack) : {});
     });
-    const unsubRv = onValue(ref(db, "rankvote/current"), async (snap) => {
-      if (snap.exists()) {
-        const rv = snap.val() as RankVoteRound;
-        if (!rv.resolved && rv.endTime > Date.now()) {
-          setRankVoteEnd(rv.endTime);
-          return;
-        }
-      } else {
-        await fb.ensureRVExists();
+    const unsubRv = onValue(ref(db, "rankvote/current"), (snap) => {
+      if (!snap.exists()) {
+        setRankVoteEnd(null);
+        void healRankVoteRound();
+        return;
       }
+
+      const rv = snap.val() as RankVoteRound;
+      const now = Date.now();
+
+      if (!rv.resolved && rv.endTime > now) {
+        setRankVoteEnd(rv.endTime);
+        return;
+      }
+
       setRankVoteEnd(null);
+      void healRankVoteRound(rv);
     });
+
+    const healPoll = setInterval(() => {
+      void healRankVoteRound();
+    }, 4000);
 
     return () => {
       unsubO();
@@ -60,8 +94,9 @@ export function useRankingData() {
       unsubUp();
       unsubDown();
       unsubRv();
+      clearInterval(healPoll);
     };
-  }, [fb]);
+  }, [fb, healRankVoteRound]);
 
   const rankedNames = useMemo(
     () =>
