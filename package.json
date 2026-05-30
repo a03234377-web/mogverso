@@ -2,6 +2,7 @@
   "name": "mogverso",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.1.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -15,6 +16,8 @@
     "react:doctor": "react-doctor . --full --verbose"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "firebase": "^12.14.0",
     "lucide-react": "^1.17.0",
     "next": "16.2.6",

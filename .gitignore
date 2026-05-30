@@ -20,8 +20,8 @@
 # production
 /build
 
-# pnpm (repo uses npm / package-lock.json in CI)
-pnpm-lock.yaml
+# npm (repo uses pnpm / pnpm-lock.yaml in CI)
+package-lock.json
 
 # misc
 .DS_Store

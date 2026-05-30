@@ -15,10 +15,10 @@ Ranking oficial de looksmaxing en España, migrado a **Next.js** para despliegue
 ## Inicio rápido
 
 ```bash
-npm install
+pnpm install
 cp .env.example .env.local
 # Edita .env.local con tus credenciales de Firebase
-npm run dev
+pnpm run dev
 ```
 
 Abre [http://localhost:3000](http://localhost:3000).
@@ -42,14 +42,14 @@ Las fotos de creadores viven en `src/assets/creators/` como WebP importados en c
 
 | Comando                | Descripción                    |
 | ---------------------- | ------------------------------ |
-| `npm run dev`          | Servidor de desarrollo         |
-| `npm run build`        | Build de producción            |
-| `npm run start`        | Servidor de producción         |
-| `npm run lint`         | ESLint                         |
-| `npm run typecheck`    | TypeScript (`tsc --noEmit`)    |
-| `npm run format`       | Prettier (formatear)           |
-| `npm run format:check` | Comprueba formato Prettier     |
-| `npm run mdlint`       | markdownlint en archivos `.md` |
+| `pnpm run dev`         | Servidor de desarrollo         |
+| `pnpm run build`       | Build de producción            |
+| `pnpm run start`       | Servidor de producción         |
+| `pnpm run lint`        | ESLint                         |
+| `pnpm run typecheck`   | TypeScript (`tsc --noEmit`)    |
+| `pnpm run format`      | Prettier (formatear)           |
+| `pnpm run format:check`| Comprueba formato Prettier     |
+| `pnpm run mdlint`      | markdownlint en archivos `.md` |
 
 ## Despliegue en Vercel
 
