@@ -27,7 +27,6 @@ export const DESKTOP_TABS: {
     badgeClass: "tab-badge",
   },
   { id: "consejo", label: "Consejos", icon: "book-open" },
-  { id: "lexico", label: "Léxico", icon: "book-marked" },
 ];
 
 export function desktopSelectedIndex(page: PageId): number {

@@ -7,7 +7,6 @@ export const LOOKSMAX_PATHS: Record<Exclude<PageId, "profile">, string> = {
   torneo: "/torneo",
   noticias: "/noticias",
   consejo: "/consejo",
-  lexico: "/lexico",
 };
 
 export const DEFAULT_LOOKSMAX_PATH = LOOKSMAX_PATHS.rankings;

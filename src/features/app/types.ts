@@ -4,5 +4,4 @@ export type PageId =
   | "torneo"
   | "noticias"
   | "consejo"
-  | "lexico"
   | "profile";

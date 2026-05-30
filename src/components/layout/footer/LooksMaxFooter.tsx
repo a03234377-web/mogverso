@@ -15,7 +15,7 @@ export function LooksMaxFooter({
   moreOpen,
   onToggleMore,
 }: LooksMaxFooterProps) {
-  const moreActive = page === "consejo" || page === "lexico";
+  const moreActive = page === "consejo";
 
   return (
     <>
@@ -146,13 +146,6 @@ function MoreMenu({
         icon="book-open"
         title="Consejos"
         sub="Guías diarias de looksmaxing"
-        onClose={onClose}
-      />
-      <MoreLinkItem
-        href={LOOKSMAX_PATHS.lexico}
-        icon="book-marked"
-        title="Léxico"
-        sub="Términos del looksmaxing"
         onClose={onClose}
       />
       <button

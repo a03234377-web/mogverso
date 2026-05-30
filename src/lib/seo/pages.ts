@@ -44,13 +44,6 @@ export const consejoMetadata: Metadata = buildPageMetadata({
   path: LOOKSMAX_PATHS.consejo,
 });
 
-export const lexicoMetadata: Metadata = buildPageMetadata({
-  title: "Léxico looksmax",
-  description:
-    "Diccionario de términos del looksmaxing en español: definiciones de la comunidad.",
-  path: LOOKSMAX_PATHS.lexico,
-});
-
 export const homeRedirectMetadata: Metadata = buildPageMetadata({
   title: "Ranking Oficial",
   description:

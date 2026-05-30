@@ -6,6 +6,5 @@ export const PAGE_PANEL_IDS: Record<PageId, string> = {
   torneo: "page-torneo",
   noticias: "page-noticias",
   consejo: "page-consejo",
-  lexico: "page-lexico",
   profile: "page-profile",
 };
