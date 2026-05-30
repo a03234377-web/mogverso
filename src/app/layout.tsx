@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Syne } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import "./globals.css";
 
 const bebas = Bebas_Neue({
@@ -47,6 +49,8 @@ export default function RootLayout({
         className={`${syne.className} min-h-screen bg-lm-bg pb-[calc(var(--lm-bottom-nav-height)+env(safe-area-inset-bottom,0px))] text-base text-lm-text antialiased select-text`}
       >
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
