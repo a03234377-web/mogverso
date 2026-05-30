@@ -40,16 +40,16 @@ Las fotos de creadores viven en `src/assets/creators/` como WebP importados en c
 
 ## Scripts
 
-| Comando                | Descripción                    |
-| ---------------------- | ------------------------------ |
-| `pnpm run dev`         | Servidor de desarrollo         |
-| `pnpm run build`       | Build de producción            |
-| `pnpm run start`       | Servidor de producción         |
-| `pnpm run lint`        | ESLint                         |
-| `pnpm run typecheck`   | TypeScript (`tsc --noEmit`)    |
-| `pnpm run format`      | Prettier (formatear)           |
-| `pnpm run format:check`| Comprueba formato Prettier     |
-| `pnpm run mdlint`      | markdownlint en archivos `.md` |
+| Comando                 | Descripción                    |
+| ----------------------- | ------------------------------ |
+| `pnpm run dev`          | Servidor de desarrollo         |
+| `pnpm run build`        | Build de producción            |
+| `pnpm run start`        | Servidor de producción         |
+| `pnpm run lint`         | ESLint                         |
+| `pnpm run typecheck`    | TypeScript (`tsc --noEmit`)    |
+| `pnpm run format`       | Prettier (formatear)           |
+| `pnpm run format:check` | Comprueba formato Prettier     |
+| `pnpm run mdlint`       | markdownlint en archivos `.md` |
 
 ## Despliegue en Vercel
 

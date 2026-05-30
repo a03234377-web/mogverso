@@ -2,7 +2,7 @@
 
 ## Requisitos
 
-- Node.js 20+
+- Node.js 22+ (requerido por pnpm 11)
 - pnpm 11+ (Corepack: `corepack enable`)
 - Proyecto Firebase con **Realtime Database** habilitada
 
