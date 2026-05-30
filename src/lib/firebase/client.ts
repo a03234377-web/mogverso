@@ -10,6 +10,7 @@ import {
   runTransaction,
   type Database,
 } from "firebase/database";
+import { ENTRY_VOTE_MS, VOTE_ROUND_MS } from "@/lib/vote-intervals";
 import { firebaseConfig, isFirebaseConfigured } from "./config";
 import type { Ranker } from "@/features/rankings/data/rankers";
 import type { IconName } from "@/types/icons";
@@ -234,7 +235,7 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
       p1: names[i1],
       p2: names[i2],
       votes: { [names[i1]]: 0, [names[i2]]: 0 },
-      endTime: Date.now() + 6 * 60 * 60 * 1000,
+      endTime: Date.now() + VOTE_ROUND_MS,
       resolved: false,
       resolving: false,
     };
@@ -478,10 +479,20 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
     }
   }
 
+  async function createEntryVote() {
+    const newEV = {
+      id: "ev_" + Date.now(),
+      votes: { franbv: 0, nilojeda: 0 },
+      endTime: Date.now() + ENTRY_VOTE_MS,
+      winner: null,
+    };
+    await set(ref(db!, "entryVote/current"), newEV);
+    return newEV;
+  }
+
   async function getOrCreateEntryVote() {
     const evRef = ref(db!, "entryVote/current");
     const snap = await get(evRef);
-    const DEADLINE = new Date("2026-06-12T22:30:00+02:00").getTime();
     const now = Date.now();
     if (snap.exists()) {
       const ev = snap.val() as {
@@ -489,23 +500,21 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
         endTime: number;
       };
       if (ev.winner) return ev;
+      // Plazo antiguo incorrecto (p. ej. fecha fija lejana)
+      if (ev.endTime - now > ENTRY_VOTE_MS) {
+        return createEntryVote();
+      }
       if (ev.endTime > now) return ev;
       await resolveEntryVoteInDB(ev as Record<string, unknown>);
       const snap2 = await get(evRef);
       return snap2.exists() ? snap2.val() : ev;
     }
-    const newEV = {
-      id: "ev_reset_" + Date.now(),
-      votes: { franbv: 0, nilojeda: 0 },
-      endTime: DEADLINE,
-      winner: null,
-    };
-    await set(evRef, newEV);
-    return newEV;
+    return createEntryVote();
   }
 
   async function resolveEntryVoteInDB(ev: Record<string, unknown>) {
     if (ev.winner) return;
+    if ((ev.endTime as number) > Date.now()) return;
     const votes = ev.votes as Record<string, number> | undefined;
     const v1 = votes?.franbv || 0;
     const v2 = votes?.nilojeda || 0;

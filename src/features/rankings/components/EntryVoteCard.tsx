@@ -104,14 +104,15 @@ export function EntryVoteCard() {
     >
       <div className="mb-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm font-extrabold tracking-[2px] text-lm-purple uppercase max-md:text-sm max-md:tracking-[1px]">
         <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-purple" />
-        VOTACIÓN ABIERTA · CIERRA VIERNES 29 MAYO 22:30
+        VOTACIÓN ABIERTA · CIERRA EN 2 HORAS
         <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-purple" />
       </div>
       <h2 className="mx-auto mb-1 w-fit max-w-full bg-[linear-gradient(135deg,#fff_0%,#c084fc_60%,var(--color-lm-purple)_100%)] bg-clip-text font-display text-[clamp(1.5rem,4vw,3rem)] tracking-[3px] text-transparent">
         ¿Quién entra al Ranking?
       </h2>
       <div className="mb-6 text-base font-semibold text-lm-text2">
-        Haz clic directamente en el candidato para votar · Un voto por dispositivo e IP
+        Haz clic directamente en el candidato para votar · Un voto por dispositivo e IP · El
+        que más votos tenga entra al ranking
       </div>
       <CountdownDigits h={cd.h} m={cd.m} s={cd.s} variant="purple" className="mb-6" />
       <div

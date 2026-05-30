@@ -95,7 +95,7 @@ export function RankingsPage({
           <CountdownDigits h={cd.h} m={cd.m} s={cd.s} variant="gold" />
           <div className="mt-3 text-base font-semibold text-lm-text2">
             El ranking se actualiza automáticamente cuando termina la{" "}
-            <span className="text-lm-gold">votación de ranking</span> · Cada 6 horas
+            <span className="text-lm-gold">votación de ranking</span> · Cada 3 horas
           </div>
         </div>
       </div>

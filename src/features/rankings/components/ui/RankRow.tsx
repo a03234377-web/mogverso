@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Pressable } from "@/components/a11y/Pressable";
+import { Icon } from "@/components/icons";
 import { Avatar } from "@/features/shared/components/Avatar";
 import { cn } from "@/lib/cn";
 import type { RankedEntry } from "@/features/rankings/lib/ranking";
@@ -35,14 +36,16 @@ export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
   if (movement) {
     if (movement.dir === "up") {
       movBadge = (
-        <span className="inline-flex items-center gap-0.5 rounded-full border border-[rgba(46,204,113,0.35)] bg-[rgba(46,204,113,0.12)] px-2.5 py-1 text-sm leading-snug font-black text-lm-green2">
-          ▲ +{movement.delta}
+        <span className="inline-flex items-center gap-1 rounded-full border border-[rgba(46,204,113,0.35)] bg-[rgba(46,204,113,0.12)] px-2.5 py-1 text-sm leading-snug font-black text-lm-green2">
+          <Icon name="trending-up" size={12} className="text-lm-green2" />+
+          {movement.delta}
         </span>
       );
     } else if (movement.dir === "down") {
       movBadge = (
-        <span className="inline-flex items-center gap-0.5 rounded-full border border-[rgba(255,71,87,0.35)] bg-[rgba(255,71,87,0.12)] px-2.5 py-1 text-sm leading-snug font-black text-lm-red2">
-          ▼ -{movement.delta}
+        <span className="inline-flex items-center gap-1 rounded-full border border-[rgba(255,71,87,0.35)] bg-[rgba(255,71,87,0.12)] px-2.5 py-1 text-sm leading-snug font-black text-lm-red2">
+          <Icon name="trending-down" size={12} className="text-lm-red2" />-
+          {movement.delta}
         </span>
       );
     }

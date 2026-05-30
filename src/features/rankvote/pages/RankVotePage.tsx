@@ -29,7 +29,7 @@ export function RankVotePage() {
             Ranking
           </>
         }
-        subtitle="Vota cada 6 horas · El ganador sube 1 puesto · El perdedor baja 1 puesto"
+        subtitle="Vota cada 3 horas · El ganador sube 1 puesto · El perdedor baja 1 puesto"
       />
       <div className="mx-auto max-w-[1000px] px-5 pb-16 max-md:px-3 max-md:pb-[5.5rem]">
         <div
@@ -137,13 +137,13 @@ function RankVoteArena({
     <>
       <div className="mb-4 inline-flex max-w-full flex-wrap items-center justify-center gap-x-1.5 gap-y-1 rounded-full border border-[rgba(46,204,113,0.4)] bg-[rgba(46,204,113,0.12)] px-3 py-1 text-sm font-extrabold tracking-[1.5px] text-lm-green2 uppercase max-md:text-sm max-md:tracking-[1px]">
         <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-green2" />
-        VOTACIÓN EN DIRECTO · 6 HORAS
+        VOTACIÓN EN DIRECTO · 3 HORAS
       </div>
       <div className="mb-0.5 font-display text-[clamp(1.2rem,3vw,2.5rem)] tracking-[2px] text-lm-text">
         ¿Quién merece subir en el ranking?
       </div>
       <div className="mb-5 text-base font-semibold text-lm-text2">
-        Vota cada 6 horas · El ganador sube 1 puesto · El perdedor baja 1 puesto
+        Vota cada 3 horas · El ganador sube 1 puesto · El perdedor baja 1 puesto
       </div>
       <CountdownDigits h={cd.h} m={cd.m} s={cd.s} variant="green" className="mb-6" />
       <div className="mx-auto mb-5 grid max-w-[700px] grid-cols-[1fr_auto_1fr] items-center gap-4 max-md:max-w-full max-md:gap-2">
@@ -198,7 +198,7 @@ function RankVoteArena({
       <div className="mt-2.5 text-sm font-semibold text-lm-text2">
         <IconLabel icon="vote" iconSize={12} className="justify-center">
           1 voto por dispositivo e IP · Ranking actualizado automáticamente · Nueva
-          ronda cada 6 horas
+          ronda cada 3 horas
         </IconLabel>
       </div>
     </>
