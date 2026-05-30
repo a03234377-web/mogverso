@@ -1,4 +1,5 @@
 import { RANKERS, type Ranker } from "@/features/rankings/data/rankers";
+import { MOVER_WINDOW_MS } from "@/lib/vote-intervals";
 import type {
   RankMovement,
   RankMovements,
@@ -25,15 +26,14 @@ export type Mover = {
   name: string;
   rank: number;
   delta: number;
+  ts: number;
 };
-
-const DEFAULT_MOVER_WINDOW_MS = 2 * 60 * 60 * 1000;
 
 /** Extrae movers recientes (subidas/bajadas) a partir del ranking y movements. */
 export function computeMovers(
   rankedNames: string[],
   movements: RankMovements | null | undefined,
-  windowMs = DEFAULT_MOVER_WINDOW_MS,
+  windowMs = MOVER_WINDOW_MS,
   now = Date.now(),
 ): { upMovers: Mover[]; downMovers: Mover[] } {
   const cutoff = now - windowMs;
@@ -44,12 +44,15 @@ export function computeMovers(
     const mov = movements?.[name];
     if (!mov || mov.ts <= cutoff) return;
     if (mov.dir === "up" && mov.delta > 0) {
-      upMovers.push({ name, rank: i + 1, delta: mov.delta });
+      upMovers.push({ name, rank: i + 1, delta: mov.delta, ts: mov.ts });
     }
     if (mov.dir === "down" && mov.delta > 0) {
-      downMovers.push({ name, rank: i + 1, delta: mov.delta });
+      downMovers.push({ name, rank: i + 1, delta: mov.delta, ts: mov.ts });
     }
   });
+
+  upMovers.sort((a, b) => b.delta - a.delta || b.ts - a.ts);
+  downMovers.sort((a, b) => b.ts - a.ts || b.delta - a.delta);
 
   return { upMovers, downMovers };
 }
@@ -67,7 +70,7 @@ export function buildRankedList(
   overrides: RankOverrides,
   movements: RankMovements | null | undefined,
   rankers: Ranker[] = RANKERS,
-  windowMs = DEFAULT_MOVER_WINDOW_MS,
+  windowMs = MOVER_WINDOW_MS,
   now = Date.now(),
 ): RankedEntry[] {
   const rankedNames = getRankedNamesFromOverrides(overrides, rankers);

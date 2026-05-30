@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import type { EntryVote, EntryVoteMyVote } from "@/features/shared/lib/types";
+import { ENTRY_VOTE_MS } from "@/lib/vote-intervals";
 
 export function useEntryVote() {
   const { fb } = useFirebase();
@@ -18,11 +19,16 @@ export function useEntryVote() {
       let current: EntryVote | null = null;
       if (snap.exists()) {
         const val = snap.val() as EntryVote & { winner?: string };
-        if (!val.winner && val.endTime <= Date.now()) {
+        const remaining = val.endTime - Date.now();
+        if (!val.winner && remaining <= 0) {
           await fb.resolveEntryVoteInDB(val as Record<string, unknown>);
-          return;
+          const resolved = await get(ref(db, "entryVote/current"));
+          current = resolved.exists() ? (resolved.val() as EntryVote) : val;
+        } else if (!val.winner && remaining > ENTRY_VOTE_MS) {
+          current = (await fb.getOrCreateEntryVote()) as EntryVote;
+        } else {
+          current = val;
         }
-        current = val;
       } else {
         current = (await fb.getOrCreateEntryVote()) as EntryVote;
       }

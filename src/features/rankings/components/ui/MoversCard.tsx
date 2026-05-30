@@ -39,13 +39,18 @@ export function MoversCard({ title, titleIcon, variant, movers }: MoversCardProp
               </div>
               <div
                 className={cn(
-                  "flex items-center gap-0.5 rounded-full px-2 py-0.5 text-base font-extrabold whitespace-nowrap",
+                  "flex items-center gap-1 rounded-full px-2 py-0.5 text-base font-extrabold whitespace-nowrap",
                   variant === "up"
                     ? "bg-[rgba(46,204,113,0.15)] text-lm-green2"
                     : "bg-[rgba(255,71,87,0.15)] text-lm-red2",
                 )}
               >
-                {variant === "up" ? "▲" : "▼"} {variant === "up" ? "+" : "-"}
+                <Icon
+                  name={variant === "up" ? "trending-up" : "trending-down"}
+                  size={12}
+                  className={variant === "up" ? "text-lm-green2" : "text-lm-red2"}
+                />
+                {variant === "up" ? "+" : "-"}
                 {m.delta}
               </div>
             </div>
