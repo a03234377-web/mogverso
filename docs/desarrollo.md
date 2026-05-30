@@ -3,7 +3,7 @@
 ## Requisitos
 
 - Node.js 20+
-- npm 10+
+- pnpm 11+ (Corepack: `corepack enable`)
 - Proyecto Firebase con **Realtime Database** habilitada
 
 ## Configuración local
@@ -11,7 +11,7 @@
 1. Clona el repositorio e instala dependencias:
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. Crea `.env.local` desde la plantilla:
@@ -27,21 +27,21 @@
 5. Arranca el servidor:
 
    ```bash
-   npm run dev
+   pnpm run dev
    ```
 
 ## Calidad de código
 
 ```bash
 # ESLint
-npm run lint
+pnpm run lint
 
 # Prettier
-npm run format:check
-npm run format
+pnpm run format:check
+pnpm run format
 
 # Markdown (README y docs/)
-npm run mdlint
+pnpm run mdlint
 ```
 
 ## Reglas de Firebase

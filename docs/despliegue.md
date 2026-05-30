@@ -29,7 +29,16 @@ En Vercel → **Settings → Domains**, añade tu dominio y actualiza `NEXT_PUBL
 
 ## Build
 
-El comando por defecto es `npm run build`. La configuración en `vercel.json` solo documenta el framework; Vercel no requiere archivo extra para Next.js.
+El comando por defecto es `pnpm run build`. La configuración en `vercel.json` documenta `pnpm install` y el build; Vercel detecta `pnpm-lock.yaml` automáticamente.
+
+## Vercel Analytics y Speed Insights
+
+La app incluye `@vercel/analytics` y `@vercel/speed-insights` en el layout raíz. Tras el deploy:
+
+1. En el dashboard de Vercel, activa **Web Analytics** y **Speed Insights** para el proyecto.
+2. Visita la URL de producción para registrar el primer evento (Vercel lo requiere para dejar de mostrar "Get Started").
+
+No hace falta variable de entorno adicional en código.
 
 ## Notas
 
