@@ -13,10 +13,7 @@ import {
   PhaseTitle,
 } from "@/features/torneo/components/PhaseCard";
 import { useCountdown } from "@/features/shared/hooks/useCountdown";
-import {
-  formatTorneoStartDate,
-  getUpcomingTorneoStartMs,
-} from "@/lib/torneo-schedule";
+import { formatTorneoStartDate, getUpcomingTorneoStartMs } from "@/lib/torneo-schedule";
 
 export function TorneoComingSoon() {
   const [now, setNow] = useState(() => Date.now());
@@ -65,7 +62,7 @@ export function TorneoComingSoon() {
             {dayName} {dateLabel}
           </div>
           <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="orange" />
-          <PhaseSub className="mb-0 mt-3">
+          <PhaseSub className="mt-3 mb-0">
             <IconLabel icon="zap" iconSize={14} className="justify-center">
               El siguiente torneo será el {dayName.toLowerCase()} a las {timeLabel}
             </IconLabel>
