@@ -9,6 +9,7 @@ import type {
 } from "@/features/shared/lib/types";
 
 type RvHistoryRow = {
+  id?: string;
   winner: string;
   loser: string;
   wVotes: number;
@@ -20,6 +21,24 @@ type RvHistoryRow = {
   loserNewPos?: number;
 };
 
+function dedupeHistory(rows: RvHistoryRow[]): RvHistoryRow[] {
+  return rows.filter((h, i, arr) => {
+    const idx = arr.findIndex((x) => {
+      if (h.id && x.id) return x.id === h.id;
+      return (
+        x.winner === h.winner &&
+        x.loser === h.loser &&
+        x.wVotes === h.wVotes &&
+        x.lVotes === h.lVotes &&
+        x.winnerNewPos === h.winnerNewPos &&
+        x.loserNewPos === h.loserNewPos &&
+        Math.abs(x.ts - h.ts) < 60_000
+      );
+    });
+    return idx === i;
+  });
+}
+
 export function useRankVote(active: boolean) {
   const { fb } = useFirebase();
   const [rv, setRv] = useState<RankVoteRound | null>(null);
@@ -30,7 +49,29 @@ export function useRankVote(active: boolean) {
   const [transitioning, setTransitioning] = useState(false);
   const [voting, setVoting] = useState(false);
   const resolvingRef = useRef(false);
+  const resolveInFlightRef = useRef<Promise<void> | null>(null);
   const rvIdRef = useRef<string | null>(null);
+
+  const runResolve = useCallback(
+    async (round: Record<string, unknown>) => {
+      if (!fb) return;
+      if (resolveInFlightRef.current) {
+        await resolveInFlightRef.current.catch(() => {});
+        return;
+      }
+      resolvingRef.current = true;
+      const task = fb
+        .resolveRVIfNeeded(round)
+        .catch(console.error)
+        .finally(() => {
+          resolvingRef.current = false;
+          resolveInFlightRef.current = null;
+        });
+      resolveInFlightRef.current = task;
+      await task;
+    },
+    [fb],
+  );
 
   const handleSnapshot = useCallback(
     async (round: RankVoteRound | null) => {
@@ -61,14 +102,8 @@ export function useRankVote(active: boolean) {
       }
 
       if (round.endTime <= now) {
-        if (!resolvingRef.current) {
-          resolvingRef.current = true;
-          if (arenaActive) setTransitioning(true);
-          await fb
-            .resolveRVIfNeeded(round as Record<string, unknown>)
-            .catch(console.error);
-          resolvingRef.current = false;
-        }
+        if (arenaActive) setTransitioning(true);
+        if (!resolvingRef.current) await runResolve(round as Record<string, unknown>);
         return;
       }
 
@@ -88,7 +123,7 @@ export function useRankVote(active: boolean) {
       );
       setLoading(false);
     },
-    [fb, active],
+    [fb, active, runResolve],
   );
 
   useEffect(() => {
@@ -112,15 +147,10 @@ export function useRankVote(active: boolean) {
           return;
         }
         const raw = snap.val() as Record<string, RvHistoryRow>;
-        const hist = Object.values(raw)
-          .filter((h) => h.ts && typeof h.ts === "number")
+        const hist = dedupeHistory(
+          Object.values(raw).filter((h) => h.ts && typeof h.ts === "number"),
+        )
           .sort((a, b) => b.ts - a.ts)
-          .filter(
-            (h, i, arr) =>
-              arr.findIndex(
-                (x) => x.ts === h.ts && x.winner === h.winner && x.loser === h.loser,
-              ) === i,
-          )
           .slice(0, 20);
         setHistory(hist);
       });
@@ -159,18 +189,12 @@ export function useRankVote(active: boolean) {
 
     const id = setInterval(() => {
       if (rv.endTime <= Date.now() && !resolvingRef.current) {
-        resolvingRef.current = true;
         setTransitioning(true);
-        void fb
-          ?.resolveRVIfNeeded(rv as Record<string, unknown>)
-          .catch(console.error)
-          .finally(() => {
-            resolvingRef.current = false;
-          });
+        void runResolve(rv as Record<string, unknown>);
       }
     }, 1000);
     return () => clearInterval(id);
-  }, [rv, active, fb]);
+  }, [rv, active, runResolve]);
 
   return {
     rv,

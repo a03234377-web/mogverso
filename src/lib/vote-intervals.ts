@@ -8,3 +8,6 @@ export const ENTRY_VOTE_HOURS = 2;
 
 /** Cuánto tiempo se muestran subidas/bajadas tras una ronda de rank vote. */
 export const MOVER_WINDOW_MS = VOTE_ROUND_MS;
+
+/** Máximo de entradas en las pilas de movimientos (subidas / bajadas). */
+export const MAX_MOVERS_STACK = 5;

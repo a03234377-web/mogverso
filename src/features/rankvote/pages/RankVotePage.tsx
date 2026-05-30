@@ -76,8 +76,11 @@ export function RankVotePage() {
                 No hay votaciones resueltas aún · ¡Participa en la primera!
               </div>
             ) : (
-              history.map((h, i) => (
-                <HistoryRow key={`${h.ts}-${h.winner}-${h.loser}-${i}`} h={h} />
+              history.map((h) => (
+                <HistoryRow
+                  key={h.id ?? `${h.ts}-${h.winner}-${h.loser}-${h.wVotes}-${h.lVotes}`}
+                  h={h}
+                />
               ))
             )}
           </div>

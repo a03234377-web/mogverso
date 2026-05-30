@@ -8,6 +8,7 @@ import {
   getRankedNamesFromOverrides,
 } from "@/features/rankings/lib/ranking";
 import type {
+  MoverStack,
   RankMovements,
   RankOverrides,
   RankVoteRound,
@@ -17,6 +18,8 @@ export function useRankingData() {
   const { fb, ready } = useFirebase();
   const [overrides, setOverrides] = useState<RankOverrides>({});
   const [movements, setMovements] = useState<RankMovements>({});
+  const [movementsUp, setMovementsUp] = useState<MoverStack>({});
+  const [movementsDown, setMovementsDown] = useState<MoverStack>({});
   const [rankVoteEnd, setRankVoteEnd] = useState<number | null>(null);
 
   useEffect(() => {
@@ -28,6 +31,12 @@ export function useRankingData() {
     });
     const unsubM = onValue(ref(db, "rankMovements"), (snap) => {
       setMovements(snap.exists() ? (snap.val() as RankMovements) : {});
+    });
+    const unsubUp = onValue(ref(db, "rankMovementsUp"), (snap) => {
+      setMovementsUp(snap.exists() ? (snap.val() as MoverStack) : {});
+    });
+    const unsubDown = onValue(ref(db, "rankMovementsDown"), (snap) => {
+      setMovementsDown(snap.exists() ? (snap.val() as MoverStack) : {});
     });
     const unsubRv = onValue(ref(db, "rankvote/current"), async (snap) => {
       if (snap.exists()) {
@@ -45,6 +54,8 @@ export function useRankingData() {
     return () => {
       unsubO();
       unsubM();
+      unsubUp();
+      unsubDown();
       unsubRv();
     };
   }, [fb]);
@@ -63,8 +74,12 @@ export function useRankingData() {
   );
 
   const { upMovers, downMovers } = useMemo(
-    () => computeMovers(rankedNames, movements),
-    [rankedNames, movements],
+    () =>
+      computeMovers(rankedNames, movements, {
+        up: movementsUp,
+        down: movementsDown,
+      }),
+    [rankedNames, movements, movementsUp, movementsDown],
   );
 
   return { ready, entries, upMovers, downMovers, rankVoteEnd, overrides };

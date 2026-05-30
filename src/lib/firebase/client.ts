@@ -10,9 +10,11 @@ import {
   runTransaction,
   type Database,
 } from "firebase/database";
+import { prependMoverStack } from "@/features/rankings/lib/ranking";
 import { ENTRY_VOTE_MS, VOTE_ROUND_MS } from "@/lib/vote-intervals";
 import { firebaseConfig, isFirebaseConfigured } from "./config";
 import type { Ranker } from "@/features/rankings/data/rankers";
+import type { MoverStack } from "@/features/shared/lib/types";
 import type { IconName } from "@/types/icons";
 
 export type FirebaseBridge = {
@@ -258,22 +260,40 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
     }
   }
 
+  async function claimRankVoteResolution(): Promise<boolean> {
+    const resolvingRef = ref(db!, "rankvote/current/resolving");
+    try {
+      const result = await runTransaction(resolvingRef, (cur) => {
+        if (cur === true) return;
+        return true;
+      });
+      return result.committed;
+    } catch {
+      return false;
+    }
+  }
+
+  function rankVoteRoundId(fresh: Record<string, unknown>): string {
+    const id = fresh.id;
+    if (typeof id === "string" && id.length > 0) return id;
+    const p1 = fresh.p1 as string;
+    const p2 = fresh.p2 as string;
+    const endTime = fresh.endTime as number;
+    return `rv_legacy_${p1}_${p2}_${endTime}`;
+  }
+
+  async function writeRankVoteHistory(
+    roundId: string,
+    entry: Record<string, unknown>,
+  ): Promise<void> {
+    await set(ref(db!, `rankvoteHistory/${roundId}`), { ...entry, id: roundId });
+  }
+
   async function resolveRVIfNeeded(rv: Record<string, unknown>) {
     if (!rv || rv.resolved) return;
     if ((rv.endTime as number) > Date.now()) return;
 
-    const resolvingRef = ref(db!, "rankvote/current/resolving");
-    let claimed = false;
-    try {
-      await runTransaction(resolvingRef, (cur) => {
-        if (cur === true) return;
-        claimed = true;
-        return true;
-      });
-    } catch {
-      return;
-    }
-    if (!claimed) return;
+    if (!(await claimRankVoteResolution())) return;
 
     const freshSnap = await get(ref(db!, "rankvote/current"));
     if (!freshSnap.exists()) {
@@ -283,6 +303,7 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
     const fresh = freshSnap.val() as Record<string, unknown>;
     if (fresh.resolved) return;
 
+    const roundId = rankVoteRoundId(fresh);
     const ovSnap = await get(ref(db!, "rankOverrides"));
     const overrides = ovSnap.exists() ? (ovSnap.val() as Record<string, number>) : {};
 
@@ -294,17 +315,17 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
     const tsNow = Date.now();
 
     if (v1 === 0 && v2 === 0) {
-      await set(ref(db!, "rankvote/current/resolved"), true);
       await Promise.all([
-        push(ref(db!, "rankvoteHistory"), {
+        writeRankVoteHistory(roundId, {
           winner: "empate",
           loser: "empate",
           wVotes: 0,
           lVotes: 0,
           ts: tsNow,
         }),
-        createNewRVRound(),
+        set(ref(db!, "rankvote/current/resolved"), true),
       ]);
+      await createNewRVRound();
       return;
     }
 
@@ -318,9 +339,8 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
     let loserIdx = ranked.indexOf(loser);
 
     if (winnerIdx === -1 || loserIdx === -1) {
-      await set(ref(db!, "rankvote/current/resolved"), true);
       await Promise.all([
-        push(ref(db!, "rankvoteHistory"), {
+        writeRankVoteHistory(roundId, {
           winner,
           loser,
           wVotes,
@@ -328,8 +348,9 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
           error: "not_found",
           ts: tsNow,
         }),
-        createNewRVRound(),
+        set(ref(db!, "rankvote/current/resolved"), true),
       ]);
+      await createNewRVRound();
       return;
     }
 
@@ -380,17 +401,44 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
 
     const batch: Record<string, unknown> = { rankOverrides: newOverrides };
     if (Object.keys(movUpdates).length > 0) {
-      const movSnap = await get(ref(db!, "rankMovements"));
+      const [movSnap, upSnap, downSnap] = await Promise.all([
+        get(ref(db!, "rankMovements")),
+        get(ref(db!, "rankMovementsUp")),
+        get(ref(db!, "rankMovementsDown")),
+      ]);
       const movements = movSnap.exists()
         ? (movSnap.val() as Record<string, unknown>)
         : {};
       Object.assign(movements, movUpdates);
       batch.rankMovements = movements;
+
+      let upStack = upSnap.exists() ? (upSnap.val() as MoverStack) : {};
+      let downStack = downSnap.exists() ? (downSnap.val() as MoverStack) : {};
+
+      if (winnerFinalIdx < winnerOrigIdx) {
+        upStack = prependMoverStack(upStack, {
+          name: winner,
+          rank: winnerFinalIdx + 1,
+          delta: winnerOrigIdx - winnerFinalIdx,
+          ts: tsNow,
+        });
+      }
+      if (loserFinalIdx > loserOrigIdx) {
+        downStack = prependMoverStack(downStack, {
+          name: loser,
+          rank: loserFinalIdx + 1,
+          delta: loserFinalIdx - loserOrigIdx,
+          ts: tsNow,
+        });
+      }
+
+      batch.rankMovementsUp = upStack;
+      batch.rankMovementsDown = downStack;
     }
 
     await Promise.all([
       update(ref(db!, "/"), batch),
-      push(ref(db!, "rankvoteHistory"), {
+      writeRankVoteHistory(roundId, {
         winner,
         loser,
         wVotes,
@@ -402,7 +450,8 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
         ts: tsNow,
       }),
       set(ref(db!, "rankvote/current/resolved"), true),
-    ]).then(() => createNewRVRound());
+    ]);
+    await createNewRVRound();
   }
 
   async function castRVVoteDB(name: string) {

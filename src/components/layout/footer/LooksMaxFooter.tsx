@@ -1,26 +1,13 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { Keys } from "@/lib/a11y/keyboard";
 import { Icon } from "@/components/icons";
 import { LOOKSMAX_PATHS } from "@/features/app/routes";
-import { PAGE_PANEL_IDS } from "@/lib/a11y/page-panels";
 import { cn } from "@/lib/cn";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
-import { useRovingTabIndex } from "@/hooks/useRovingTabIndex";
-import { BNAV, bottomSelectedIndex } from "@/components/layout/footer/nav-config";
+import { BNAV } from "@/components/layout/footer/nav-config";
 import type { LooksMaxFooterProps } from "@/components/layout/footer/types";
 import type { IconName } from "@/types/icons";
-
-function isRovingKey(key: string): boolean {
-  return (
-    key === Keys.ArrowLeft ||
-    key === Keys.ArrowRight ||
-    key === Keys.Home ||
-    key === Keys.End
-  );
-}
 
 export function LooksMaxFooter({
   page,
@@ -29,31 +16,6 @@ export function LooksMaxFooter({
   onToggleMore,
 }: LooksMaxFooterProps) {
   const moreActive = page === "consejo" || page === "lexico";
-  const selectedIndex = bottomSelectedIndex(page);
-  const keyboardRoving = useRef(false);
-
-  const { focusedIndex, getTabIndex, onKeyDown, syncFocusedIndex } = useRovingTabIndex({
-    count: BNAV.length,
-    selectedIndex,
-    orientation: "horizontal",
-  });
-
-  useEffect(() => {
-    syncFocusedIndex(selectedIndex);
-  }, [page, selectedIndex, syncFocusedIndex]);
-
-  useEffect(() => {
-    if (!keyboardRoving.current) return;
-    keyboardRoving.current = false;
-    const tab = BNAV[focusedIndex];
-    if (!tab) return;
-    document.getElementById(`tab-bnav-${tab.id}`)?.focus();
-  }, [focusedIndex]);
-
-  const onTabListKeyDown = (e: React.KeyboardEvent) => {
-    if (isRovingKey(e.key)) keyboardRoving.current = true;
-    onKeyDown(e);
-  };
 
   return (
     <>
@@ -69,22 +31,16 @@ export function LooksMaxFooter({
         <nav
           className="flex h-[var(--lm-bottom-nav-height)] w-full items-stretch justify-around px-1"
           aria-label="Navegación móvil"
-          role="tablist"
-          onKeyDown={onTabListKeyDown}
         >
-          {BNAV.map((tab, idx) => {
+          {BNAV.map((tab) => {
             const active = page === tab.id;
             return (
               <Link
                 key={tab.id}
                 href={LOOKSMAX_PATHS[tab.id]}
-                role="tab"
-                id={`tab-bnav-${tab.id}`}
-                aria-controls={PAGE_PANEL_IDS[tab.id]}
-                aria-selected={active}
-                tabIndex={getTabIndex(idx)}
+                id={`nav-bnav-${tab.id}`}
+                aria-current={active ? "page" : undefined}
                 className="relative flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 no-underline lm-focus-ring"
-                onClick={() => syncFocusedIndex(idx)}
               >
                 <span
                   className={cn(

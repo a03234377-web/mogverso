@@ -1,29 +1,13 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import Link from "next/link";
-import { Keys } from "@/lib/a11y/keyboard";
 import { Icon } from "@/components/icons";
 import { LOOKSMAX_PATHS } from "@/features/app/routes";
-import { PAGE_PANEL_IDS } from "@/lib/a11y/page-panels";
 import { cn } from "@/lib/cn";
-import { useRovingTabIndex } from "@/hooks/useRovingTabIndex";
-import {
-  DESKTOP_TABS,
-  desktopSelectedIndex,
-  sectionTitle,
-} from "@/components/layout/header/nav-config";
+import { DESKTOP_TABS, sectionTitle } from "@/components/layout/header/nav-config";
 import { useHeaderScroll } from "@/components/layout/header/useHeaderScroll";
 import type { LooksMaxHeaderProps } from "@/components/layout/header/types";
-
-function isRovingKey(key: string): boolean {
-  return (
-    key === Keys.ArrowLeft ||
-    key === Keys.ArrowRight ||
-    key === Keys.Home ||
-    key === Keys.End
-  );
-}
 
 function BrandLink({
   logoOpacity,
@@ -83,30 +67,6 @@ function NavBadge({
 
 export function LooksMaxHeader({ page, onOpenDiscord }: LooksMaxHeaderProps) {
   const { headerOpacity, logoOpacity, isLogoInteractive } = useHeaderScroll();
-  const selectedIndex = desktopSelectedIndex(page);
-  const keyboardRoving = useRef(false);
-  const { focusedIndex, getTabIndex, onKeyDown, syncFocusedIndex } = useRovingTabIndex({
-    count: DESKTOP_TABS.length,
-    selectedIndex,
-    orientation: "horizontal",
-  });
-
-  useEffect(() => {
-    syncFocusedIndex(selectedIndex);
-  }, [page, selectedIndex, syncFocusedIndex]);
-
-  useEffect(() => {
-    if (!keyboardRoving.current) return;
-    keyboardRoving.current = false;
-    const tab = DESKTOP_TABS[focusedIndex];
-    if (!tab) return;
-    document.getElementById(`tab-desktop-${tab.id}`)?.focus();
-  }, [focusedIndex]);
-
-  const onTabListKeyDown = (e: React.KeyboardEvent) => {
-    if (isRovingKey(e.key)) keyboardRoving.current = true;
-    onKeyDown(e);
-  };
 
   return (
     <header
@@ -131,29 +91,23 @@ export function LooksMaxHeader({ page, onOpenDiscord }: LooksMaxHeaderProps) {
         <div
           className="hidden min-w-0 flex-1 items-center justify-center md:flex lg:max-w-2xl xl:max-w-3xl"
           id="desktopTabs"
-          role="tablist"
           aria-label="Secciones"
-          onKeyDown={onTabListKeyDown}
         >
           <div className="scrollbar-none flex max-w-full items-center gap-0.5 overflow-x-auto rounded-full border border-lm-border bg-lm-bg2/90 p-1">
-            {DESKTOP_TABS.map((tab, idx) => {
+            {DESKTOP_TABS.map((tab) => {
               const active = page === tab.id;
               return (
                 <Link
                   key={tab.id}
                   href={LOOKSMAX_PATHS[tab.id]}
-                  role="tab"
-                  id={`tab-desktop-${tab.id}`}
-                  aria-controls={PAGE_PANEL_IDS[tab.id]}
-                  aria-selected={active}
-                  tabIndex={getTabIndex(idx)}
+                  id={`nav-desktop-${tab.id}`}
+                  aria-current={active ? "page" : undefined}
                   className={cn(
                     "group relative flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 font-sans text-sm font-bold whitespace-nowrap no-underline lm-focus-ring transition-colors duration-200 lg:px-3.5 lg:text-[0.9375rem]",
                     active
                       ? "bg-[linear-gradient(135deg,rgba(232,184,75,0.22),rgba(232,184,75,0.08))] text-lm-gold shadow-[inset_0_0_0_1px_rgba(232,184,75,0.35)]"
                       : "text-lm-text2 hover:text-lm-gold2",
                   )}
-                  onClick={() => syncFocusedIndex(idx)}
                 >
                   <Icon
                     name={tab.icon}

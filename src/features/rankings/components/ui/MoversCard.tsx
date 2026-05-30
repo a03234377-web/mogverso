@@ -28,9 +28,9 @@ export function MoversCard({ title, titleIcon, variant, movers }: MoversCardProp
             Sin movimientos recientes
           </div>
         ) : (
-          movers.slice(0, 3).map((m) => (
+          movers.map((m) => (
             <div
-              key={m.name}
+              key={`${m.ts}-${m.name}`}
               className="flex items-center justify-between gap-2 border-b border-lm-border py-2 last:border-b-0"
             >
               <div className="flex items-center gap-2 text-base font-bold">

@@ -48,7 +48,7 @@ pnpm run mdlint
 
 La app espera rutas como:
 
-- `rankOverrides`, `rankMovements`
+- `rankOverrides`, `rankMovements`, `rankMovementsUp`, `rankMovementsDown` (pilas de 5)
 - `rankvote/current`, `rankvoteHistory`, `rankvoteVotes/`
 - `entryVote/current`, `entryVotes/`
 - `torneo/state`, `torneoVotes/`

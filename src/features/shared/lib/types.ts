@@ -42,6 +42,16 @@ export type RankMovement = {
 
 export type RankMovements = Record<string, RankMovement>;
 
+/** Entrada en la pila de movimientos (rankMovementsUp / rankMovementsDown). */
+export type MoverStackEntry = {
+  name: string;
+  rank: number;
+  delta: number;
+  ts: number;
+};
+
+export type MoverStack = Record<string, MoverStackEntry>;
+
 /** Torneo */
 export type TorneoPlayer = {
   name: string;

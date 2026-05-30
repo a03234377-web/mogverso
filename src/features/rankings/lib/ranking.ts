@@ -1,6 +1,8 @@
 import { RANKERS, type Ranker } from "@/features/rankings/data/rankers";
-import { MOVER_WINDOW_MS } from "@/lib/vote-intervals";
+import { MAX_MOVERS_STACK, MOVER_WINDOW_MS } from "@/lib/vote-intervals";
 import type {
+  MoverStack,
+  MoverStackEntry,
   RankMovement,
   RankMovements,
   RankOverrides,
@@ -29,13 +31,57 @@ export type Mover = {
   ts: number;
 };
 
-/** Extrae movers recientes (subidas/bajadas) a partir del ranking y movements. */
+/** Convierte una pila de Firebase en lista ordenada (más reciente primero, máx. 5). */
+export function parseMoverStack(
+  stack: MoverStack | null | undefined,
+  max = MAX_MOVERS_STACK,
+): Mover[] {
+  if (!stack) return [];
+  return Object.values(stack)
+    .filter((e) => e?.name && typeof e.ts === "number")
+    .sort((a, b) => b.ts - a.ts)
+    .slice(0, max)
+    .map((e) => ({
+      name: e.name,
+      rank: e.rank,
+      delta: e.delta,
+      ts: e.ts,
+    }));
+}
+
+/** Añade una entrada arriba y recorta la pila al máximo (FIFO: cae el más antiguo). */
+export function prependMoverStack(
+  stack: MoverStack | null | undefined,
+  entry: MoverStackEntry,
+  max = MAX_MOVERS_STACK,
+): MoverStack {
+  const list = parseMoverStack(stack, max);
+  const next = [entry, ...list].slice(0, max);
+  return Object.fromEntries(
+    next.map((e) => [
+      `${e.ts}_${e.name}`,
+      { name: e.name, rank: e.rank, delta: e.delta, ts: e.ts },
+    ]),
+  );
+}
+
+/** Extrae movers desde pilas; si no hay pilas, usa rankMovements legacy. */
 export function computeMovers(
   rankedNames: string[],
   movements: RankMovements | null | undefined,
+  stacks?: {
+    up?: MoverStack | null;
+    down?: MoverStack | null;
+  },
   windowMs = MOVER_WINDOW_MS,
   now = Date.now(),
 ): { upMovers: Mover[]; downMovers: Mover[] } {
+  const upFromStack = parseMoverStack(stacks?.up ?? null);
+  const downFromStack = parseMoverStack(stacks?.down ?? null);
+  if (upFromStack.length > 0 || downFromStack.length > 0) {
+    return { upMovers: upFromStack, downMovers: downFromStack };
+  }
+
   const cutoff = now - windowMs;
   const upMovers: Mover[] = [];
   const downMovers: Mover[] = [];
@@ -54,7 +100,10 @@ export function computeMovers(
   upMovers.sort((a, b) => b.delta - a.delta || b.ts - a.ts);
   downMovers.sort((a, b) => b.ts - a.ts || b.delta - a.delta);
 
-  return { upMovers, downMovers };
+  return {
+    upMovers: upMovers.slice(0, MAX_MOVERS_STACK),
+    downMovers: downMovers.slice(0, MAX_MOVERS_STACK),
+  };
 }
 
 export type RankedEntry = {
