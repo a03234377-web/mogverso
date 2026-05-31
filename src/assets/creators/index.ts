@@ -20,7 +20,7 @@ import el_cromas from "./el-cromas.webp";
 import elcalvo from "./elcalvo.webp";
 import erra from "./erra.webp";
 import febron from "./febron.webp";
-import foxtef from "./foxtef.webp";
+import foxter_gg from "./foxter-gg.webp";
 import franbeuve from "./franbeuve.webp";
 import future from "./future.webp";
 import giva from "./giva.webp";
@@ -94,7 +94,7 @@ const CREATOR_IMAGES = {
   "elcalvo.webp": elcalvo,
   "erra.webp": erra,
   "febron.webp": febron,
-  "foxtef.webp": foxtef,
+  "foxter-gg.webp": foxter_gg,
   "franbeuve.webp": franbeuve,
   "future.webp": future,
   "giva.webp": giva,

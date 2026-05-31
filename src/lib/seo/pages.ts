@@ -40,7 +40,7 @@ export const noticiasMetadata: Metadata = buildPageMetadata({
 export const consejoMetadata: Metadata = buildPageMetadata({
   title: "Consejos looksmax",
   description:
-    "Guías y consejos diarios de looksmaxing: estilo, salud, percepción y mentalidad.",
+    "Protocolos de looksmaxing en España: piel, postura, nutrición, estilo, sueño y grooming con impacto real en cámara.",
   path: LOOKSMAX_PATHS.consejo,
 });
 

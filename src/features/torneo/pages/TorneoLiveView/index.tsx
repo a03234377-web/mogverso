@@ -2,12 +2,12 @@
 
 import { useCallback, useState } from "react";
 import { IconLabel } from "@/components/icons";
-import { ActivePage } from "@/features/shared/components/ui/ActivePage";
-import { HeroSection } from "@/features/shared/components/ui/HeroSection";
+import { ActivePage } from "@/components/ui/ActivePage";
+import { HeroSection } from "@/components/ui/HeroSection";
 import { TorneoPhaseCard } from "./TorneoPhaseCard";
 import { TorneoMatchesSection } from "./TorneoMatchesSection";
 import { TorneoBracket } from "./TorneoBracket";
-import { SectionTitle } from "@/features/shared/components/ui/SectionTitle";
+import { SectionTitle } from "@/components/ui/SectionTitle";
 import {
   TORNEO_HERO_EYEBROW,
   TORNEO_HERO_SUBTITLE,

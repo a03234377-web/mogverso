@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
-import type { EntryVote, EntryVoteMyVote } from "@/features/shared/lib/types";
+import type { EntryVote, EntryVoteMyVote } from "@/types/looksmax";
 import { ENTRY_VOTE_MS } from "@/lib/vote-intervals";
 
 export function useEntryVote() {

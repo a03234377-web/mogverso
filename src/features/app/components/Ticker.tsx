@@ -1,11 +1,15 @@
 "use client";
 
 import { Icon, IconLabel } from "@/components/icons";
-import { TICKER_ITEMS } from "@/features/app/data/ticker";
+import { useTickerItems } from "@/features/noticias/hooks/useTickerItems";
 import { cn } from "@/lib/cn";
 
 export function Ticker() {
-  const items = [...TICKER_ITEMS, ...TICKER_ITEMS];
+  const { items, visible } = useTickerItems();
+
+  if (!visible) return null;
+
+  const loop = [...items, ...items];
 
   return (
     <div
@@ -26,12 +30,18 @@ export function Ticker() {
       </div>
       <div className="min-w-0 flex-1 overflow-hidden">
         <div className="flex animate-ticker gap-12 whitespace-nowrap" id="tickerInner">
-          {items.map((t, i) => (
+          {loop.map((t, i) => (
             <span
-              key={`${t.text}-${i < TICKER_ITEMS.length ? "a" : "b"}`}
-              className="flex shrink-0 items-center gap-1.5 text-base font-semibold text-lm-text2"
-            >
-              <Icon name={t.icon} size={14} className="text-lm-gold" />
+              key={`${t.id}-${i < items.length ? "a" : "b"}`}
+              className={cn(
+                "flex shrink-0 items-center gap-1.5 text-base font-semibold text-lm-text2",
+              )}
+              >
+              <Icon
+                name={t.icon}
+                size={14}
+                className={t.labelClass ?? "text-lm-gold"}
+              />
               {t.text}
             </span>
           ))}

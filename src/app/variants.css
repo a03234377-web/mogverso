@@ -415,6 +415,10 @@
 }
 
 /* ── Consejo: categoría ── */
+.consejo-cat--piel {
+  color: #e8b84b;
+}
+
 .consejo-cat--nutricion {
   color: #4ec9b0;
 }
@@ -430,6 +434,14 @@
 
 .consejo-cat--mente {
   color: #569cd6;
+}
+
+.consejo-cat--sueno {
+  color: #9cdcfe;
+}
+
+.consejo-cat--grooming {
+  color: #d7ba7d;
 }
 
 /* ── Noticias: categoría ── */

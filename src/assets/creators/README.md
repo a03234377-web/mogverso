@@ -12,8 +12,9 @@ Cada archivo debe coincidir con el **nombre del ranker** en minúsculas; los esp
 | Lucas G      | `lucas-g.webp`      |
 | Nil Ojeda    | `nil-ojeda.webp`    |
 | Arnau Mestre | `arnau-mestre.webp` |
+| foxterGG     | `foxter-gg.webp`    |
 
-Usa `rankerPhotoFile(name)` de `@/assets/creators` para obtener el nombre de archivo. En runtime, `getRankerPhoto(name)` en `avatars.ts` resuelve la foto automáticamente.
+Usa `rankerPhotoFile(name)` de `@/assets/creators` para obtener el nombre de archivo. Si el nombre no encaja con la regla por defecto (p. ej. sufijos en mayúsculas), declara un override en `ranker-photo-file.ts`. En runtime, `getRankerPhoto(name)` en `avatars.ts` resuelve la foto automáticamente.
 
 ## Añadir una foto nueva
 

@@ -1,8 +1,9 @@
 "use client";
 
 import { Icon, IconLabel } from "@/components/icons";
-import { ActivePage } from "@/features/shared/components/ui/ActivePage";
-import { HeroSection } from "@/features/shared/components/ui/HeroSection";
+import { ActivePage } from "@/components/ui/ActivePage";
+import { SpainTimezoneNote } from "@/components/ui/SpainTimezoneNote";
+import { HeroSection } from "@/components/ui/HeroSection";
 import { RankVoteArena } from "./RankVoteArena";
 import { HistoryRow } from "./HistoryRow";
 import { useRankVote } from "@/features/rankvote/hooks/useRankVote";
@@ -103,6 +104,7 @@ export function RankVotePage() {
             <Icon name="scroll-text" size={22} className="text-lm-gold" />
             Historial de Votaciones
           </div>
+          <SpainTimezoneNote className="mb-4" />
           <div id="rankvoteHistoryList">
             {history.length === 0 ? (
               <div className="p-6 text-center text-base text-lm-text2">

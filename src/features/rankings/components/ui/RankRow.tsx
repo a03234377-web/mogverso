@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { Pressable } from "@/components/a11y/Pressable";
 import { Icon } from "@/components/icons";
-import { Avatar } from "@/features/shared/components/Avatar";
+import { Avatar } from "@/components/Avatar";
 import { cn } from "@/lib/cn";
 import type { RankedEntry } from "@/features/rankings/lib/ranking";
 

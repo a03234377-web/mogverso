@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar } from "@/features/shared/components/Avatar";
+import { Avatar } from "@/components/Avatar";
 import { Icon, IconLabel } from "@/components/icons";
 import { RANKERS } from "@/features/rankings/data/rankers";
 import { cn } from "@/lib/cn";

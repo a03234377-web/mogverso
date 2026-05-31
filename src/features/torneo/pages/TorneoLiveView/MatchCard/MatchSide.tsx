@@ -1,6 +1,6 @@
 "use client";
 
-import { CreatorImage } from "@/features/shared/components/CreatorImage";
+import { CreatorImage } from "@/components/CreatorImage";
 import { CreatorIcon, Icon } from "@/components/icons";
 import type { CreatorPhoto } from "@/assets/creators";
 import type { IconName } from "@/types/icons";

@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Icon, IconLabel } from "@/components/icons";
-import { ActivePage } from "@/features/shared/components/ui/ActivePage";
-import { HeroSection } from "@/features/shared/components/ui/HeroSection";
+import { ActivePage } from "@/components/ui/ActivePage";
+import { SpainTimezoneNote } from "@/components/ui/SpainTimezoneNote";
+import { HeroSection } from "@/components/ui/HeroSection";
 import {
   PhaseCard,
   PhaseDisplay,
@@ -12,7 +13,7 @@ import {
   PhaseTimer,
   PhaseTitle,
 } from "@/features/torneo/components/PhaseCard";
-import { useCountdown } from "@/features/shared/hooks/useCountdown";
+import { useCountdown } from "@/hooks/useCountdown";
 import { formatTorneoStartDate, getUpcomingTorneoStartMs } from "@/lib/torneo-schedule";
 import {
   TORNEO_HERO_EYEBROW,
@@ -70,6 +71,7 @@ export function TorneoComingSoon() {
               El siguiente torneo será el {dayName.toLowerCase()} a las {timeLabel}
             </IconLabel>
           </PhaseSub>
+          <SpainTimezoneNote className="mt-4 text-center" />
         </PhaseCard>
       </PhaseDisplay>
     </ActivePage>

@@ -1,0 +1,29 @@
+---
+description: Fechas y horas en hora peninsular (Europe/Madrid)
+globs: src/**/*.{tsx,ts}
+alwaysApply: false
+---
+
+# Zona horaria (España)
+
+Todas las fechas y horas visibles al usuario deben interpretarse y formatearse en **`Europe/Madrid`** (Península y Baleares, CET/CEST), no en la zona horaria del navegador.
+
+## Utilidades
+
+| Qué | Dónde |
+| :--- | :--- |
+| Constantes y formateo | `src/lib/spain-time.ts` |
+| Duraciones relativas (`3 min 12s`) | `src/lib/time.ts` |
+| Calendario del torneo (viernes 23:00) | `src/lib/torneo-schedule.ts` (usa `spain-time`) |
+
+## Reglas
+
+1. **Nunca** usar `Date#getHours()`, `getDay()`, `setHours(23,0,0,0)` ni `toLocaleString` sin `timeZone: SPAIN_TIMEZONE` para mostrar horas al usuario.
+2. Preferir `formatEventTime`, `formatSpainTime`, `formatSpainDateTimeCompact`, `formatSpainWeekdayDate` de `@/lib/spain-time`.
+3. Comparar «mismo día» con `isSameCalendarDayInSpain`, no con métodos locales de `Date`.
+4. Próximo reinicio diario a las 23:00 → `getNextMadrid23Ms`.
+5. Cuando la página muestre timestamps (noticias, historial rankvote, torneo), incluir o referenciar **`SpainTimezoneNote`** o mencionar «hora peninsular» en el copy si no queda claro por contexto.
+
+## UI
+
+Componente reutilizable: `@/components/ui/SpainTimezoneNote`.

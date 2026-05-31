@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import { TorneoComingSoon } from "@/features/torneo/pages/TorneoComingSoon";
 import { TorneoLiveView } from "@/features/torneo/pages/TorneoLiveView";
-import type { TorneoPhase } from "@/features/shared/lib/types";
+import type { TorneoPhase } from "@/types/looksmax";
 import { shouldShowTorneoComingSoon } from "@/lib/torneo-schedule";
 
 function useTorneoPhase() {

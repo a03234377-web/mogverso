@@ -13,8 +13,8 @@ import {
 } from "@/features/torneo/components/PhaseCard";
 import { TorneoPhaseEnded, TorneoPhaseWaitingOctavos } from "./TorneoPhaseViews";
 import { getNext23Ms } from "./getNext23Ms";
-import { useCountdown } from "@/features/shared/hooks/useCountdown";
-import type { TorneoState } from "@/features/shared/lib/types";
+import { useCountdown } from "@/hooks/useCountdown";
+import type { TorneoState } from "@/types/looksmax";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 
 export function TorneoPhaseCard({

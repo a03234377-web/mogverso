@@ -1,7 +1,7 @@
 "use client";
 
 import { Icon, IconLabel } from "@/components/icons";
-import { Modal, ModalCloseButton } from "@/features/shared/components/ui/Modal";
+import { Modal, ModalCloseButton } from "@/components/ui/Modal";
 import { cn } from "@/lib/cn";
 
 type DiscordModalProps = {

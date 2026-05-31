@@ -1,9 +1,9 @@
 "use client";
 
 import { Icon, IconLabel } from "@/components/icons";
-import { CountdownDigits } from "@/features/shared/components/ui/CountdownDigits";
+import { CountdownDigits } from "@/components/ui/CountdownDigits";
 import { FighterCard } from "./FighterCard";
-import { useCountdown } from "@/features/shared/hooks/useCountdown";
+import { useCountdown } from "@/hooks/useCountdown";
 import { RANKERS } from "@/features/rankings/data/rankers";
 import {
   isKnownRankerName,
