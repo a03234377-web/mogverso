@@ -52,14 +52,14 @@ Publica reglas restrictivas en Firebase Console → Realtime Database → **Regl
 
 Checklist operativo (doc privado o consola):
 
-| Ruta | Lectura | Escritura cliente |
-| :--- | :------ | :---------------- |
-| `rankvote/current`, `rankvoteHistory` | Pública | **Denegada** (heal/votos vía API + Admin SDK) |
-| `rankOverrides`, `rankMovements*` | Pública | **Denegada** |
-| `rankvoteVotes/*`, `entryVotes/*`, `torneoVotes/*` | Denegada o solo lectura propia | **Denegada** (API server-side) |
-| `entryVote/current` | Pública | **Denegada** |
-| `torneo/state` | Pública | **Denegada** |
-| `announcements` | Pública | **Denegada** |
+| Ruta                                               | Lectura                        | Escritura cliente                             |
+| :------------------------------------------------- | :----------------------------- | :-------------------------------------------- |
+| `rankvote/current`, `rankvoteHistory`              | Pública                        | **Denegada** (heal/votos vía API + Admin SDK) |
+| `rankOverrides`, `rankMovements*`                  | Pública                        | **Denegada**                                  |
+| `rankvoteVotes/*`, `entryVotes/*`, `torneoVotes/*` | Denegada o solo lectura propia | **Denegada** (API server-side)                |
+| `entryVote/current`                                | Pública                        | **Denegada**                                  |
+| `torneo/state`                                     | Pública                        | **Denegada**                                  |
+| `announcements`                                    | Pública                        | **Denegada**                                  |
 
 Tras desplegar la capa `/api/*`, bloquea **toda** escritura desde el cliente SDK; solo Admin SDK escribe.
 
