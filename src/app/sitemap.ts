@@ -14,8 +14,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === LOOKSMAX_PATHS.rankings ? 1 : 0.8,
   }));
 
-  const profiles = RANKERS.map((_, index) => ({
-    url: `${base}${profilePath(index)}`,
+  const profiles = RANKERS.map((ranker) => ({
+    url: `${base}${profilePath(ranker.name)}`,
     lastModified: now,
     changeFrequency: "weekly" as const,
     priority: 0.6,

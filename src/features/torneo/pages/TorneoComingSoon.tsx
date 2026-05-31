@@ -14,6 +14,7 @@ import {
 } from "@/features/torneo/components/PhaseCard";
 import { useCountdown } from "@/features/shared/hooks/useCountdown";
 import { formatTorneoStartDate, getUpcomingTorneoStartMs } from "@/lib/torneo-schedule";
+import { cn } from "@/lib/cn";
 
 export function TorneoComingSoon() {
   const [now, setNow] = useState(() => Date.now());
@@ -54,7 +55,14 @@ export function TorneoComingSoon() {
           <PhaseTitle color="orange" className="text-[clamp(2rem,6vw,4.5rem)]">
             Viernes · 23:00
           </PhaseTitle>
-          <div className="mx-auto my-1 mb-2.5 w-fit max-w-full bg-[linear-gradient(135deg,var(--color-lm-orange),var(--color-lm-gold2))] bg-clip-text font-display text-[clamp(1.4rem,6vw,6rem)] tracking-[6px] text-transparent max-[360px]:tracking-[1px] max-md:tracking-[2px]">
+          <div
+            className={cn(
+              "mx-auto my-1 mb-2.5 w-fit max-w-full font-display text-transparent",
+              "bg-[linear-gradient(135deg,var(--color-lm-orange),var(--color-lm-gold2))] bg-clip-text",
+              "text-[clamp(1.4rem,6vw,6rem)] tracking-[6px]",
+              "max-[360px]:tracking-[1px] max-md:tracking-[2px]",
+            )}
+          >
             EMPIEZA A LAS {timeLabel}
           </div>
           <div className="mb-3.5 flex items-center justify-center gap-1.5 text-sm font-bold text-lm-text2">

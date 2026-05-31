@@ -21,7 +21,12 @@ export function Particles() {
       p.className = "particle absolute rounded-full";
       const sz = 1 + Math.random() * 3;
       const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-      p.style.cssText = `left:${Math.random() * 100}%;--drift:${(Math.random() - 0.5) * 200}px;animation-duration:${7 + Math.random() * 13}s;animation-delay:${Math.random() * 18}s;opacity:0;width:${sz}px;height:${sz}px;background:${color},${0.4 + Math.random() * 0.4})`;
+      p.style.cssText =
+        `left:${Math.random() * 100}%;--drift:${(Math.random() - 0.5) * 200}px;` +
+        `animation-duration:${7 + Math.random() * 13}s;` +
+        `animation-delay:${Math.random() * 18}s;opacity:0;` +
+        `width:${sz}px;height:${sz}px;` +
+        `background:${color},${0.4 + Math.random() * 0.4})`;
       wrap.appendChild(p);
     }
   }, []);

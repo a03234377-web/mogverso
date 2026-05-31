@@ -13,7 +13,8 @@ export function FirebaseLoader() {
     <div
       id="fb-loader"
       className={cn(
-        "fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4 bg-lm-bg transition-opacity duration-500",
+        "fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-4",
+        "bg-lm-bg transition-opacity duration-500",
         ready && "pointer-events-none opacity-0",
       )}
     >
@@ -25,7 +26,12 @@ export function FirebaseLoader() {
         </div>
       ) : (
         <>
-          <div className="h-12 w-12 animate-spin-slow rounded-full border-[3px] border-lm-border2 border-t-lm-gold select-none" />
+          <div
+            className={cn(
+              "h-12 w-12 animate-spin-slow rounded-full border-[3px] select-none",
+              "border-lm-border2 border-t-lm-gold",
+            )}
+          />
           <div className="font-sans text-base font-bold tracking-tight text-lm-gold">
             Conectando a Firebase
           </div>

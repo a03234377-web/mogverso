@@ -3,21 +3,22 @@
 import { notFound } from "next/navigation";
 import { useParams } from "next/navigation";
 import { ProfilePage } from "@/features/rankings/pages/ProfilePage";
-import { RANKERS } from "@/features/rankings/data/rankers";
+import { resolveRankerFromProfileSlug } from "@/features/rankings/lib/profile-slug";
 import { useRankingData } from "@/features/rankings/hooks/useRankingData";
 import type { RankedEntry } from "@/features/rankings/lib/ranking";
 
 export function ProfileRoute() {
   const params = useParams();
-  const index = Number(params.index);
+  const slug = typeof params.slug === "string" ? params.slug : "";
   const { entries } = useRankingData();
 
-  if (!Number.isInteger(index) || index < 0 || index >= RANKERS.length) {
+  const ranker = resolveRankerFromProfileSlug(slug);
+  if (!ranker) {
     notFound();
   }
 
-  const entry = entries.find((e: RankedEntry) => e.originalIndex === index);
+  const entry = entries.find((e: RankedEntry) => e.name === ranker.name);
   const rankPosition = entry ? entry.rank - 1 : 0;
 
-  return <ProfilePage profileIndex={index} rankPosition={rankPosition} />;
+  return <ProfilePage ranker={ranker} rankPosition={rankPosition} />;
 }

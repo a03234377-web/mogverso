@@ -43,7 +43,7 @@ export function RankingItemListJsonLd() {
           "@type": "ListItem",
           position: i + 1,
           name: r.name,
-          url: `${url}${profilePath(i)}`,
+          url: `${url}${profilePath(r.name)}`,
         })),
       }}
     />
@@ -55,35 +55,32 @@ export function ProfilePersonJsonLd({
   title,
   description,
   rank,
-  profileIndex,
 }: {
   name: string;
   title: string;
   description: string;
-  rank: number;
-  profileIndex: number;
+  rank?: number;
 }) {
-  const url = `${getSiteUrl()}${profilePath(profileIndex)}`;
-  return (
-    <JsonLdScript
-      data={{
-        "@context": "https://schema.org",
-        "@type": "Person",
-        name,
-        description: `${title}. ${description}`,
-        url,
-        jobTitle: "Creador looksmaxer",
-        nationality: { "@type": "Country", name: "España" },
-        memberOf: {
-          "@type": "Organization",
-          name: SITE_NAME,
-        },
-        additionalProperty: {
-          "@type": "PropertyValue",
-          name: "Posición en ranking",
-          value: rank,
-        },
-      }}
-    />
-  );
+  const url = `${getSiteUrl()}${profilePath(name)}`;
+  const data: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name,
+    description: `${title}. ${description}`,
+    url,
+    jobTitle: "Creador looksmaxer",
+    nationality: { "@type": "Country", name: "España" },
+    memberOf: {
+      "@type": "Organization",
+      name: SITE_NAME,
+    },
+  };
+  if (rank != null) {
+    data.additionalProperty = {
+      "@type": "PropertyValue",
+      name: "Posición en ranking",
+      value: rank,
+    };
+  }
+  return <JsonLdScript data={data} />;
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import type { Ranker } from "@/features/rankings/data/rankers";
+import { RANKERS, type Ranker } from "@/features/rankings/data/rankers";
 import { LOOKSMAX_PATHS, profilePath } from "@/features/app/routes";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -51,12 +51,12 @@ export const homeRedirectMetadata: Metadata = buildPageMetadata({
   path: "/rankings",
 });
 
-export function buildProfileMetadata(ranker: Ranker, index: number): Metadata {
-  const rank = index + 1;
+export function buildProfileMetadata(ranker: Ranker, rank?: number): Metadata {
+  const position = rank ?? RANKERS.findIndex((r) => r.name === ranker.name) + 1;
   return buildPageMetadata({
-    title: `${ranker.name} — Puesto #${rank}`,
+    title: `${ranker.name} — Puesto #${position}`,
     description: `${ranker.title} · ${ranker.sub}. Score ${ranker.score}. ${ranker.bio.slice(0, 140)}…`,
-    path: profilePath(index),
+    path: profilePath(ranker.name),
     keywords: [ranker.name, "looksmax españa", "ranking looksmax", ranker.title],
   });
 }

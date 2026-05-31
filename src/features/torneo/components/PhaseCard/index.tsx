@@ -1,60 +1,17 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import {
+  cardVariants,
+  dotColors,
+  labelColors,
+  timerNumStyles,
+  timerSepColors,
+  titleGradients,
+  type PhaseCardVariant,
+  type PhaseColor,
+} from "./phase-card-styles";
 
-export type PhaseColor = "orange" | "green" | "purple" | "gold";
-export type PhaseCardVariant = "waiting" | "voting" | "break" | "semifinals";
-
-const cardVariants: Record<PhaseCardVariant, string> = {
-  waiting:
-    "border-2 border-[rgba(255,107,53,0.5)] bg-[linear-gradient(135deg,rgba(232,184,75,0.1),rgba(255,107,53,0.06))]",
-  voting:
-    "border-2 border-[rgba(46,204,113,0.5)] bg-[linear-gradient(135deg,rgba(46,204,113,0.1),rgba(59,130,246,0.06))]",
-  break:
-    "border-2 border-[rgba(168,85,247,0.4)] bg-[linear-gradient(135deg,rgba(168,85,247,0.1),rgba(232,184,75,0.05))]",
-  semifinals:
-    "border-2 border-[rgba(232,184,75,0.5)] bg-[linear-gradient(135deg,rgba(232,184,75,0.12),rgba(255,107,53,0.05))]",
-};
-
-const labelColors: Record<PhaseColor, string> = {
-  orange: "text-[#ff6b35]",
-  green: "text-lm-green2",
-  purple: "text-lm-purple",
-  gold: "text-lm-gold",
-};
-
-const dotColors: Record<PhaseColor, string> = {
-  orange: "bg-[#ff6b35]",
-  green: "bg-lm-green2",
-  purple: "bg-lm-purple",
-  gold: "bg-lm-gold",
-};
-
-const titleGradients: Record<PhaseColor, string> = {
-  orange:
-    "bg-[linear-gradient(135deg,#fff,#ff9f5b,#ff6b35)] bg-clip-text text-transparent",
-  green:
-    "bg-[linear-gradient(135deg,#fff,var(--color-lm-green2))] bg-clip-text text-transparent",
-  purple:
-    "bg-[linear-gradient(135deg,#fff,#c084fc,var(--color-lm-purple))] bg-clip-text text-transparent",
-  gold: "bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text text-transparent",
-};
-
-const timerNumStyles: Record<PhaseColor, string> = {
-  orange:
-    "text-[#ff6b35] border border-[rgba(255,107,53,0.3)] bg-[rgba(255,107,53,0.12)]",
-  green:
-    "text-lm-green2 border border-[rgba(46,204,113,0.3)] bg-[rgba(46,204,113,0.12)]",
-  purple:
-    "text-lm-purple border border-[rgba(168,85,247,0.3)] bg-[rgba(168,85,247,0.12)]",
-  gold: "text-lm-gold2 border border-[rgba(232,184,75,0.3)] bg-[rgba(232,184,75,0.12)]",
-};
-
-const timerSepColors: Record<PhaseColor, string> = {
-  orange: "text-[#ff6b35]",
-  green: "text-lm-green2",
-  purple: "text-lm-purple",
-  gold: "text-lm-gold",
-};
+export type { PhaseCardVariant, PhaseColor };
 
 export function PhaseDisplay({ children }: { children: ReactNode }) {
   return <div className="mx-auto mb-8 max-w-[860px] px-5 max-md:px-3">{children}</div>;
@@ -198,7 +155,8 @@ function TimerUnit({
     <div className="flex flex-col items-center gap-1">
       <div
         className={cn(
-          "min-w-[65px] rounded-xl px-2 py-0.5 text-center lm-type-score text-[clamp(1.75rem,5vw,3.25rem)] max-md:min-w-12 max-md:text-[clamp(1.35rem,5vw,2.25rem)]",
+          "min-w-[65px] rounded-xl px-2 py-0.5 text-center lm-type-score",
+          "text-[clamp(1.75rem,5vw,3.25rem)] max-md:min-w-12 max-md:text-[clamp(1.35rem,5vw,2.25rem)]",
           timerNumStyles[color],
         )}
       >

@@ -41,3 +41,28 @@ App **Next.js App Router** con `src/`. Coloca cada cambio en la carpeta correcta
 ## Antes de crear un archivo
 
 Preguntarse: **¿es ruta, componente, lib, estilo o config?** Si la duda es server vs client: ¿usa hooks, eventos DOM, Firebase en tiempo real o `window`? → `'use client'`.
+
+## Refactor: dividir un componente en varios archivos
+
+Si un archivo (p. ej. `components/Foo.tsx`) se parte en **2 o más archivos**, **no** dejes los trozos sueltos junto a otros componentes del mismo directorio.
+
+1. Crear una **subcarpeta con el nombre del componente original**: `components/Foo/`.
+2. El punto de entrada público pasa a `Foo/index.tsx` (exporta `Foo` como antes).
+3. Subcomponentes, estilos y utilidades **solo de Foo** van **dentro** de `Foo/` (`Bar.tsx`, `styles.ts`, …).
+4. Si uno de esos trozos se vuelve a dividir, repetir el mismo criterio: `Foo/Bar/index.tsx` + partes internas en `Foo/Bar/`.
+
+**Ejemplo**
+
+```
+components/
+  EntryVoteCard/
+    index.tsx              ← export público
+    EntryVoteActive.tsx
+    EntryVoteWinner.tsx
+    shell-styles.ts
+  AdBanner.tsx             ← componente único, sin subcarpeta
+```
+
+**Imports externos:** `@/features/.../EntryVoteCard` (la carpeta, no archivos internos salvo que se exporten explícitamente).
+
+**Imports internos:** rutas relativas dentro de la subcarpeta (`./EntryVoteActive`, `./shell-styles`).

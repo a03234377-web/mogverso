@@ -2,6 +2,7 @@ import type { Viewport } from "next";
 import { Bebas_Neue, Lora, Syne } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
+import { cn } from "@/lib/cn";
 import { WebSiteJsonLd } from "@/lib/seo/json-ld";
 import { rootLayoutMetadata } from "@/lib/seo/metadata";
 import "./globals.css";
@@ -45,11 +46,15 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${bebas.variable} ${syne.variable} ${lora.variable}`}
+      className={cn(bebas.variable, syne.variable, lora.variable)}
       suppressHydrationWarning
     >
       <body
-        className={`${syne.className} min-h-screen bg-lm-bg pb-[calc(var(--lm-bottom-nav-height)+env(safe-area-inset-bottom,0px))] text-base text-lm-text antialiased select-text`}
+        className={cn(
+          syne.className,
+          "min-h-screen bg-lm-bg text-base text-lm-text antialiased select-text",
+          "pb-[calc(var(--lm-bottom-nav-height)+env(safe-area-inset-bottom,0px))]",
+        )}
       >
         <WebSiteJsonLd />
         {children}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Icon } from "@/components/icons";
+import { cn } from "@/lib/cn";
 import { BackgroundEffects } from "@/features/app/components/BackgroundEffects";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -12,17 +13,34 @@ export const metadata = buildPageMetadata({
 
 export default function NotFound() {
   return (
-    <div className="relative flex min-h-[calc(100vh-var(--lm-bottom-nav-height))] flex-col items-center justify-center px-5 py-16 text-center">
+    <div
+      className={cn(
+        "relative flex flex-col items-center justify-center px-5 py-16 text-center",
+        "min-h-[calc(100vh-var(--lm-bottom-nav-height))]",
+      )}
+    >
       <BackgroundEffects />
 
       <div className="relative z-10 flex max-w-md flex-col items-center gap-6">
-        <div className="flex h-14 w-14 items-center justify-center rounded-[10px] bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold3))] text-black shadow-[0_0_16px_rgba(232,184,75,0.3)]">
+        <div
+          className={cn(
+            "flex h-14 w-14 items-center justify-center rounded-[10px] text-black",
+            "bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold3))]",
+            "shadow-[0_0_16px_rgba(232,184,75,0.3)]",
+          )}
+        >
           <Icon name="crown" size={28} />
         </div>
 
         <div>
           <p className="mb-2 lm-type-label text-lm-gold">LooksMax España</p>
-          <h1 className="mx-auto w-fit bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text font-display text-[clamp(4rem,18vw,8rem)] tracking-[4px] text-transparent">
+          <h1
+            className={cn(
+              "mx-auto w-fit bg-clip-text font-display text-transparent",
+              "bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2),var(--color-lm-gold))]",
+              "text-[clamp(4rem,18vw,8rem)] tracking-[4px]",
+            )}
+          >
             404
           </h1>
           <p className="mt-3 text-base font-semibold tracking-wide text-lm-text2">
@@ -37,7 +55,11 @@ export default function NotFound() {
 
         <Link
           href="/"
-          className="inline-flex items-center gap-2 rounded-lg bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold3))] px-6 py-3 font-sans text-base font-bold text-black transition-transform hover:scale-[1.04]"
+          className={cn(
+            "inline-flex items-center gap-2 rounded-lg px-6 py-3",
+            "font-sans text-base font-bold text-black transition-transform hover:scale-[1.04]",
+            "bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold3))]",
+          )}
         >
           <Icon name="trophy" size={16} className="text-black" />
           Volver al inicio

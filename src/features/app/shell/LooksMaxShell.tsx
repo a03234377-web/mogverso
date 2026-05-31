@@ -96,9 +96,9 @@ export function useLooksMaxNavigate() {
   );
 
   const openProfile = useCallback(
-    (originalIndex: number, rankPos: number) => {
+    (name: string, rankPos: number) => {
       void rankPos;
-      const href = pathForPage("profile", originalIndex);
+      const href = pathForPage("profile", name);
       if (href !== pathname) router.push(href);
       window.scrollTo({ top: 0, behavior: "smooth" });
     },

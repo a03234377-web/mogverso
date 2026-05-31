@@ -1,27 +1,42 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { profilePath } from "@/features/app/routes";
 import { ProfileRoute } from "@/features/rankings/views/ProfileRoute";
 import { RANKERS } from "@/features/rankings/data/rankers";
+import {
+  findRankerByLegacyIndex,
+  rankerProfileSlug,
+  resolveRankerFromProfileSlug,
+} from "@/features/rankings/lib/profile-slug";
 import { ProfilePersonJsonLd } from "@/lib/seo/json-ld";
 import { buildProfileMetadata, profileNotFoundMetadata } from "@/lib/seo/pages";
 
 type PageProps = {
-  params: Promise<{ index: string }>;
+  params: Promise<{ slug: string }>;
 };
 
+export function generateStaticParams() {
+  return RANKERS.map((r) => ({ slug: rankerProfileSlug(r.name) }));
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { index } = await params;
-  const i = Number(index);
-  if (!Number.isInteger(i) || i < 0 || i >= RANKERS.length) {
+  const { slug } = await params;
+  const ranker = resolveRankerFromProfileSlug(slug);
+  if (!ranker) {
     return profileNotFoundMetadata;
   }
-  return buildProfileMetadata(RANKERS[i], i);
+  return buildProfileMetadata(ranker);
 }
 
 export default async function ProfilePageRoute({ params }: PageProps) {
-  const { index } = await params;
-  const i = Number(index);
-  const ranker =
-    Number.isInteger(i) && i >= 0 && i < RANKERS.length ? RANKERS[i] : null;
+  const { slug } = await params;
+
+  const legacy = findRankerByLegacyIndex(slug);
+  if (legacy) {
+    redirect(profilePath(legacy.name));
+  }
+
+  const ranker = resolveRankerFromProfileSlug(slug);
 
   return (
     <>
@@ -30,8 +45,6 @@ export default async function ProfilePageRoute({ params }: PageProps) {
           name={ranker.name}
           title={ranker.title}
           description={ranker.bio}
-          rank={i + 1}
-          profileIndex={i}
         />
       )}
       <ProfileRoute />

@@ -23,12 +23,17 @@ const numBoxStyles: Record<CountdownVariant, string> = {
   ),
   green: cn(
     numBoxBase,
-    "min-w-[44px] rounded-[7px] border border-[rgba(46,204,113,0.3)] bg-[rgba(46,204,113,0.1)] px-1.5 max-md:min-w-[38px]",
+    "min-w-[44px] rounded-[7px] border px-1.5 max-md:min-w-[38px]",
+    "border-[rgba(46,204,113,0.3)] bg-[rgba(46,204,113,0.1)]",
   ),
 };
 
 const numTextStyles: Record<CountdownVariant, string> = {
-  gold: "bg-[linear-gradient(180deg,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text text-[clamp(1.6rem,4.5vw,3.5rem)] font-bold text-transparent max-md:text-[clamp(1.35rem,4vw,2rem)]",
+  gold: cn(
+    "bg-clip-text font-bold text-transparent",
+    "bg-[linear-gradient(180deg,var(--color-lm-gold2),var(--color-lm-gold))]",
+    "text-[clamp(1.6rem,4.5vw,3.5rem)] max-md:text-[clamp(1.35rem,4vw,2rem)]",
+  ),
   purple:
     "text-[clamp(1.35rem,4vw,2.25rem)] font-bold text-lm-purple max-md:text-[clamp(1.15rem,4vw,1.75rem)]",
   green:
