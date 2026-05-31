@@ -18,11 +18,7 @@ export function NoticiasFilterTabs({
   counts,
 }: NoticiasFilterTabsProps) {
   return (
-    <div
-      className="mb-4"
-      role="tablist"
-      aria-label="Filtrar noticias"
-    >
+    <div className="mb-4" role="tablist" aria-label="Filtrar noticias">
       <div
         className={cn(
           "scrollbar-none flex w-full flex-wrap items-center gap-1 overflow-x-auto",

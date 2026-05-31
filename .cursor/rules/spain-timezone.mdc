@@ -22,7 +22,7 @@ Todas las fechas y horas visibles al usuario deben interpretarse y formatearse e
 2. Preferir `formatEventTime`, `formatSpainTime`, `formatSpainDateTimeCompact`, `formatSpainWeekdayDate` de `@/lib/spain-time`.
 3. Comparar «mismo día» con `isSameCalendarDayInSpain`, no con métodos locales de `Date`.
 4. Próximo reinicio diario a las 23:00 → `getNextMadrid23Ms`.
-5. Cuando la página muestre timestamps (noticias, historial rankvote, torneo), incluir o referenciar **`SpainTimezoneNote`** o mencionar «hora peninsular» en el copy si no queda claro por contexto.
+5. Cuando la página muestre timestamps (noticias, historial rankvote, torneo), incluir o referenciar **`SpainTimezoneNote`**: «hora de España» en negrita y detalle `(peninsular, CET/CEST)` entre paréntesis.
 
 ## UI
 

@@ -1,8 +1,11 @@
 /** Zona horaria oficial del proyecto (Península y Baleares). */
 export const SPAIN_TIMEZONE = "Europe/Madrid";
 
-/** Etiqueta para mostrar junto a fechas/horas en la UI. */
-export const SPAIN_TIMEZONE_LABEL = "hora peninsular (CET/CEST)";
+/** Etiqueta principal para la UI (referencia geográfica clara). */
+export const SPAIN_TIMEZONE_LABEL = "hora de España";
+
+/** Detalle técnico entre paréntesis (zona concreta y siglas). */
+export const SPAIN_TIMEZONE_DETAIL = "peninsular, CET/CEST";
 
 const MADRID_PARTS_FORMATTER = new Intl.DateTimeFormat("en-GB", {
   timeZone: SPAIN_TIMEZONE,
@@ -152,7 +155,7 @@ export function formatSpainWeekdayDate(ts: number) {
   };
 }
 
-/** Próximo instante a las 23:00 en hora peninsular. */
+/** Próximo instante a las 23:00 en hora de España. */
 export function getNextMadrid23Ms(from = Date.now()): number {
   const start = getMadridParts(from);
   const today23 = madridLocalToUtc(start.year, start.month, start.day, 23, 0);

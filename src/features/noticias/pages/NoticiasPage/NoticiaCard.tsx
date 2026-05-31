@@ -2,6 +2,7 @@
 
 import { Icon } from "@/components/icons";
 import { NoticiaTextWithProfiles } from "@/features/noticias/lib/linkify-noticia-text";
+import { NoticiaInvolvedRankers } from "./NoticiaInvolvedRankers";
 import { noticiaKindLabelClass } from "@/features/noticias/lib/noticia-kind-colors";
 import type { NoticiaEventKind } from "@/features/noticias/lib/noticia-event";
 import type { IconName } from "@/types/icons";
@@ -30,15 +31,11 @@ export function NoticiaCard({
 
   return (
     <div className="rounded-xl border border-lm-border bg-lm-card p-4">
-      <div
-        className={cn(
-          "mb-1.5 flex items-center gap-1 lm-type-label",
-          labelClass,
-        )}
-      >
+      <div className={cn("mb-1.5 flex items-center gap-1 lm-type-label", labelClass)}>
         <Icon name={catIcon} size={12} />
         {catLabel}
       </div>
+      <NoticiaInvolvedRankers kind={kind} profileNames={profileNames} />
       <div className="mb-1.5 text-base leading-snug font-bold text-lm-text">
         <NoticiaTextWithProfiles
           text={title}

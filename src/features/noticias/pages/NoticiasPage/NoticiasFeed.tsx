@@ -21,7 +21,7 @@ function NoticiasSkeleton() {
         <div
           key={i}
           className={cn(
-            "h-[140px] animate-pulse rounded-xl border border-lm-border bg-lm-card",
+            "h-[180px] animate-pulse rounded-xl border border-lm-border bg-lm-card",
           )}
           aria-hidden
         />
@@ -45,9 +45,10 @@ function NoticiasEmpty({ message }: { message: string }) {
 
 function useFilterCounts(events: ReturnType<typeof useNoticiasFeed>["events"]) {
   return useMemo(() => {
-    const counts = Object.fromEntries(
-      NOTICIAS_FILTERS.map((f) => [f.id, 0]),
-    ) as Record<NoticiasFilterId, number>;
+    const counts = Object.fromEntries(NOTICIAS_FILTERS.map((f) => [f.id, 0])) as Record<
+      NoticiasFilterId,
+      number
+    >;
     for (const tab of NOTICIAS_FILTERS) {
       counts[tab.id] = filterNoticiaEvents(events, tab.id).length;
     }
@@ -59,10 +60,7 @@ export function NoticiasFeed() {
   const { events, ready, isEmpty } = useNoticiasFeed();
   const [filter, setFilter] = useState<NoticiasFilterId>(DEFAULT_NOTICIAS_FILTER);
   const counts = useFilterCounts(events);
-  const filtered = useMemo(
-    () => filterNoticiaEvents(events, filter),
-    [events, filter],
-  );
+  const filtered = useMemo(() => filterNoticiaEvents(events, filter), [events, filter]);
   const filterEmpty = ready && !isEmpty && filtered.length === 0;
 
   if (!ready) {
