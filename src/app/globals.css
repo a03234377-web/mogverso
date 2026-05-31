@@ -43,6 +43,17 @@
   --animate-orb-float-2: orbFloat2 18s ease-in-out infinite;
   --animate-orb-float-3: orbFloat3 16s ease-in-out infinite;
   --animate-particle-float: particleFloat linear infinite;
+  --animate-join-shimmer: joinShimmer 0.75s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  --animate-join-star: joinStarIgnite 0.6s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
+  --animate-join-spark: joinSpark 0.55s ease-out forwards;
+  --animate-join-aura: joinAura 0.85s ease-out forwards;
+  --animate-quick-shimmer: quickActionShimmer 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  --animate-quick-aura: quickActionAura 0.9s ease-out forwards;
+  --animate-quick-gradient: quickActionGradient 1.4s ease-in-out infinite;
+  --animate-quick-icon: quickActionIconPop 0.55s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
+  --animate-quick-check: quickActionCheckDraw 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  --animate-quick-ring: quickActionRingPulse 0.7s ease-out forwards;
+  --animate-quick-cross: quickActionCrossFlash 0.5s ease-out forwards;
 }
 
 :root {
@@ -495,5 +506,343 @@ textarea::-moz-selection {
   100% {
     opacity: 0;
     transform: translateY(-20vh) translateX(var(--drift)) scale(1);
+  }
+}
+
+@keyframes joinShimmer {
+  from {
+    transform: translateX(-120%) skewX(-12deg);
+  }
+  to {
+    transform: translateX(120%) skewX(-12deg);
+  }
+}
+
+@keyframes joinStarIgnite {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  35% {
+    transform: rotate(-18deg) scale(1.18);
+  }
+  70% {
+    transform: rotate(8deg) scale(1.06);
+  }
+  100% {
+    transform: rotate(0deg) scale(1.08);
+  }
+}
+
+@keyframes joinSpark {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 8;
+  }
+  35% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes joinAura {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+
+@keyframes joinStarTrace {
+  from {
+    stroke-dashoffset: 52;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.lm-join-btn:hover .lm-join-shimmer {
+  animation: var(--animate-join-shimmer);
+}
+
+.lm-join-btn:hover .lm-join-aura {
+  animation: var(--animate-join-aura);
+}
+
+.lm-join-btn:hover .lm-join-star-body {
+  transform-origin: center;
+  animation: var(--animate-join-star);
+}
+
+.lm-join-star-trace {
+  stroke-width: 1.35;
+  stroke-dasharray: 52;
+  stroke-dashoffset: 52;
+  transition: stroke-dashoffset 0.35s ease;
+}
+
+.lm-join-btn:hover .lm-join-star-trace {
+  animation: joinStarTrace 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.lm-join-star-spark {
+  stroke-width: 1.5;
+  stroke-dasharray: 8;
+  stroke-dashoffset: 8;
+  transform-origin: 12px 12px;
+}
+
+.lm-join-btn:hover .lm-join-star-spark {
+  animation: var(--animate-join-spark);
+  animation-delay: var(--join-spark-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lm-join-btn:hover .lm-join-shimmer,
+  .lm-join-btn:hover .lm-join-aura,
+  .lm-join-btn:hover .lm-join-star-body,
+  .lm-join-btn:hover .lm-join-star-spark {
+    animation: none;
+  }
+
+  .lm-join-star-trace {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes quickActionShimmer {
+  from {
+    transform: translateX(-120%) skewX(-10deg);
+  }
+  to {
+    transform: translateX(120%) skewX(-10deg);
+  }
+}
+
+@keyframes quickActionAura {
+  0% {
+    opacity: 0.75;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes quickActionGradient {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes quickActionIconPop {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  40% {
+    transform: scale(1.14) rotate(-4deg);
+  }
+  100% {
+    transform: scale(1.06) rotate(0deg);
+  }
+}
+
+@keyframes quickActionCheckDraw {
+  from {
+    stroke-dashoffset: 14;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes quickActionRingPulse {
+  0% {
+    opacity: 0.35;
+    transform: scale(0.88);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes quickActionCrossFlash {
+  0% {
+    opacity: 0.35;
+    stroke-dashoffset: 12;
+  }
+  100% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+.lm-quick-action-btn--vote {
+  background: linear-gradient(135deg, var(--color-lm-green2), var(--color-lm-gold));
+  box-shadow: 0 0 24px rgb(46 204 113 / 0.35);
+}
+
+.lm-quick-action-btn--vote:hover {
+  box-shadow:
+    0 0 34px rgb(46 204 113 / 0.55),
+    0 8px 28px rgb(0 0 0 / 0.28);
+}
+
+.lm-quick-action-btn--vote .lm-quick-action-gradient {
+  background: linear-gradient(
+    135deg,
+    rgb(82 240 168 / 0.95),
+    var(--color-lm-green2) 35%,
+    var(--color-lm-gold) 70%,
+    #ffe08a 100%
+  );
+  background-size: 220% 220%;
+}
+
+.lm-quick-action-btn--vote .lm-quick-action-aura {
+  border-color: rgb(255 255 255 / 0.35);
+  box-shadow: 0 0 18px rgb(46 204 113 / 0.45);
+}
+
+.lm-quick-action-btn--torneo {
+  background: linear-gradient(135deg, #ff6b35, var(--color-lm-gold));
+  box-shadow: 0 0 24px rgb(255 107 53 / 0.35);
+}
+
+.lm-quick-action-btn--torneo:hover {
+  box-shadow:
+    0 0 34px rgb(255 107 53 / 0.55),
+    0 8px 28px rgb(0 0 0 / 0.28);
+}
+
+.lm-quick-action-btn--torneo .lm-quick-action-gradient {
+  background: linear-gradient(
+    135deg,
+    #ff8f5a 0%,
+    #ff6b35 30%,
+    var(--color-lm-gold) 65%,
+    #ffe08a 100%
+  );
+  background-size: 220% 220%;
+}
+
+.lm-quick-action-btn--torneo .lm-quick-action-aura {
+  border-color: rgb(255 255 255 / 0.35);
+  box-shadow: 0 0 18px rgb(255 107 53 / 0.45);
+}
+
+.lm-quick-action-btn:hover .lm-quick-action-shimmer {
+  animation: var(--animate-quick-shimmer);
+}
+
+.lm-quick-action-btn:hover .lm-quick-action-aura {
+  animation: var(--animate-quick-aura);
+}
+
+.lm-quick-action-btn:hover .lm-quick-action-gradient {
+  opacity: 1;
+  animation: var(--animate-quick-gradient);
+}
+
+.lm-quick-action-btn:hover .lm-qa-icon {
+  animation: var(--animate-quick-icon);
+  transform-origin: center;
+}
+
+.lm-qa-vote-box,
+.lm-qa-vote-slot,
+.lm-qa-vote-check,
+.lm-qa-torneo-ring,
+.lm-qa-torneo-cross {
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.lm-qa-vote-box {
+  stroke-dasharray: 56;
+  stroke-dashoffset: 0;
+}
+
+.lm-qa-vote-check {
+  stroke-dasharray: 14;
+  stroke-dashoffset: 14;
+}
+
+.lm-quick-action-btn:hover .lm-qa-vote-check {
+  animation: var(--animate-quick-check) 0.45s cubic-bezier(0.4, 0, 0.2, 1) 0.12s forwards;
+}
+
+.lm-qa-torneo-ring {
+  transform-origin: 12px 12px;
+}
+
+.lm-qa-torneo-ring--outer {
+  stroke-dasharray: 52;
+  stroke-dashoffset: 52;
+}
+
+.lm-quick-action-btn:hover .lm-qa-torneo-ring--outer {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.45s ease;
+}
+
+.lm-qa-torneo-ring--mid {
+  opacity: 0.85;
+}
+
+.lm-quick-action-btn:hover .lm-qa-torneo-ring--mid {
+  animation: var(--animate-quick-ring);
+}
+
+.lm-qa-torneo-core {
+  transform-origin: 12px 12px;
+  transition: transform 0.3s ease;
+}
+
+.lm-quick-action-btn:hover .lm-qa-torneo-core {
+  transform: scale(1.35);
+}
+
+.lm-qa-torneo-cross {
+  stroke-dasharray: 12;
+  stroke-dashoffset: 12;
+  opacity: 0.7;
+}
+
+.lm-quick-action-btn:hover .lm-qa-torneo-cross {
+  animation: var(--animate-quick-cross) 0.5s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lm-quick-action-btn:hover .lm-quick-action-shimmer,
+  .lm-quick-action-btn:hover .lm-quick-action-aura,
+  .lm-quick-action-btn:hover .lm-quick-action-gradient,
+  .lm-quick-action-btn:hover .lm-qa-icon,
+  .lm-quick-action-btn:hover .lm-qa-vote-check,
+  .lm-quick-action-btn:hover .lm-qa-torneo-ring--mid,
+  .lm-quick-action-btn:hover .lm-qa-torneo-cross {
+    animation: none;
+  }
+
+  .lm-qa-vote-check,
+  .lm-qa-torneo-ring--outer,
+  .lm-qa-torneo-cross {
+    stroke-dashoffset: 0;
+  }
+
+  .lm-quick-action-btn:hover .lm-qa-torneo-core {
+    transform: none;
   }
 }
