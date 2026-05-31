@@ -61,7 +61,7 @@ export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
     <Pressable
       aria-label={`Ver perfil de ${ranker.name}, puesto ${rank}`}
       className={cn(
-        "group relative flex min-h-[58px] animate-row-slide items-center gap-3",
+        "group relative flex min-h-[58px] items-center gap-3",
         "overflow-hidden rounded-xl border border-lm-border bg-lm-card px-4 py-3",
         "select-none transition-[transform,border-color] duration-300 ease-out",
         "before:pointer-events-none before:absolute before:inset-0 before:z-0 before:bg-lm-card2",
@@ -74,7 +74,6 @@ export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
         "[&>*]:relative [&>*]:z-[1]",
         topRowClass,
       )}
-      style={{ animationDelay: `${index * 0.05}s` }}
       onClick={() => onOpenProfile(ranker.name, rank - 1)}
     >
       <div

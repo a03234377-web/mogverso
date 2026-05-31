@@ -1,5 +1,6 @@
 "use client";
 
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { AdBanner } from "@/features/rankings/components/AdBanner";
 import { IconLabel } from "@/components/icons";
 import { EntryVoteCard } from "@/features/rankings/components/EntryVoteCard";
@@ -68,18 +69,22 @@ export function RankingsPage({
         )}
         id="moversGrid"
       >
-        <MoversCard
-          title="Mayores Subidas"
-          titleIcon="trending-up"
-          variant="up"
-          movers={upMovers}
-        />
-        <MoversCard
-          title="Últimos Movimientos"
-          titleIcon="trending-down"
-          variant="down"
-          movers={downMovers}
-        />
+        <ScrollReveal y={36}>
+          <MoversCard
+            title="Mayores Subidas"
+            titleIcon="trending-up"
+            variant="up"
+            movers={upMovers}
+          />
+        </ScrollReveal>
+        <ScrollReveal y={36} delay={0.04}>
+          <MoversCard
+            title="Últimos Movimientos"
+            titleIcon="trending-down"
+            variant="down"
+            movers={downMovers}
+          />
+        </ScrollReveal>
       </div>
 
       <div className="mx-auto max-w-[1100px] px-5 pb-12 max-md:px-2.5 max-md:pb-20">
@@ -90,12 +95,9 @@ export function RankingsPage({
         </SectionTitle>
         <div className="flex flex-col gap-2" id="rankList">
           {entries.map((entry, i) => (
-            <RankRow
-              key={entry.name}
-              entry={entry}
-              index={i}
-              onOpenProfile={openProfile}
-            />
+            <ScrollReveal key={entry.name} className="w-full" y={40}>
+              <RankRow entry={entry} index={i} onOpenProfile={openProfile} />
+            </ScrollReveal>
           ))}
         </div>
       </div>
@@ -122,7 +124,9 @@ export function RankingsPage({
       </div>
 
       <div className="mx-auto max-w-[1100px] px-5 pb-16 max-md:px-3 max-md:pb-4">
-        <EntryVoteCard />
+        <ScrollReveal y={44}>
+          <EntryVoteCard />
+        </ScrollReveal>
       </div>
     </div>
   );
