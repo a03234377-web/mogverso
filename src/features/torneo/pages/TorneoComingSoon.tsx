@@ -14,6 +14,11 @@ import {
 } from "@/features/torneo/components/PhaseCard";
 import { useCountdown } from "@/features/shared/hooks/useCountdown";
 import { formatTorneoStartDate, getUpcomingTorneoStartMs } from "@/lib/torneo-schedule";
+import {
+  TORNEO_HERO_EYEBROW,
+  TORNEO_HERO_SUBTITLE,
+  TORNEO_HERO_TITLE,
+} from "@/features/torneo/components/torneo-hero-content";
 import { cn } from "@/lib/cn";
 
 export function TorneoComingSoon() {
@@ -31,19 +36,9 @@ export function TorneoComingSoon() {
     <ActivePage id="page-torneo" active>
       <HeroSection
         variant="torneo"
-        eyebrow={
-          <IconLabel icon="goal" iconSize={14} iconClassName="text-[#ff6b35]">
-            Torneo Oficial · 16 Participantes
-          </IconLabel>
-        }
-        title={
-          <>
-            Torneo
-            <br />
-            Looksmaxing
-          </>
-        }
-        subtitle="Eliminación directa · El mejor looksmaxer de España"
+        eyebrow={TORNEO_HERO_EYEBROW}
+        title={TORNEO_HERO_TITLE}
+        subtitle={TORNEO_HERO_SUBTITLE}
       />
 
       <PhaseDisplay>

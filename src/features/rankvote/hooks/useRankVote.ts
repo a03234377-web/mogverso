@@ -7,7 +7,10 @@ import type {
   RankVoteMyVote,
   RankVoteRound,
 } from "@/features/shared/lib/types";
-import { isKnownRankerName, isValidRankVotePair } from "@/features/rankings/lib/ranker-name";
+import {
+  isKnownRankerName,
+  isValidRankVotePair,
+} from "@/features/rankings/lib/ranker-name";
 
 type RvHistoryRow = {
   id?: string;

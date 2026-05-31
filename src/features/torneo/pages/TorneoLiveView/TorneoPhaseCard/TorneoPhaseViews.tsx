@@ -90,7 +90,7 @@ export function TorneoPhaseEnded({
         </PhaseTitle>
         <PhaseSub>El mejor looksmaxer de España ha sido coronado</PhaseSub>
         <div className="my-4 flex flex-col items-center gap-3">
-          <div className="relative h-[90px] w-[90px] overflow-hidden rounded-full border-[3px] border-lm-gold">
+          <div className="relative size-[90px] overflow-hidden rounded-full border-[3px] border-lm-gold">
             <CreatorImage
               src={champInfo.photo}
               alt={champ}

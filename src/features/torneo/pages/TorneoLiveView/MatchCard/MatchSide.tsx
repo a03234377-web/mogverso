@@ -6,6 +6,8 @@ import type { CreatorPhoto } from "@/assets/creators";
 import type { IconName } from "@/types/icons";
 import { cn } from "@/lib/cn";
 
+export type MatchSideHighlight = "winner" | "loser" | "voted";
+
 export function MatchSide({
   player,
   info,
@@ -13,9 +15,7 @@ export function MatchSide({
   votes,
   showBars,
   canVote,
-  isWinner,
-  isLoser,
-  votedFor,
+  highlight,
   onVote,
 }: {
   player: string;
@@ -24,11 +24,13 @@ export function MatchSide({
   votes: number;
   showBars: boolean;
   canVote: boolean;
-  isWinner: boolean;
-  isLoser: boolean;
-  votedFor: boolean;
+  highlight?: MatchSideHighlight | null;
   onVote: () => void;
 }) {
+  const isWinner = highlight === "winner";
+  const isLoser = highlight === "loser";
+  const votedFor = highlight === "voted";
+
   return (
     <button
       type="button"

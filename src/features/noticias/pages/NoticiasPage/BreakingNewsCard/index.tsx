@@ -14,7 +14,7 @@ export function BreakingNewsCard() {
       )}
     >
       <div className="mb-2 flex items-center gap-1.5 lm-type-label text-lm-red2">
-        <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-red2" />
+        <div className="size-[7px] animate-pulse-soft rounded-full bg-lm-red2" />
         <IconLabel icon="siren" iconSize={12}>
           BREAKING NEWS
         </IconLabel>
@@ -25,7 +25,7 @@ export function BreakingNewsCard() {
           "max-md:text-[clamp(1.05rem,4.5vw,1.35rem)]",
         )}
       >
-        KAPPAH: DE SUB-HUMAN A CHAD ABSOLUTO — LA TRANSFORMACIÓN QUE PARTIÓ EL FORO EN
+        KAPPAH: DE SUB-HUMAN A CHAD ABSOLUTO · LA TRANSFORMACIÓN QUE PARTIÓ EL FORO EN
         DOS
       </div>
       <div className="mt-2.5 text-base leading-normal font-semibold text-lm-text2">

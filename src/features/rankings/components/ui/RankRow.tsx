@@ -63,9 +63,9 @@ export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
       className={cn(
         "group relative flex min-h-[58px] items-center gap-3",
         "overflow-hidden rounded-xl border border-lm-border bg-lm-card px-4 py-3",
-        "select-none transition-[transform,border-color] duration-300 ease-out",
+        "transition-[transform,border-color] duration-300 ease-out select-none",
         "before:pointer-events-none before:absolute before:inset-0 before:z-0 before:bg-lm-card2",
-        "before:content-[''] before:origin-left before:scale-x-0",
+        "before:origin-left before:scale-x-0 before:content-['']",
         "before:transition-transform before:duration-300 before:ease-out",
         "motion-reduce:before:transition-none",
         "hover:translate-x-1 hover:border-lm-border2 hover:before:scale-x-100",
@@ -84,7 +84,7 @@ export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
       >
         {rank}
       </div>
-      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-lm-border bg-lm-bg3">
+      <div className="relative size-10 shrink-0 overflow-hidden rounded-full border-2 border-lm-border bg-lm-bg3">
         <Avatar name={ranker.name} size={40} fit="contain" />
       </div>
       <div className="min-w-0 flex-1">

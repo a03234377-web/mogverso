@@ -8,6 +8,11 @@ import { TorneoPhaseCard } from "./TorneoPhaseCard";
 import { TorneoMatchesSection } from "./TorneoMatchesSection";
 import { TorneoBracket } from "./TorneoBracket";
 import { SectionTitle } from "@/features/shared/components/ui/SectionTitle";
+import {
+  TORNEO_HERO_EYEBROW,
+  TORNEO_HERO_SUBTITLE,
+  TORNEO_HERO_TITLE,
+} from "@/features/torneo/components/torneo-hero-content";
 import { useTorneo } from "@/features/torneo/hooks/useTorneo";
 
 export function TorneoLiveView() {
@@ -19,19 +24,9 @@ export function TorneoLiveView() {
     <ActivePage id="page-torneo" active>
       <HeroSection
         variant="torneo"
-        eyebrow={
-          <IconLabel icon="goal" iconSize={14} iconClassName="text-[#ff6b35]">
-            Torneo Oficial · 16 Participantes
-          </IconLabel>
-        }
-        title={
-          <>
-            Torneo
-            <br />
-            Looksmaxing
-          </>
-        }
-        subtitle="Eliminación directa · El mejor looksmaxer de España"
+        eyebrow={TORNEO_HERO_EYEBROW}
+        title={TORNEO_HERO_TITLE}
+        subtitle={TORNEO_HERO_SUBTITLE}
       />
 
       <TorneoPhaseCard state={state} loading={loading} onRestart={refresh} />

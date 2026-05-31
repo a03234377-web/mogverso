@@ -43,7 +43,11 @@ export function Avatar({
 
   return (
     <span
-      className={cn("relative inline-block shrink-0 overflow-hidden", radiusClass, className)}
+      className={cn(
+        "relative inline-block shrink-0 overflow-hidden",
+        radiusClass,
+        className,
+      )}
       style={{ width: size, height: size }}
     >
       <Image
@@ -52,7 +56,9 @@ export function Avatar({
         fill
         sizes={`${size}px`}
         className={cn(
-          fit === "contain" ? "object-contain object-center" : "object-cover object-top",
+          fit === "contain"
+            ? "object-contain object-center"
+            : "object-cover object-top",
           "select-none",
           radiusClass,
         )}

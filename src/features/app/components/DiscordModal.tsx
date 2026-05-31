@@ -38,7 +38,7 @@ export function DiscordModal({ open, onClose }: DiscordModalProps) {
   );
 }
 
-export function DiscordModalContent() {
+function DiscordModalContent() {
   return (
     <>
       <div className="mb-2.5 flex animate-modal-crown justify-center" aria-hidden>

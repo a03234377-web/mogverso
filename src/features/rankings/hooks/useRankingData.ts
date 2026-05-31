@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import {
   buildRankedList,
@@ -14,14 +14,57 @@ import type {
   RankVoteRound,
 } from "@/features/shared/lib/types";
 
+type RankingSyncState = {
+  overrides: RankOverrides;
+  overridesReady: boolean;
+  movements: RankMovements;
+  movementsUp: MoverStack;
+  movementsDown: MoverStack;
+  rankVoteEnd: number | null;
+};
+
+const initialRankingSyncState: RankingSyncState = {
+  overrides: {},
+  overridesReady: false,
+  movements: {},
+  movementsUp: {},
+  movementsDown: {},
+  rankVoteEnd: null,
+};
+
+type RankingSyncAction =
+  | { type: "overrides"; payload: RankOverrides }
+  | { type: "movements"; payload: RankMovements }
+  | { type: "movementsUp"; payload: MoverStack }
+  | { type: "movementsDown"; payload: MoverStack }
+  | { type: "rankVoteActive"; payload: number }
+  | { type: "rankVoteInactive" };
+
+function rankingSyncReducer(
+  state: RankingSyncState,
+  action: RankingSyncAction,
+): RankingSyncState {
+  switch (action.type) {
+    case "overrides":
+      return { ...state, overrides: action.payload, overridesReady: true };
+    case "movements":
+      return { ...state, movements: action.payload };
+    case "movementsUp":
+      return { ...state, movementsUp: action.payload };
+    case "movementsDown":
+      return { ...state, movementsDown: action.payload };
+    case "rankVoteActive":
+      return { ...state, rankVoteEnd: action.payload };
+    case "rankVoteInactive":
+      return { ...state, rankVoteEnd: null };
+    default:
+      return state;
+  }
+}
+
 export function useRankingData() {
   const { fb, ready } = useFirebase();
-  const [overrides, setOverrides] = useState<RankOverrides>({});
-  const [overridesReady, setOverridesReady] = useState(false);
-  const [movements, setMovements] = useState<RankMovements>({});
-  const [movementsUp, setMovementsUp] = useState<MoverStack>({});
-  const [movementsDown, setMovementsDown] = useState<MoverStack>({});
-  const [rankVoteEnd, setRankVoteEnd] = useState<number | null>(null);
+  const [syncState, dispatch] = useReducer(rankingSyncReducer, initialRankingSyncState);
   const healInFlightRef = useRef(false);
 
   const healRankVoteRound = useCallback(
@@ -53,21 +96,32 @@ export function useRankingData() {
     });
 
     const unsubO = onValue(ref(db, "rankOverrides"), (snap) => {
-      setOverrides(snap.exists() ? (snap.val() as RankOverrides) : {});
-      setOverridesReady(true);
+      dispatch({
+        type: "overrides",
+        payload: snap.exists() ? (snap.val() as RankOverrides) : {},
+      });
     });
     const unsubM = onValue(ref(db, "rankMovements"), (snap) => {
-      setMovements(snap.exists() ? (snap.val() as RankMovements) : {});
+      dispatch({
+        type: "movements",
+        payload: snap.exists() ? (snap.val() as RankMovements) : {},
+      });
     });
     const unsubUp = onValue(ref(db, "rankMovementsUp"), (snap) => {
-      setMovementsUp(snap.exists() ? (snap.val() as MoverStack) : {});
+      dispatch({
+        type: "movementsUp",
+        payload: snap.exists() ? (snap.val() as MoverStack) : {},
+      });
     });
     const unsubDown = onValue(ref(db, "rankMovementsDown"), (snap) => {
-      setMovementsDown(snap.exists() ? (snap.val() as MoverStack) : {});
+      dispatch({
+        type: "movementsDown",
+        payload: snap.exists() ? (snap.val() as MoverStack) : {},
+      });
     });
     const unsubRv = onValue(ref(db, "rankvote/current"), (snap) => {
       if (!snap.exists()) {
-        setRankVoteEnd(null);
+        dispatch({ type: "rankVoteInactive" });
         void healRankVoteRound();
         return;
       }
@@ -76,11 +130,11 @@ export function useRankingData() {
       const now = Date.now();
 
       if (!rv.resolved && rv.endTime > now) {
-        setRankVoteEnd(rv.endTime);
+        dispatch({ type: "rankVoteActive", payload: rv.endTime });
         return;
       }
 
-      setRankVoteEnd(null);
+      dispatch({ type: "rankVoteInactive" });
       void healRankVoteRound(rv);
     });
 
@@ -97,6 +151,15 @@ export function useRankingData() {
       clearInterval(healPoll);
     };
   }, [fb, healRankVoteRound]);
+
+  const {
+    overrides,
+    overridesReady,
+    movements,
+    movementsUp,
+    movementsDown,
+    rankVoteEnd,
+  } = syncState;
 
   const rankedNames = useMemo(
     () =>

@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  use,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { RANKERS, type Ranker } from "@/features/rankings/data/rankers";
 import {
   getFirebaseBridge,
@@ -20,7 +27,7 @@ export type FirebaseContextValue = {
 const FirebaseContext = createContext<FirebaseContextValue | null>(null);
 
 export function useFirebase(): FirebaseContextValue {
-  const ctx = useContext(FirebaseContext);
+  const ctx = use(FirebaseContext);
   if (!ctx) {
     throw new Error("useFirebase debe usarse dentro de FirebaseProvider");
   }
@@ -80,9 +87,10 @@ export function FirebaseProvider({
     };
   }, [rankers]);
 
-  return (
-    <FirebaseContext.Provider value={{ fb, ready, error, announcements }}>
-      {children}
-    </FirebaseContext.Provider>
+  const value = useMemo(
+    () => ({ fb, ready, error, announcements }),
+    [fb, ready, error, announcements],
   );
+
+  return <FirebaseContext.Provider value={value}>{children}</FirebaseContext.Provider>;
 }

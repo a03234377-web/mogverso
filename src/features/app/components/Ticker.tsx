@@ -28,7 +28,7 @@ export function Ticker() {
         <div className="flex animate-ticker gap-12 whitespace-nowrap" id="tickerInner">
           {items.map((t, i) => (
             <span
-              key={i}
+              key={`${t.text}-${i < TICKER_ITEMS.length ? "a" : "b"}`}
               className="flex shrink-0 items-center gap-1.5 text-base font-semibold text-lm-text2"
             >
               <Icon name={t.icon} size={14} className="text-lm-gold" />

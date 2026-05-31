@@ -59,7 +59,7 @@ export function RankingsQuickActions() {
             "max-md:flex-[1.3] max-md:text-left max-md:text-base",
           )}
         >
-          ¡El torneo ha comenzado — vota los partidos!
+          ¡El torneo ha comenzado: vota los partidos!
         </p>
       </div>
     </div>

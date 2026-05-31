@@ -17,6 +17,21 @@ import { useLooksMaxNavigate } from "@/features/app/shell/LooksMaxShell";
 import type { Mover, RankedEntry } from "@/features/rankings/lib/ranking";
 import { cn } from "@/lib/cn";
 
+const RANKINGS_HERO_BADGES = (
+  <>
+    <HeroBadge>
+      <IconLabel icon="timer" iconSize={12}>
+        Actualización por Votación
+      </IconLabel>
+    </HeroBadge>
+    <HeroBadge>
+      <IconLabel icon="flame" iconSize={12}>
+        Datos en tiempo real
+      </IconLabel>
+    </HeroBadge>
+  </>
+);
+
 type RankingsPageProps = {
   entries: RankedEntry[];
   upMovers: Mover[];
@@ -52,20 +67,7 @@ export function RankingsPage({
           </>
         }
         subtitle="Temporada 2025 · España"
-        badges={
-          <>
-            <HeroBadge>
-              <IconLabel icon="timer" iconSize={12}>
-                Actualización por Votación
-              </IconLabel>
-            </HeroBadge>
-            <HeroBadge>
-              <IconLabel icon="flame" iconSize={12}>
-                Datos en tiempo real
-              </IconLabel>
-            </HeroBadge>
-          </>
-        }
+        badges={RANKINGS_HERO_BADGES}
       />
 
       <RankingsQuickActions />

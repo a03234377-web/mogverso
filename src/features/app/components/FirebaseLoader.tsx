@@ -19,7 +19,7 @@ export function FirebaseLoader() {
       )}
     >
       {error ? (
-        <div className="px-4 py-4 text-center text-base leading-normal font-bold text-lm-red2">
+        <div className="p-4 text-center text-base leading-normal font-bold text-lm-red2">
           <IconLabel icon="alert-triangle" iconSize={18}>
             No se pudo conectar a Firebase. Comprueba tu configuración.
           </IconLabel>

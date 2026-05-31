@@ -29,11 +29,6 @@ export const DESKTOP_TABS: {
   { id: "consejo", label: "Consejos", icon: "book-open" },
 ];
 
-export function desktopSelectedIndex(page: PageId): number {
-  const idx = DESKTOP_TABS.findIndex((t) => t.id === page);
-  return idx >= 0 ? idx : 0;
-}
-
 export function sectionTitle(page: PageId): string {
   if (page === "profile") return "Perfil";
   return DESKTOP_TABS.find((t) => t.id === page)?.label ?? "Rankings";

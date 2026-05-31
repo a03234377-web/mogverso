@@ -10,7 +10,7 @@ type PageMetaInput = {
   keywords?: string[];
 };
 
-export function pageCanonical(path: string): string {
+function pageCanonical(path: string): string {
   const base = getSiteUrl();
   const clean = path.startsWith("/") ? path : `/${path}`;
   return `${base}${clean}`;

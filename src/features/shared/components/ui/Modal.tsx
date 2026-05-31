@@ -1,9 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { useEffect } from "react";
+import { useCallback, type ReactNode } from "react";
 import { Icon } from "@/components/icons";
-import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { cn } from "@/lib/cn";
 
 type ModalProps = {
@@ -23,41 +21,38 @@ export function Modal({
   labelledBy,
   describedBy,
 }: ModalProps) {
-  const dialogRef = useFocusTrap<HTMLDivElement>(open, {
-    initialFocus: "first",
-    restoreFocus: true,
-  });
-
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [open]);
-
-  if (!open) return null;
+  const setDialogRef = useCallback(
+    (node: HTMLDialogElement | null) => {
+      if (!node) return;
+      if (open && !node.open) node.showModal();
+      else if (!open && node.open) node.close();
+    },
+    [open],
+  );
 
   return (
-    <div
+    <dialog
+      ref={setDialogRef}
+      id={id}
+      aria-labelledby={labelledBy}
+      aria-describedby={describedBy}
       className={cn(
-        "fixed inset-0 z-[9998] flex items-center justify-center bg-black/75 p-5",
-        "backdrop-blur-sm max-md:items-end max-md:p-2",
+        "fixed inset-0 z-[9998] m-0 h-full max-h-none w-full max-w-none",
+        "border-0 bg-transparent p-5 open:flex open:items-center open:justify-center",
+        "backdrop:bg-black/75 backdrop:backdrop-blur-sm",
+        "p-2 max-md:open:items-end",
       )}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
+      onClose={onClose}
     >
+      <button
+        type="button"
+        aria-label="Cerrar diálogo"
+        className="fixed inset-0 m-0 h-full w-full cursor-default border-0 bg-transparent p-0"
+        onClick={onClose}
+      />
       <div
-        ref={dialogRef}
-        id={id}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={labelledBy}
-        aria-describedby={describedBy}
         className={cn(
-          "relative w-full max-w-[440px] rounded-[22px] border px-8 py-9",
+          "relative z-[1] w-full max-w-[440px] rounded-[22px] border px-8 py-9",
           "border-[rgba(232,184,75,0.45)]",
           "bg-[linear-gradient(145deg,var(--color-lm-card),var(--color-lm-bg2))]",
           "shadow-[0_0_60px_rgba(232,184,75,0.12),0_24px_60px_rgba(0,0,0,0.5)]",
@@ -69,7 +64,7 @@ export function Modal({
       >
         {children}
       </div>
-    </div>
+    </dialog>
   );
 }
 
@@ -79,7 +74,7 @@ export function ModalCloseButton({ onClose }: { onClose: () => void }) {
       type="button"
       aria-label="Cerrar"
       className={cn(
-        "absolute top-3.5 right-4 flex h-[30px] w-[30px] cursor-pointer items-center",
+        "absolute top-3.5 right-4 flex size-[30px] cursor-pointer items-center",
         "justify-center rounded-full border border-lm-border bg-white/6",
         "text-lm-text2 lm-focus-ring transition-all duration-200",
         "hover:bg-white/12 hover:text-lm-text",

@@ -1,3 +1,6 @@
+minimumReleaseAge: 10080
+trustPolicy: no-downgrade
+
 allowBuilds:
   "@firebase/util": true
   msgpackr-extract: true
