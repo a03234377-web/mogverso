@@ -32,7 +32,7 @@ export type Mover = {
 };
 
 /** Convierte una pila de Firebase en lista ordenada (más reciente primero, máx. 5). */
-export function parseMoverStack(
+function parseMoverStack(
   stack: MoverStack | null | undefined,
   max = MAX_MOVERS_STACK,
 ): Mover[] {
@@ -66,7 +66,7 @@ export function prependMoverStack(
 }
 
 /** Mapa nombre → movimiento más reciente dentro de las pilas (máx. 5 por dirección). */
-export function buildMovementMapFromStacks(stacks?: {
+function buildMovementMapFromStacks(stacks?: {
   up?: MoverStack | null;
   down?: MoverStack | null;
 }): Map<string, RankMovement> {

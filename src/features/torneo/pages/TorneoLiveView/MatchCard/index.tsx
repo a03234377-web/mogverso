@@ -96,9 +96,15 @@ export function MatchCard({
           votes={v1}
           showBars={showBars}
           canVote={canVote}
-          isWinner={!!(isResolved && match.winner === match.p1)}
-          isLoser={!!(isResolved && match.winner !== match.p1)}
-          votedFor={myVote === match.p1}
+          highlight={
+            isResolved && match.winner === match.p1
+              ? "winner"
+              : isResolved
+                ? "loser"
+                : myVote === match.p1
+                  ? "voted"
+                  : null
+          }
           onVote={() => onVote(match.p1)}
         />
         <div
@@ -116,9 +122,15 @@ export function MatchCard({
           votes={v2}
           showBars={showBars}
           canVote={canVote}
-          isWinner={!!(isResolved && match.winner === match.p2)}
-          isLoser={!!(isResolved && match.winner !== match.p2)}
-          votedFor={myVote === match.p2}
+          highlight={
+            isResolved && match.winner === match.p2
+              ? "winner"
+              : isResolved
+                ? "loser"
+                : myVote === match.p2
+                  ? "voted"
+                  : null
+          }
           onVote={() => onVote(match.p2)}
         />
       </div>

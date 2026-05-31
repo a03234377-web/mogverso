@@ -47,7 +47,7 @@ export function getRankerPhoto(name: string): CreatorPhoto | undefined {
 }
 
 /** Icono Lucide fallback cuando no hay foto */
-export const FALLBACK: Record<string, IconName> = {
+const FALLBACK: Record<string, IconName> = {
   Kappah: "crown",
   RubenMaxxing: "microscope",
   SergiCabrer: "waves",

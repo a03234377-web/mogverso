@@ -61,7 +61,7 @@ function findRankerByKebabSlug(
   return rankers.find((r) => rankerPhotoFile(r.name).replace(/\.webp$/, "") === kebab);
 }
 
-export function findRankerByProfileSlug(
+function findRankerByProfileSlug(
   slug: string,
   rankers: Ranker[] = RANKERS,
 ): Ranker | undefined {

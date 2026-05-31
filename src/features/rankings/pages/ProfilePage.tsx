@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import type { Ranker } from "@/features/rankings/data/rankers";
 import { ProfileAvatar } from "@/features/shared/components/Avatar";
@@ -15,34 +16,63 @@ type ProfilePageProps = {
   rankPosition: number;
 };
 
-export function ProfilePage({ ranker, rankPosition }: ProfilePageProps) {
-  const searchParams = useSearchParams();
+function ProfileBackButton() {
+  const { get } = useSearchParams();
   const { backFromProfile } = useLooksMaxNavigate();
-  const profileFrom = parseProfileFrom(searchParams.get("from"));
+  const profileFrom = parseProfileFrom(get("from"));
   const backSection = profileFrom ?? "rankings";
   const backButtonId = `profile-back-${backSection}`;
 
-  const r = ranker;
+  return (
+    <button
+      id={backButtonId}
+      type="button"
+      className={cn(
+        "inline-flex cursor-pointer items-center gap-1.5 rounded-lg",
+        "border border-lm-border bg-lm-card px-3.5 py-2 font-sans text-base font-bold",
+        "tracking-[0.8px] text-lm-text2 lm-focus-ring transition-all duration-200",
+        "hover:-translate-x-1 hover:border-lm-border2 hover:text-lm-text max-md:ml-4",
+      )}
+      aria-label={`Volver a ${sectionTitle(backSection)}`}
+      onClick={() => backFromProfile(profileFrom)}
+    >
+      ← Volver a {sectionTitle(backSection)}
+    </button>
+  );
+}
 
+export function ProfilePage({ ranker, rankPosition }: ProfilePageProps) {
+  const r = ranker;
   const rank = rankPosition + 1;
+  const displayTags = r.tagNames.reduce<Array<{ label: string; cls: string }>>(
+    (acc, label, idx) => {
+      if (label.startsWith("Score:")) return acc;
+      acc.push({ label, cls: r.tags[idx] || "ptag-appeal" });
+      return acc;
+    },
+    [],
+  );
 
   return (
     <ActivePage id="page-profile" active>
       <div className="mx-auto mt-12 mb-8 flex max-w-[1000px] items-start px-5 max-md:px-4 max-md:text-center">
-        <button
-          id={backButtonId}
-          type="button"
-          className={cn(
-            "inline-flex cursor-pointer items-center gap-1.5 rounded-lg",
-            "border border-lm-border bg-lm-card px-3.5 py-2 font-sans text-base font-bold",
-            "tracking-[0.8px] text-lm-text2 lm-focus-ring transition-all duration-200",
-            "hover:-translate-x-1 hover:border-lm-border2 hover:text-lm-text max-md:ml-4",
-          )}
-          aria-label={`Volver a ${sectionTitle(backSection)}`}
-          onClick={() => backFromProfile(profileFrom)}
+        <Suspense
+          fallback={
+            <button
+              type="button"
+              disabled
+              className={cn(
+                "inline-flex cursor-default items-center gap-1.5 rounded-lg",
+                "border border-lm-border bg-lm-card px-3.5 py-2 font-sans text-base font-bold",
+                "tracking-[0.8px] text-lm-text2 opacity-70 max-md:ml-4",
+              )}
+            >
+              ← Volver a Rankings
+            </button>
+          }
         >
-          ← Volver a {sectionTitle(backSection)}
-        </button>
+          <ProfileBackButton />
+        </Suspense>
       </div>
 
       <div
@@ -80,27 +110,24 @@ export function ProfilePage({ ranker, rankPosition }: ProfilePageProps) {
                 "max-md:text-sm",
               )}
             >
-              — Ranking dinámico
+              · Ranking dinámico
             </div>
           </div>
           <div className="mb-3 text-base font-semibold text-lm-text2">
             {r.title} · {r.sub}
           </div>
           <div className="mb-3 flex flex-wrap gap-1.5 max-md:justify-center">
-            {r.tagNames
-              .map((t, idx) => ({ label: t, cls: r.tags[idx] || "ptag-appeal" }))
-              .filter(({ label }) => !label.startsWith("Score:"))
-              .map(({ label, cls }) => (
-                <span
-                  key={label}
-                  className={cn(
-                    "rounded-full border px-2 py-0.5 text-sm font-bold tracking-[0.8px]",
-                    cls,
-                  )}
-                >
-                  {label}
-                </span>
-              ))}
+            {displayTags.map(({ label, cls }) => (
+              <span
+                key={label}
+                className={cn(
+                  "rounded-full border px-2 py-0.5 text-sm font-bold tracking-[0.8px]",
+                  cls,
+                )}
+              >
+                {label}
+              </span>
+            ))}
           </div>
         </div>
       </div>

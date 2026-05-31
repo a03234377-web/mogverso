@@ -73,85 +73,7 @@ import voroby from "./voroby.webp";
 import xaxoym from "./xaxoym.webp";
 import yunymat from "./yunymat.webp";
 
-/** Archivos de creadores importados (optimizados por Next.js). */
-export const CREATOR_IMAGE_FILES = [
-  "aaronjaureguii.webp",
-  "adria-marcor.webp",
-  "adrity.webp",
-  "agustin.webp",
-  "alejandro-villamizar.webp",
-  "alejandroale.webp",
-  "alen-vicente.webp",
-  "alessandrorizzz.webp",
-  "alvarosapo.webp",
-  "anas-andalousi.webp",
-  "arnau-mestre.webp",
-  "castu.webp",
-  "chiquiibai.webp",
-  "daniel-ath.webp",
-  "deniss-darko.webp",
-  "didac.webp",
-  "el-cromas.webp",
-  "elcalvo.webp",
-  "erra.webp",
-  "febron.webp",
-  "foxtef.webp",
-  "franbeuve.webp",
-  "future.webp",
-  "giva.webp",
-  "guille-fernandez.webp",
-  "hectrollprox.webp",
-  "ibaillanos.webp",
-  "ismael.webp",
-  "jaime-silva.webp",
-  "javichu.webp",
-  "javihoyos.webp",
-  "javimaska.webp",
-  "jon-mashallah.webp",
-  "jonata.webp",
-  "jordiwild.webp",
-  "josenogales.webp",
-  "juan-beato.webp",
-  "juanki-municio.webp",
-  "kappah.webp",
-  "kappahsub.webp",
-  "leonardomisha.webp",
-  "llanos.webp",
-  "lucas-g.webp",
-  "manu-regato.webp",
-  "mario.webp",
-  "megias.webp",
-  "melias.webp",
-  "miguelillo.webp",
-  "misha.webp",
-  "misho.webp",
-  "nico.webp",
-  "nil-ojeda.webp",
-  "pablo-vera.webp",
-  "pache.webp",
-  "papri.webp",
-  "paul-ferrer.webp",
-  "peereira7.webp",
-  "peldanyos.webp",
-  "rayan-mcquen.webp",
-  "rosito.webp",
-  "rubenmaxxing.webp",
-  "ryux.webp",
-  "samu-barber.webp",
-  "sergicabrer.webp",
-  "sergio-bueno.webp",
-  "sipote.webp",
-  "titochape.webp",
-  "valmaseda.webp",
-  "varo.webp",
-  "voroby.webp",
-  "xaxoym.webp",
-  "yunymat.webp",
-] as const;
-
-export type CreatorImageFile = (typeof CREATOR_IMAGE_FILES)[number];
-
-const CREATOR_IMAGES: Record<CreatorImageFile, StaticImageData> = {
+const CREATOR_IMAGES = {
   "aaronjaureguii.webp": aaronjaureguii,
   "adria-marcor.webp": adria_marcor,
   "adrity.webp": adrity,
@@ -224,7 +146,9 @@ const CREATOR_IMAGES: Record<CreatorImageFile, StaticImageData> = {
   "voroby.webp": voroby,
   "xaxoym.webp": xaxoym,
   "yunymat.webp": yunymat,
-};
+} as const satisfies Record<string, StaticImageData>;
+
+export type CreatorImageFile = keyof typeof CREATOR_IMAGES;
 
 export type CreatorPhoto = StaticImageData;
 

@@ -32,9 +32,9 @@ export function EntryVoteActive({
           "lm-type-label text-lm-purple max-md:text-sm",
         )}
       >
-        <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-purple" />
+        <div className="size-[7px] animate-pulse-soft rounded-full bg-lm-purple" />
         VOTACIÓN ABIERTA · CIERRA EN 2 HORAS
-        <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-purple" />
+        <div className="size-[7px] animate-pulse-soft rounded-full bg-lm-purple" />
       </div>
       <h2
         className={cn(
@@ -59,13 +59,17 @@ export function EntryVoteActive({
           const pct = Math.round((voteCount / total) * 100);
           const isSel = voted && myCandidateId === c.id;
           return (
-            <div
+            <button
               key={c.id}
+              type="button"
+              disabled={voted || voting}
+              aria-pressed={isSel}
               className={cn(
-                "relative cursor-pointer overflow-hidden rounded-[14px]",
-                "border border-lm-border bg-lm-card p-5 transition-all duration-300",
+                "relative w-full cursor-pointer overflow-hidden rounded-[14px] text-left",
+                "border border-lm-border bg-lm-card p-5 lm-focus-ring transition-all duration-300",
                 "max-md:rounded-xl max-md:p-3.5",
                 !voted && "hover:-translate-y-0.5 hover:border-[rgba(168,85,247,0.5)]",
+                (voted || voting) && "cursor-default",
                 isSel &&
                   cn(
                     "-translate-y-0.5 border-lm-purple bg-[rgba(168,85,247,0.15)]",
@@ -73,10 +77,7 @@ export function EntryVoteActive({
                   ),
               )}
               data-id={c.id}
-              role={!voted ? "button" : undefined}
-              tabIndex={!voted ? 0 : undefined}
               onClick={() => !voted && !voting && onVote(c.id)}
-              onKeyDown={(e) => e.key === "Enter" && !voted && !voting && onVote(c.id)}
             >
               {isSel && (
                 <Icon
@@ -124,7 +125,7 @@ export function EntryVoteActive({
               <div className="text-sm font-semibold text-lm-text2">
                 {voted ? `${voteCount} voto${voteCount !== 1 ? "s" : ""}` : ""}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>

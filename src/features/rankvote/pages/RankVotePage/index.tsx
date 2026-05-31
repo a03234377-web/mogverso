@@ -105,7 +105,7 @@ export function RankVotePage() {
           </div>
           <div id="rankvoteHistoryList">
             {history.length === 0 ? (
-              <div className="px-6 py-6 text-center text-base text-lm-text2">
+              <div className="p-6 text-center text-base text-lm-text2">
                 No hay votaciones resueltas aún · ¡Participa en la primera!
               </div>
             ) : (

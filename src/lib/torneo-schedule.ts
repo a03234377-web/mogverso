@@ -1,9 +1,41 @@
-import { PHASES } from "@/features/torneo/data/torneo-players";
 import type { TorneoPhase } from "@/features/shared/lib/types";
+import { PHASES } from "@/features/torneo/data/torneo-players";
 
-export const TORNEO_TZ = "Europe/Madrid";
-export const TORNEO_START_HOUR = 23;
-export const TORNEO_START_MINUTE = 0;
+const TORNEO_TZ = "Europe/Madrid";
+const TORNEO_START_HOUR = 23;
+const TORNEO_START_MINUTE = 0;
+
+const MADRID_PARTS_FORMATTER = new Intl.DateTimeFormat("en-GB", {
+  timeZone: TORNEO_TZ,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
+
+const MADRID_WEEKDAY_FORMATTER = new Intl.DateTimeFormat("en-US", {
+  timeZone: TORNEO_TZ,
+  weekday: "short",
+});
+
+const TORNEO_DAY_NAME_FORMATTER = new Intl.DateTimeFormat("es-ES", {
+  timeZone: TORNEO_TZ,
+  weekday: "long",
+});
+
+const TORNEO_DATE_LABEL_FORMATTER = new Intl.DateTimeFormat("es-ES", {
+  timeZone: TORNEO_TZ,
+  day: "numeric",
+  month: "long",
+});
+
+const TORNEO_TIME_LABEL_FORMATTER = new Intl.DateTimeFormat("es-ES", {
+  timeZone: TORNEO_TZ,
+  hour: "2-digit",
+  minute: "2-digit",
+});
 
 type MadridParts = {
   year: number;
@@ -15,17 +47,7 @@ type MadridParts = {
 
 function getMadridParts(at: number): MadridParts {
   const parts = Object.fromEntries(
-    new Intl.DateTimeFormat("en-GB", {
-      timeZone: TORNEO_TZ,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    })
-      .formatToParts(new Date(at))
-      .map((p) => [p.type, p.value]),
+    MADRID_PARTS_FORMATTER.formatToParts(new Date(at)).map((p) => [p.type, p.value]),
   );
   return {
     year: Number(parts.year),
@@ -37,10 +59,7 @@ function getMadridParts(at: number): MadridParts {
 }
 
 function getMadridWeekday(at: number): number {
-  const wd = new Intl.DateTimeFormat("en-US", {
-    timeZone: TORNEO_TZ,
-    weekday: "short",
-  }).format(new Date(at));
+  const wd = MADRID_WEEKDAY_FORMATTER.format(new Date(at));
   const map: Record<string, number> = {
     Sun: 0,
     Mon: 1,
@@ -104,20 +123,9 @@ export function getUpcomingTorneoStartMs(from = Date.now()): number {
 
 export function formatTorneoStartDate(ms: number) {
   const date = new Date(ms);
-  const dayName = new Intl.DateTimeFormat("es-ES", {
-    timeZone: TORNEO_TZ,
-    weekday: "long",
-  }).format(date);
-  const dateLabel = new Intl.DateTimeFormat("es-ES", {
-    timeZone: TORNEO_TZ,
-    day: "numeric",
-    month: "long",
-  }).format(date);
-  const timeLabel = new Intl.DateTimeFormat("es-ES", {
-    timeZone: TORNEO_TZ,
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
+  const dayName = TORNEO_DAY_NAME_FORMATTER.format(date);
+  const dateLabel = TORNEO_DATE_LABEL_FORMATTER.format(date);
+  const timeLabel = TORNEO_TIME_LABEL_FORMATTER.format(date);
 
   return {
     dayName: dayName.charAt(0).toUpperCase() + dayName.slice(1),

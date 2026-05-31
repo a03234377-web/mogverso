@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer } from "react";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import {
   advanceTorneoPhaseIfNeeded,
@@ -10,11 +10,43 @@ import {
 } from "@/features/torneo/data/torneo-players";
 import type { TorneoState } from "@/features/shared/lib/types";
 
+type TorneoHookState = {
+  state: TorneoState | null;
+  loading: boolean;
+};
+
+const initialTorneoHookState: TorneoHookState = {
+  state: null,
+  loading: true,
+};
+
+type TorneoHookAction =
+  | { type: "set"; payload: TorneoState | null }
+  | { type: "sync"; payload: TorneoState }
+  | { type: "patch"; payload: TorneoState };
+
+function torneoHookReducer(
+  state: TorneoHookState,
+  action: TorneoHookAction,
+): TorneoHookState {
+  switch (action.type) {
+    case "set":
+      return { state: action.payload, loading: false };
+    case "sync":
+      return { state: action.payload, loading: false };
+    case "patch":
+      return { ...state, state: action.payload };
+    default:
+      return state;
+  }
+}
+
 export function useTorneo(active: boolean) {
   const { fb } = useFirebase();
-  const [state, setState] = useState<TorneoState | null>(null);
-  const [loading, setLoading] = useState(true);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [{ state, loading }, dispatch] = useReducer(
+    torneoHookReducer,
+    initialTorneoHookState,
+  );
 
   const applyState = useCallback(
     async (incoming: TorneoState) => {
@@ -22,11 +54,10 @@ export function useTorneo(active: boolean) {
       const now = Date.now();
       if (incoming.phaseEnd <= now - 2000) {
         const advanced = await advanceTorneoPhaseIfNeeded(fb, incoming, now);
-        setState(advanced ?? incoming);
+        dispatch({ type: "sync", payload: advanced ?? incoming });
       } else {
-        setState(incoming);
+        dispatch({ type: "sync", payload: incoming });
       }
-      setLoading(false);
     },
     [fb],
   );
@@ -35,23 +66,24 @@ export function useTorneo(active: boolean) {
     if (!fb || !active) return;
 
     void ensureTorneoState(fb).then((initial) => {
-      setState(initial);
-      setLoading(false);
+      dispatch({ type: "set", payload: initial });
     });
 
     const { db, ref, onValue } = fb;
+    let debounceId: ReturnType<typeof setTimeout> | null = null;
+
     const unsub = onValue(ref(db, "torneo/state"), (snap) => {
       if (!snap.exists()) return;
       const incoming = snap.val() as TorneoState;
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-      debounceRef.current = setTimeout(() => {
+      if (debounceId) clearTimeout(debounceId);
+      debounceId = setTimeout(() => {
         void applyState(incoming);
       }, 400);
     });
 
     return () => {
       unsub();
-      if (debounceRef.current) clearTimeout(debounceRef.current);
+      if (debounceId) clearTimeout(debounceId);
     };
   }, [fb, active, applyState]);
 
@@ -62,7 +94,7 @@ export function useTorneo(active: boolean) {
     const id = setInterval(() => {
       if (state.phaseEnd <= Date.now()) {
         void advanceTorneoPhaseIfNeeded(fb, state).then((advanced) => {
-          if (advanced) setState(advanced);
+          if (advanced) dispatch({ type: "patch", payload: advanced });
         });
       }
     }, 1000);
@@ -81,7 +113,7 @@ export function useTorneo(active: boolean) {
     if (!fb) return;
     const fresh = getInitialTorneoState(Date.now());
     await fb.initTorneoState(fresh as Record<string, unknown>);
-    setState(fresh);
+    dispatch({ type: "set", payload: fresh });
   }, [fb]);
 
   const getTorneoVoteKey = useCallback(

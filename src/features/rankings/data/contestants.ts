@@ -2,7 +2,7 @@ import type { Ranker } from "./ranker-types";
 import { CONTESTANT_PROFILES } from "./contestant-profiles";
 
 /** Nuevos concursantes (posiciones 21–70, tras el top 20 actual). */
-export const CONTESTANT_NAMES = [
+const CONTESTANT_NAMES = [
   "Xaxoym",
   "Llanos",
   "Sipote",

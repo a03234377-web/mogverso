@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const SCROLL_RANGE_PX = 100;
 
@@ -26,25 +26,34 @@ export function useHeaderScroll() {
   );
   const [logoOpacity, setLogoOpacity] = useState(() => readScrollState().logoOpacity);
 
-  const handleScroll = useCallback(() => {
+  const handleScrollRef = useRef(() => {
     const next = readScrollState();
     setHeaderOpacity(next.headerOpacity);
     setLogoOpacity(next.logoOpacity);
-  }, []);
+  });
 
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll, { passive: true });
+    handleScrollRef.current = () => {
+      const next = readScrollState();
+      setHeaderOpacity(next.headerOpacity);
+      setLogoOpacity(next.logoOpacity);
+    };
+  });
+
+  useEffect(() => {
+    const onScroll = () => handleScrollRef.current();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
 
     const motionMq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    motionMq.addEventListener("change", handleScroll);
+    motionMq.addEventListener("change", onScroll);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
-      motionMq.removeEventListener("change", handleScroll);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      motionMq.removeEventListener("change", onScroll);
     };
-  }, [handleScroll]);
+  }, []);
 
   const isLogoInteractive = logoOpacity > 0.05;
 

@@ -5,7 +5,10 @@ import { CountdownDigits } from "@/features/shared/components/ui/CountdownDigits
 import { FighterCard } from "./FighterCard";
 import { useCountdown } from "@/features/shared/hooks/useCountdown";
 import { RANKERS } from "@/features/rankings/data/rankers";
-import { isKnownRankerName, safeRankerLabel } from "@/features/rankings/lib/ranker-name";
+import {
+  isKnownRankerName,
+  safeRankerLabel,
+} from "@/features/rankings/lib/ranker-name";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import { cn } from "@/lib/cn";
 
@@ -69,7 +72,7 @@ export function RankVoteArena({
           "px-3 py-1 font-sans text-sm font-bold tracking-wide text-lm-green2 uppercase",
         )}
       >
-        <div className="h-[7px] w-[7px] animate-pulse-soft rounded-full bg-lm-green2" />
+        <div className="size-[7px] animate-pulse-soft rounded-full bg-lm-green2" />
         VOTACIÓN EN DIRECTO · 3 HORAS
       </div>
       <div className="mb-0.5 font-sans text-xl font-bold tracking-tight text-lm-text lg:text-2xl">

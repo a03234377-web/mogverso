@@ -2,7 +2,6 @@ import { creatorImage } from "@/assets/creators";
 import { getRankerFallback, getRankerPhoto } from "@/features/rankings/data/avatars";
 import type { FirebaseBridge } from "@/lib/firebase/client";
 import type {
-  OctavosMatchDef,
   TorneoMatch,
   TorneoPhase,
   TorneoPlayer,
@@ -18,7 +17,7 @@ function torneoPlayer(name: string, icon: IconName): TorneoPlayer {
   };
 }
 
-export const TORNEO_PLAYERS: TorneoPlayer[] = [
+const TORNEO_PLAYERS: TorneoPlayer[] = [
   torneoPlayer("Aaronjaureguii", "star"),
   torneoPlayer("Peereira7", "goal"),
   torneoPlayer("TitoChape", "cookie"),
@@ -37,20 +36,8 @@ export const TORNEO_PLAYERS: TorneoPlayer[] = [
   torneoPlayer("Hectrollprox", "ghost"),
 ];
 
-export const OCTAVOS_MATCHES: OctavosMatchDef[] = [
-  { id: "oct_0", p1: TORNEO_PLAYERS[0], p2: TORNEO_PLAYERS[1] },
-  { id: "oct_1", p1: TORNEO_PLAYERS[2], p2: TORNEO_PLAYERS[12] },
-  { id: "oct_2", p1: TORNEO_PLAYERS[4], p2: TORNEO_PLAYERS[5] },
-  { id: "oct_3", p1: TORNEO_PLAYERS[6], p2: TORNEO_PLAYERS[7] },
-  { id: "oct_4", p1: TORNEO_PLAYERS[8], p2: TORNEO_PLAYERS[9] },
-  { id: "oct_5", p1: TORNEO_PLAYERS[10], p2: TORNEO_PLAYERS[11] },
-  { id: "oct_6", p1: TORNEO_PLAYERS[3], p2: TORNEO_PLAYERS[13] },
-  { id: "oct_7", p1: TORNEO_PLAYERS[14], p2: TORNEO_PLAYERS[15] },
-];
-
-export const WAIT_BEFORE_OCTAVOS = 10 * 60 * 1000;
-export const VOTING_DURATION = 30 * 60 * 1000;
-export const BREAK_BETWEEN_ROUNDS = 5 * 60 * 1000;
+const VOTING_DURATION = 30 * 60 * 1000;
+const BREAK_BETWEEN_ROUNDS = 5 * 60 * 1000;
 
 export const PHASES = {
   WAITING_OCTAVOS: "waiting_octavos",
@@ -64,16 +51,6 @@ export const PHASES = {
   TORNEO_ENDED: "torneo_ended",
 } as const satisfies Record<string, TorneoPhase>;
 
-const OCTAVOS_IDS = [
-  "oct_0",
-  "oct_1",
-  "oct_2",
-  "oct_3",
-  "oct_4",
-  "oct_5",
-  "oct_6",
-  "oct_7",
-] as const;
 const CUARTOS_IDS = ["cua_0", "cua_1", "cua_2", "cua_3"] as const;
 const SEMIS_IDS = ["semi_0", "semi_1"] as const;
 
@@ -123,7 +100,7 @@ export function getInitialTorneoState(now: number): TorneoState {
   };
 }
 
-export function createWaitingTorneoState(now = Date.now()): TorneoState {
+function createWaitingTorneoState(now = Date.now()): TorneoState {
   const target23 = new Date(now);
   target23.setHours(23, 0, 0, 0);
   if (now >= target23.getTime()) {
@@ -138,50 +115,7 @@ export function createWaitingTorneoState(now = Date.now()): TorneoState {
   };
 }
 
-export function resolveOctavosMatches(matchesObj: Record<string, TorneoMatch>): {
-  winners: (string | null)[];
-  updatedMatches: Record<string, TorneoMatch>;
-} {
-  const updatedMatches = cloneMatches(matchesObj);
-  const winners: (string | null)[] = [];
-  OCTAVOS_IDS.forEach((id) => {
-    const m = updatedMatches[id];
-    if (!m) {
-      winners.push(null);
-      return;
-    }
-    const v1 = m.votes?.[m.p1] || 0;
-    const v2 = m.votes?.[m.p2] || 0;
-    const winner = v1 >= v2 ? m.p1 : m.p2;
-    m.winner = winner;
-    m.resolved = true;
-    winners.push(winner);
-  });
-  return { winners, updatedMatches };
-}
-
-export function buildCuartosMatches(
-  winners: (string | null)[],
-): Record<string, TorneoMatch> {
-  const cuartos: Record<string, TorneoMatch> = {};
-  for (let i = 0; i < 4; i++) {
-    const id = `cua_${i}`;
-    const p1name = winners[i * 2] || "TBD";
-    const p2name = winners[i * 2 + 1] || "TBD";
-    cuartos[id] = {
-      id,
-      round: "cuartos",
-      p1: p1name,
-      p2: p2name,
-      votes: { _placeholder_: 0 },
-      winner: null,
-      resolved: false,
-    };
-  }
-  return cuartos;
-}
-
-export function resolveCuartosMatches(cuartosObj: Record<string, TorneoMatch>): {
+function resolveCuartosMatches(cuartosObj: Record<string, TorneoMatch>): {
   winners: (string | null)[];
   updatedMatches: Record<string, TorneoMatch>;
 } {
@@ -203,9 +137,7 @@ export function resolveCuartosMatches(cuartosObj: Record<string, TorneoMatch>): 
   return { winners, updatedMatches };
 }
 
-export function buildSemisMatches(
-  winners: (string | null)[],
-): Record<string, TorneoMatch> {
+function buildSemisMatches(winners: (string | null)[]): Record<string, TorneoMatch> {
   const semis: Record<string, TorneoMatch> = {};
   for (let i = 0; i < 2; i++) {
     const id = `semi_${i}`;
@@ -224,7 +156,7 @@ export function buildSemisMatches(
   return semis;
 }
 
-export function resolveSemisMatches(semisObj: Record<string, TorneoMatch>): {
+function resolveSemisMatches(semisObj: Record<string, TorneoMatch>): {
   winners: (string | null)[];
   updatedMatches: Record<string, TorneoMatch>;
 } {
@@ -246,7 +178,7 @@ export function resolveSemisMatches(semisObj: Record<string, TorneoMatch>): {
   return { winners, updatedMatches };
 }
 
-export function buildFinalMatch(winners: (string | null)[]): TorneoMatch {
+function buildFinalMatch(winners: (string | null)[]): TorneoMatch {
   const p1name = winners[0] || "TBD";
   const p2name = winners[1] || "TBD";
   return {
@@ -425,9 +357,4 @@ export async function ensureTorneoState(
   const waitingState = createWaitingTorneoState(now);
   await fb.initTorneoState(waitingState as Record<string, unknown>);
   return waitingState;
-}
-
-/** Libera el mutex interno de avance (útil en tests). */
-export function resetTorneoAdvancingFlag(): void {
-  _torneoAdvancing = false;
 }

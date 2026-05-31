@@ -4,12 +4,12 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
-  useState,
   type ElementType,
   type ReactNode,
 } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { cn } from "@/lib/cn";
 
 let scrollTriggerRegistered = false;
 
@@ -27,32 +27,17 @@ export type ScrollRevealProps = {
   children: ReactNode;
   className?: string;
   as?: ElementType;
-  /** Desplazamiento inicial en px (positivo = desde abajo). */
   y?: number;
-  /** Peso relativo de la fase de entrada en el timeline (solo proporciones). */
   enterSpan?: number;
-  /** Peso relativo de la fase visible antes de salir. */
   holdSpan?: number;
-  /** Peso relativo de la fase de salida. */
   exitSpan?: number;
-  /** Desplaza la entrada en el recorrido de scroll (fracción del timeline). */
   delay?: number;
-  /** Inicio del tramo de scroll (elemento asomando por abajo). */
   start?: string;
-  /** Fin del tramo de scroll (elemento saliendo por arriba). */
   end?: string;
-  /** true = 1:1 con el scroll; número = suavizado mínimo en segundos. */
   scrub?: boolean | number;
-  /**
-   * traverse: recorrido start/end (filas del ranking).
-   * block: entra al bajar (aparece) y sale al subir; progress 1 = totalmente visible.
-   */
   scrollRange?: "traverse" | "block";
-  /** block: posición final del trigger (progress 1 = visible, no oculto). */
   blockEnd?: string;
-  /** Si el bloque ya está visible al llegar al final de página, forzar estado visible. */
   snapVisibleAtBottom?: boolean;
-  /** Oculto hasta que GSAP tome el control (evita flash al hidratar). */
   hideUntilReady?: boolean;
 };
 
@@ -75,7 +60,6 @@ export function ScrollReveal({
   hideUntilReady = true,
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [gsapReady, setGsapReady] = useState(false);
 
   useLayoutEffect(() => {
     const el = ref.current;
@@ -83,7 +67,7 @@ export function ScrollReveal({
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
       gsap.set(el, VISIBLE);
-      setGsapReady(true);
+      el.dataset.revealReady = "true";
       return;
     }
     gsap.set(el, HIDDEN(y));
@@ -119,6 +103,10 @@ export function ScrollReveal({
           end: resolvedEnd,
           scrub: resolvedScrub,
           invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            el.style.willChange =
+              self.progress > 0 && self.progress < 1 ? "transform, opacity" : "";
+          },
         },
       });
 
@@ -145,7 +133,6 @@ export function ScrollReveal({
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight;
       const inView = rect.top < vh && rect.bottom > 0;
-
       if (!inView) return;
 
       if (snapVisibleAtBottom) {
@@ -157,12 +144,12 @@ export function ScrollReveal({
       }
     };
 
-    setGsapReady(true);
+    el.dataset.revealReady = "true";
+    syncScrollState();
 
     const refresh = () => {
       syncScrollState();
     };
-    refresh();
     const ro = new ResizeObserver(refresh);
     ro.observe(el);
     window.addEventListener("load", refresh);
@@ -170,8 +157,9 @@ export function ScrollReveal({
     return () => {
       ro.disconnect();
       window.removeEventListener("load", refresh);
+      el.style.willChange = "";
+      delete el.dataset.revealReady;
       ctx.revert();
-      setGsapReady(false);
     };
   }, [
     y,
@@ -190,13 +178,11 @@ export function ScrollReveal({
   return (
     <Tag
       ref={ref}
-      className={className}
-      style={{
-        willChange: "transform, opacity",
-        ...(!gsapReady && hideUntilReady
-          ? { opacity: 0, visibility: "hidden" as const }
-          : undefined),
-      }}
+      className={cn(
+        className,
+        hideUntilReady &&
+          "invisible opacity-0 [&[data-reveal-ready=true]]:visible [&[data-reveal-ready=true]]:opacity-100",
+      )}
     >
       {children}
     </Tag>
