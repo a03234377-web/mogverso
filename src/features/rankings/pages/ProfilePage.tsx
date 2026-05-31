@@ -1,8 +1,11 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import type { Ranker } from "@/features/rankings/data/rankers";
 import { ProfileAvatar } from "@/features/shared/components/Avatar";
 import { Icon } from "@/components/icons";
+import { sectionTitle } from "@/components/layout/header/nav-config";
+import { parseProfileFrom } from "@/features/app/routes";
 import { ActivePage } from "@/features/shared/components/ui/ActivePage";
 import { useLooksMaxNavigate } from "@/features/app/shell/LooksMaxShell";
 import { cn } from "@/lib/cn";
@@ -13,7 +16,11 @@ type ProfilePageProps = {
 };
 
 export function ProfilePage({ ranker, rankPosition }: ProfilePageProps) {
-  const { backToRanking } = useLooksMaxNavigate();
+  const searchParams = useSearchParams();
+  const { backFromProfile } = useLooksMaxNavigate();
+  const profileFrom = parseProfileFrom(searchParams.get("from"));
+  const backSection = profileFrom ?? "rankings";
+  const backButtonId = `profile-back-${backSection}`;
 
   const r = ranker;
 
@@ -23,6 +30,7 @@ export function ProfilePage({ ranker, rankPosition }: ProfilePageProps) {
     <ActivePage id="page-profile" active>
       <div className="mx-auto mt-12 mb-8 flex max-w-[1000px] items-start px-5 max-md:px-4 max-md:text-center">
         <button
+          id={backButtonId}
           type="button"
           className={cn(
             "inline-flex cursor-pointer items-center gap-1.5 rounded-lg",
@@ -30,9 +38,10 @@ export function ProfilePage({ ranker, rankPosition }: ProfilePageProps) {
             "tracking-[0.8px] text-lm-text2 lm-focus-ring transition-all duration-200",
             "hover:-translate-x-1 hover:border-lm-border2 hover:text-lm-text max-md:ml-4",
           )}
-          onClick={backToRanking}
+          aria-label={`Volver a ${sectionTitle(backSection)}`}
+          onClick={() => backFromProfile(profileFrom)}
         >
-          ← Volver al Ranking
+          ← Volver a {sectionTitle(backSection)}
         </button>
       </div>
 

@@ -97,7 +97,13 @@ export function RankingsPage({
       </div>
 
       <div className="mx-auto max-w-[1100px] px-5 pb-12 max-md:px-2.5 max-md:pb-20">
-        <ScrollReveal y={28} className="mb-4" enterSpan={0.22} holdSpan={0.56} exitSpan={0.22}>
+        <ScrollReveal
+          y={28}
+          className="mb-4"
+          enterSpan={0.22}
+          holdSpan={0.56}
+          exitSpan={0.22}
+        >
           <SectionTitle>
             <IconLabel icon="trophy" iconSize={20}>
               Ranking Completo
@@ -116,7 +122,11 @@ export function RankingsPage({
               start="top bottom+=6%"
               end="bottom top+=6%"
             >
-              <RankRow entry={entry} index={i} onOpenProfile={openProfile} />
+              <RankRow
+                entry={entry}
+                index={i}
+                onOpenProfile={(name, rank) => openProfile(name, rank, "rankings")}
+              />
             </ScrollReveal>
           ))}
         </div>
@@ -131,20 +141,28 @@ export function RankingsPage({
         )}
       >
         <div className="h-px flex-1 bg-lm-border max-md:hidden" />
-        <div className="text-center lm-type-label leading-snug text-lm-text2 max-md:max-w-full md:whitespace-nowrap">
-          <IconLabel
-            icon="vote"
-            iconSize={12}
-            className="justify-center md:justify-start"
-          >
-            Votación Especial · Próximo Candidato
-          </IconLabel>
-        </div>
+        <ScrollReveal y={24} scrollRange="inView" className="max-md:max-w-full">
+          <div className="text-center lm-type-label leading-snug text-lm-text2 md:whitespace-nowrap">
+            <IconLabel
+              icon="vote"
+              iconSize={12}
+              className="justify-center md:justify-start"
+            >
+              Votación Especial · Próximo Candidato
+            </IconLabel>
+          </div>
+        </ScrollReveal>
         <div className="h-px flex-1 bg-lm-border max-md:hidden" />
       </div>
 
       <div className="mx-auto max-w-[1100px] px-5 pb-16 max-md:px-3 max-md:pb-4">
-        <ScrollReveal y={44} scrollRange="inView">
+        <ScrollReveal
+          y={36}
+          scrollRange="inView"
+          enterSpan={0.22}
+          holdSpan={0.78}
+          exitSpan={0}
+        >
           <EntryVoteCard />
         </ScrollReveal>
       </div>

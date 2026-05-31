@@ -12,10 +12,12 @@ import { Ticker } from "@/features/app/components/Ticker";
 import { BackgroundEffects } from "@/features/app/components/BackgroundEffects";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import {
-  DEFAULT_LOOKSMAX_PATH,
+  backPathFromProfile,
   isNavPage,
   pageIdFromPathname,
   pathForPage,
+  profilePath,
+  type NavPageId,
 } from "@/features/app/routes";
 import type { PageId } from "@/features/app/types";
 import { useSecurityGuard } from "@/features/app/hooks/useSecurityGuard";
@@ -96,19 +98,27 @@ export function useLooksMaxNavigate() {
   );
 
   const openProfile = useCallback(
-    (name: string, rankPos: number) => {
+    (name: string, rankPos: number, from?: NavPageId) => {
       void rankPos;
-      const href = pathForPage("profile", name);
-      if (href !== pathname) router.push(href);
+      const href = profilePath(name, from);
+      const current =
+        typeof window !== "undefined"
+          ? window.location.pathname + window.location.search
+          : pathname;
+      if (href !== current) router.push(href);
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
     [pathname, router],
   );
 
-  const backToRanking = useCallback(() => {
-    if (pathname !== DEFAULT_LOOKSMAX_PATH) router.push(DEFAULT_LOOKSMAX_PATH);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [pathname, router]);
+  const backFromProfile = useCallback(
+    (from?: NavPageId | null) => {
+      const target = backPathFromProfile(from);
+      if (pathname !== target) router.push(target);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    [pathname, router],
+  );
 
-  return { navigate, openProfile, backToRanking };
+  return { navigate, openProfile, backFromProfile };
 }
