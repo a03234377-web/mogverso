@@ -50,8 +50,10 @@
   --animate-quick-beam: quickActionBeam 0.7s ease-out forwards;
   --animate-quick-inset: quickActionInsetPulse 0.8s ease-out forwards;
   --animate-quick-corner: quickActionCornerFlash 0.55s ease-out forwards;
-  --animate-quick-icon-shell: quickActionIconShell 0.45s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
-  --animate-quick-vote-check: quickActionVoteCheckPop 0.35s cubic-bezier(0.34, 1.5, 0.64, 1) 0.22s forwards;
+  --animate-quick-icon-shell: quickActionIconShell 0.45s
+    cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+  --animate-quick-vote-check: quickActionVoteCheckPop 0.35s
+    cubic-bezier(0.34, 1.5, 0.64, 1) 0.22s forwards;
   --animate-quick-torneo-ripple: quickActionTorneoRipple 0.9s ease-out forwards;
   --animate-quick-label-line: quickActionLabelLine 0.4s ease-out forwards;
 }
