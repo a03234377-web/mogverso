@@ -36,7 +36,7 @@ export function Ticker() {
               className={cn(
                 "flex shrink-0 items-center gap-1.5 text-base font-semibold text-lm-text2",
               )}
-              >
+            >
               <Icon
                 name={t.icon}
                 size={14}

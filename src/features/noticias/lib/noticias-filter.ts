@@ -21,10 +21,7 @@ export const NOTICIAS_FILTERS = [
 
 export type NoticiasFilterId = (typeof NOTICIAS_FILTERS)[number]["id"];
 
-const FILTER_KIND: Record<
-  Exclude<NoticiasFilterId, "todas">,
-  NoticiaEventKind
-> = {
+const FILTER_KIND: Record<Exclude<NoticiasFilterId, "todas">, NoticiaEventKind> = {
   informaciongeneral: "rankvote",
   subida: "subida",
   bajada: "bajada",

@@ -35,7 +35,11 @@ export function WormBorder({
   return (
     <div
       id={id}
-      className={cn("worm-border group", animated && "worm-border--animated", className)}
+      className={cn(
+        "worm-border group",
+        animated && "worm-border--animated",
+        className,
+      )}
       data-category={category}
       data-theme={theme}
     >
