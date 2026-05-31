@@ -93,13 +93,18 @@ export function ScrollReveal({
 
     const isInView = scrollRange === "inView";
     const resolvedStart = isInView ? "top bottom+=8%" : start;
-    const resolvedEnd = isInView ? "top 72%" : end;
-    const resolvedEnterSpan = isInView ? 0.28 : enterSpan;
-    const resolvedHoldSpan = isInView ? 0.72 : holdSpan;
+    // inView: recorrido hasta el final de página (bloques al pie); traverse usa end propio.
+    const resolvedEnd = isInView ? "bottom bottom" : end;
+    const resolvedEnterSpan = isInView ? 0.22 : enterSpan;
+    const resolvedHoldSpan = isInView ? 0.78 : holdSpan;
     const resolvedExitSpan = isInView ? 0 : exitSpan;
+    const totalSpan = resolvedEnterSpan + resolvedHoldSpan + resolvedExitSpan;
+    const enterProgress = totalSpan > 0 ? resolvedEnterSpan / totalSpan : 1;
+
+    let tl: gsap.core.Timeline;
 
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
+      tl = gsap.timeline({
         scrollTrigger: {
           trigger: el,
           start: resolvedStart,
@@ -116,17 +121,29 @@ export function ScrollReveal({
         ...VISIBLE,
         ease: "none",
         duration: resolvedEnterSpan,
-      })
-        .to(el, { ...VISIBLE, ease: "none", duration: resolvedHoldSpan });
+      }).to(el, { ...VISIBLE, ease: "none", duration: resolvedHoldSpan });
 
       if (resolvedExitSpan > 0) {
         tl.to(el, { ...EXIT(y), ease: "none", duration: resolvedExitSpan });
       }
     }, el);
 
+    const revealIfAlreadyInZone = () => {
+      ScrollTrigger.refresh();
+      const st = tl!.scrollTrigger;
+      if (!st || st.progress > 0) return;
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      if (rect.top < vh * 0.92 && rect.bottom > 0) {
+        tl!.progress(Math.max(st.progress, enterProgress));
+      }
+    };
+
     setGsapReady(true);
 
-    const refresh = () => ScrollTrigger.refresh();
+    const refresh = () => {
+      revealIfAlreadyInZone();
+    };
     refresh();
     const ro = new ResizeObserver(refresh);
     ro.observe(el);

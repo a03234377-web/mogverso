@@ -1,5 +1,7 @@
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { Icon } from "@/components/icons";
+import type { NavPageId } from "@/features/app/routes";
+import { RankerProfileLink } from "@/features/rankings/components/ui/RankerProfileLink";
 import type { Mover } from "@/features/rankings/lib/ranking";
 import { cn } from "@/lib/cn";
 import type { IconName } from "@/types/icons";
@@ -9,9 +11,16 @@ type MoversCardProps = {
   titleIcon: IconName;
   variant: "up" | "down";
   movers: Mover[];
+  profileFrom?: NavPageId;
 };
 
-export function MoversCard({ title, titleIcon, variant, movers }: MoversCardProps) {
+export function MoversCard({
+  title,
+  titleIcon,
+  variant,
+  movers,
+  profileFrom = "rankings",
+}: MoversCardProps) {
   return (
     <div className="rounded-[14px] border border-lm-border bg-lm-card px-5 py-4">
       <div
@@ -36,9 +45,15 @@ export function MoversCard({ title, titleIcon, variant, movers }: MoversCardProp
               y={32}
               className="flex items-center justify-between gap-2 border-b border-lm-border py-2 last:border-b-0"
             >
-              <div className="flex items-center gap-2 text-base font-bold">
-                <span className="text-base font-bold text-lm-text2">#{m.rank}</span>{" "}
-                {m.name}
+              <div className="flex min-w-0 items-center gap-2 text-base font-bold">
+                <span className="shrink-0 text-base font-bold text-lm-text2">
+                  #{m.rank}
+                </span>
+                <RankerProfileLink
+                  name={m.name}
+                  from={profileFrom}
+                  className="truncate text-lm-text"
+                />
               </div>
               <div
                 className={cn(

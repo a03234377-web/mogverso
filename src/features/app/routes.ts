@@ -12,8 +12,25 @@ export const LOOKSMAX_PATHS: Record<Exclude<PageId, "profile">, string> = {
 
 export const DEFAULT_LOOKSMAX_PATH = LOOKSMAX_PATHS.rankings;
 
-export function profilePath(name: string): string {
-  return `/perfil/${rankerProfileSlug(name)}`;
+export type NavPageId = Exclude<PageId, "profile">;
+
+/** Valida el query `from` de URLs de perfil (/perfil/x?from=rankvote). */
+export function parseProfileFrom(value: string | null | undefined): NavPageId | null {
+  if (!value) return null;
+  if (isNavPage(value as PageId)) return value as NavPageId;
+  return null;
+}
+
+export function profilePath(name: string, from?: NavPageId | null): string {
+  const base = `/perfil/${rankerProfileSlug(name)}`;
+  const origin = from ? parseProfileFrom(from) : null;
+  if (!origin) return base;
+  return `${base}?from=${origin}`;
+}
+
+export function backPathFromProfile(from: NavPageId | null | undefined): string {
+  const origin = from ? parseProfileFrom(from) : null;
+  return origin ? LOOKSMAX_PATHS[origin] : DEFAULT_LOOKSMAX_PATH;
 }
 
 export function pathForPage(page: PageId, profileName?: string | null): string {

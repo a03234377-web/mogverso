@@ -1,10 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { Icon } from "@/components/icons";
-import { profilePath } from "@/features/app/routes";
-import { resolveRankerFromProfileSlug } from "@/features/rankings/lib/profile-slug";
-import { isKnownRankerName, safeRankerLabel } from "@/features/rankings/lib/ranker-name";
+import { RankerProfileLink } from "@/features/rankings/components/ui/RankerProfileLink";
 import { cn } from "@/lib/cn";
 
 type HistoryEntry = {
@@ -18,29 +15,6 @@ type HistoryEntry = {
   winnerNewPos?: number;
   loserNewPos?: number;
 };
-
-function HistoryNameLink({ name, className }: { name: string; className: string }) {
-  const label = safeRankerLabel(name, "—");
-  const ranker = isKnownRankerName(name) ? resolveRankerFromProfileSlug(name) : null;
-
-  if (!ranker) {
-    return <span className={className}>{label}</span>;
-  }
-
-  return (
-    <Link
-      href={profilePath(name)}
-      className={cn(
-        className,
-        "cursor-pointer rounded-sm underline-offset-2 transition-opacity",
-        "hover:underline hover:opacity-90 lm-focus-ring",
-      )}
-      title={`Ver perfil de ${label}`}
-    >
-      {label}
-    </Link>
-  );
-}
 
 export function HistoryRow({ h }: { h: HistoryEntry }) {
   const d = new Date(h.ts);
@@ -80,12 +54,13 @@ export function HistoryRow({ h }: { h: HistoryEntry }) {
     >
       <Icon name="vote" size={14} className="shrink-0 text-lm-text2" />
       <span className="font-sans text-base font-semibold text-lm-green2">
-        ▲ <HistoryNameLink name={h.winner} className="text-lm-green2" />
+        ▲{" "}
+        <RankerProfileLink name={h.winner} from="rankvote" className="text-lm-green2" />
         {posW}
       </span>
       <span className="font-sans text-base text-lm-text2">vs</span>
       <span className="font-sans text-base font-semibold text-lm-red2">
-        ▼ <HistoryNameLink name={h.loser} className="text-lm-red2" />
+        ▼ <RankerProfileLink name={h.loser} from="rankvote" className="text-lm-red2" />
         {posL}
       </span>
       <span className="text-sm font-bold text-lm-text2 max-md:basis-full max-md:text-left md:ml-auto">
