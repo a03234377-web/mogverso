@@ -1,7 +1,7 @@
 "use client";
 
 import { Icon, IconLabel } from "@/components/icons";
-import { Modal, ModalCloseButton } from "@/features/shared/components/ui/Modal";
+import { Modal, ModalCloseButton } from "@/components/ui/Modal";
 import { cn } from "@/lib/cn";
 
 type DiscordModalProps = {
@@ -50,6 +50,7 @@ function DiscordModalContent() {
           "mb-1 bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2)_50%,var(--color-lm-gold)_100%)]",
           "bg-clip-text text-center font-sans text-[clamp(1.35rem,5vw,2rem)] leading-tight font-bold",
           "tracking-tight text-transparent max-md:text-[clamp(1.5rem,5vw,2.2rem)]",
+          "w-full text-center",
         )}
       >
         Únete a la

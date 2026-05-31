@@ -1,8 +1,8 @@
 "use client";
 
 import { IconLabel } from "@/components/icons";
-import { CountdownDigits } from "@/features/shared/components/ui/CountdownDigits";
-import { useCountdown } from "@/features/shared/hooks/useCountdown";
+import { CountdownDigits } from "@/components/ui/CountdownDigits";
+import { useCountdown } from "@/hooks/useCountdown";
 import { cn } from "@/lib/cn";
 
 export function RankingsCountdownCard({ rankVoteEnd }: { rankVoteEnd: number | null }) {

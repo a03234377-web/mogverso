@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { CANDIDATES } from "@/features/rankings/data/candidates";
 import { Icon } from "@/components/icons";
-import { useCountdown } from "@/features/shared/hooks/useCountdown";
+import { useCountdown } from "@/hooks/useCountdown";
 import { useEntryVote } from "@/features/rankings/hooks/useEntryVote";
 import { EntryVoteActive } from "./EntryVoteActive";
 import { EntryVoteWinner } from "./EntryVoteWinner";

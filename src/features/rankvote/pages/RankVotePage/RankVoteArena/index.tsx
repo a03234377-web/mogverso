@@ -1,9 +1,9 @@
 "use client";
 
 import { Icon, IconLabel } from "@/components/icons";
-import { CountdownDigits } from "@/features/shared/components/ui/CountdownDigits";
+import { CountdownDigits } from "@/components/ui/CountdownDigits";
 import { FighterCard } from "./FighterCard";
-import { useCountdown } from "@/features/shared/hooks/useCountdown";
+import { useCountdown } from "@/hooks/useCountdown";
 import { RANKERS } from "@/features/rankings/data/rankers";
 import {
   isKnownRankerName,
@@ -91,6 +91,7 @@ export function RankVoteArena({
         <FighterCard
           side="up"
           name={displayP1}
+          photoName={rv.p1}
           ranker={r1}
           idx={idx1}
           pct={pct1}
@@ -106,6 +107,7 @@ export function RankVoteArena({
         <FighterCard
           side="down"
           name={displayP2}
+          photoName={rv.p2}
           ranker={r2}
           idx={idx2}
           pct={pct2}

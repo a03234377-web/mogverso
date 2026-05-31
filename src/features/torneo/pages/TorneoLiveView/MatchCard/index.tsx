@@ -4,7 +4,7 @@ import { Icon } from "@/components/icons";
 import type { IconName } from "@/types/icons";
 import { getPlayerByName, PHASES } from "@/features/torneo/data/torneo-players";
 import { MatchSide } from "./MatchSide";
-import type { TorneoMatch, TorneoState } from "@/features/shared/lib/types";
+import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 import { cn } from "@/lib/cn";
 
 export function MatchCard({

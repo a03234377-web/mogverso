@@ -2,11 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
-import type {
-  RankOverrides,
-  RankVoteMyVote,
-  RankVoteRound,
-} from "@/features/shared/lib/types";
+import type { RankOverrides, RankVoteMyVote, RankVoteRound } from "@/types/looksmax";
 import {
   isKnownRankerName,
   isValidRankVotePair,

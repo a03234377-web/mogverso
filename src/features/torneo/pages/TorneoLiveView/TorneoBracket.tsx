@@ -1,9 +1,9 @@
 "use client";
 
-import { CreatorImage } from "@/features/shared/components/CreatorImage";
+import { CreatorImage } from "@/components/CreatorImage";
 import { CreatorIcon, Icon } from "@/components/icons";
 import { getPlayerByName } from "@/features/torneo/data/torneo-players";
-import type { TorneoState } from "@/features/shared/lib/types";
+import type { TorneoState } from "@/types/looksmax";
 import { cn } from "@/lib/cn";
 
 export function TorneoBracket({ state }: { state: TorneoState | null }) {

@@ -327,13 +327,13 @@ export const CONTESTANT_PROFILES: Record<string, ContestantProfile> = {
     movement: "Castu regresa con versión actualizada.",
     movIcon: "flame",
   },
-  Foxtef: {
+  foxterGG: {
     title: "El Astuto del Glow-Up",
     sub: "España",
     tags: ["ptag-new", "ptag-risers", "ptag-humor"],
     tagNames: ["Nuevo", "En Ascenso", "Humor"],
-    bio: "Foxtef juega al maxxing con inteligencia y memes, pero los resultados hablan en serio.",
-    movement: "Foxtef debuta con estilo desenfadado.",
+    bio: "foxterGG juega al maxxing con inteligencia y memes, pero los resultados hablan en serio.",
+    movement: "foxterGG debuta con estilo desenfadado.",
     movIcon: "laugh",
   },
   "Nil Ojeda": {

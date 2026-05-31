@@ -6,7 +6,7 @@ import type {
   RankMovement,
   RankMovements,
   RankOverrides,
-} from "@/features/shared/lib/types";
+} from "@/types/looksmax";
 
 /** Ordena nombres según overrides de Firebase; sin overrides usa el orden base de RANKERS. */
 export function getRankedNamesFromOverrides(

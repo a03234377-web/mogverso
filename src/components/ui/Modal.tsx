@@ -52,7 +52,7 @@ export function Modal({
       />
       <div
         className={cn(
-          "relative z-[1] w-full max-w-[440px] rounded-[22px] border px-8 py-9",
+          "relative z-[1] w-full max-w-[700px] rounded-[22px] border px-8 py-9",
           "border-[rgba(232,184,75,0.45)]",
           "bg-[linear-gradient(145deg,var(--color-lm-card),var(--color-lm-bg2))]",
           "shadow-[0_0_60px_rgba(232,184,75,0.12),0_24px_60px_rgba(0,0,0,0.5)]",

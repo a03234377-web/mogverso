@@ -1,6 +1,6 @@
 "use client";
 
-import { CreatorImage } from "@/features/shared/components/CreatorImage";
+import { CreatorImage } from "@/components/CreatorImage";
 import { CreatorIcon, Icon, IconLabel } from "@/components/icons";
 import type { EntryCandidate } from "@/features/rankings/data/candidates";
 import { entryVoteCardShellClass } from "./shell-styles";

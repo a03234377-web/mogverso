@@ -5,31 +5,7 @@ import {
   type CreatorPhoto,
 } from "@/assets/creators";
 import type { IconName } from "@/types/icons";
-
-/** Nombres alternativos (torneo, votación, Firebase) → nombre canónico en RANKERS. */
-const RANKER_PHOTO_ALIASES: Record<string, string> = {
-  Sergi: "SergiCabrer",
-  Franbv: "Franbeuve",
-  NilOjeda: "Nil Ojeda",
-  Ibai: "IbaiLlanos",
-  Chiqui: "ChiquiIbai",
-  Tito: "TitoChape",
-  Alvaro: "AlvaroSapo",
-  Hectroll: "Hectrollprox",
-  Ruben: "RubenMaxxing",
-};
-
-function resolveRankerName(name: string): string {
-  const trimmed = name.trim();
-  if (!trimmed) return trimmed;
-
-  if (RANKER_PHOTO_ALIASES[trimmed]) return RANKER_PHOTO_ALIASES[trimmed];
-
-  const alias = Object.entries(RANKER_PHOTO_ALIASES).find(
-    ([key]) => key.toLowerCase() === trimmed.toLowerCase(),
-  );
-  return alias?.[1] ?? trimmed;
-}
+import { resolveCanonicalRankerName } from "./ranker-aliases";
 
 function photoForRankerName(name: string): CreatorPhoto | undefined {
   const file = rankerPhotoFile(name);
@@ -42,7 +18,7 @@ export function getRankerPhoto(name: string): CreatorPhoto | undefined {
   const trimmed = name.trim();
   if (!trimmed) return undefined;
 
-  const canonical = resolveRankerName(trimmed);
+  const canonical = resolveCanonicalRankerName(trimmed);
   return photoForRankerName(canonical);
 }
 
@@ -72,12 +48,13 @@ const FALLBACK: Record<string, IconName> = {
   Hectrollprox: "ghost",
   Giva: "flame",
   "Nil Ojeda": "gem",
+  foxterGG: "laugh",
 };
 
 export function getRankerFallback(name: string): IconName {
   if (!name) return "user";
   const trimmed = name.trim();
-  const aliasKey = RANKER_PHOTO_ALIASES[trimmed] ?? trimmed;
+  const aliasKey = resolveCanonicalRankerName(trimmed);
   return (
     FALLBACK[aliasKey] ??
     FALLBACK[trimmed] ??

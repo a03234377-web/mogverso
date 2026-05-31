@@ -1,4 +1,5 @@
 import { rankerPhotoFile } from "@/assets/creators";
+import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import { RANKERS, type Ranker } from "@/features/rankings/data/rankers";
 
 /** Segmento URL para /perfil/[slug] (codifica espacios y caracteres especiales). */
@@ -11,19 +12,6 @@ export function rankerProfileParam(name: string): string {
   return name.trim();
 }
 
-/** Alias de URL o nombre legacy → nombre canónico en RANKERS. */
-const PROFILE_SLUG_ALIASES: Record<string, string> = {
-  Sergi: "SergiCabrer",
-  Franbv: "Franbeuve",
-  NilOjeda: "Nil Ojeda",
-  Ibai: "IbaiLlanos",
-  Chiqui: "ChiquiIbai",
-  Tito: "TitoChape",
-  Alvaro: "AlvaroSapo",
-  Hectroll: "Hectrollprox",
-  Ruben: "RubenMaxxing",
-};
-
 function normalizeProfileSlug(slug: string): string {
   let decoded: string;
   try {
@@ -34,22 +22,16 @@ function normalizeProfileSlug(slug: string): string {
   return decoded;
 }
 
-function resolveCanonicalRankerName(name: string, rankers: Ranker[]): string {
+function resolveRankerNameFromSlug(name: string, rankers: Ranker[]): string {
   const trimmed = name.trim();
   if (!trimmed) return trimmed;
 
-  if (PROFILE_SLUG_ALIASES[trimmed]) return PROFILE_SLUG_ALIASES[trimmed];
+  const canonical = resolveCanonicalRankerName(trimmed);
+  if (rankers.some((r) => r.name === canonical)) return canonical;
 
-  const alias = Object.entries(PROFILE_SLUG_ALIASES).find(
-    ([key]) => key.toLowerCase() === trimmed.toLowerCase(),
-  );
-  if (alias) return alias[1];
-
-  if (rankers.some((r) => r.name === trimmed)) return trimmed;
-
-  const lower = trimmed.toLowerCase();
+  const lower = canonical.toLowerCase();
   const byName = rankers.find((r) => r.name.toLowerCase() === lower);
-  return byName?.name ?? trimmed;
+  return byName?.name ?? canonical;
 }
 
 function findRankerByKebabSlug(
@@ -66,7 +48,7 @@ function findRankerByProfileSlug(
   rankers: Ranker[] = RANKERS,
 ): Ranker | undefined {
   const normalized = normalizeProfileSlug(slug);
-  const canonical = resolveCanonicalRankerName(normalized, rankers);
+  const canonical = resolveRankerNameFromSlug(normalized, rankers);
 
   const exact = rankers.find((r) => r.name === canonical);
   if (exact) return exact;

@@ -1,9 +1,9 @@
 "use client";
 
 import { CANDIDATES } from "@/features/rankings/data/candidates";
-import { CreatorImage } from "@/features/shared/components/CreatorImage";
+import { CreatorImage } from "@/components/CreatorImage";
 import { CreatorIcon, Icon, IconLabel } from "@/components/icons";
-import { CountdownDigits } from "@/features/shared/components/ui/CountdownDigits";
+import { CountdownDigits } from "@/components/ui/CountdownDigits";
 import { entryVoteCardShellClass } from "./shell-styles";
 import { cn } from "@/lib/cn";
 

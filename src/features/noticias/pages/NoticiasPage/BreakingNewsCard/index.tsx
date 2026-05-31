@@ -7,7 +7,7 @@ export function BreakingNewsCard() {
   return (
     <div
       className={cn(
-        "relative mb-6 animate-breaking-pulse overflow-hidden rounded-[14px]",
+        "relative mt-20 animate-breaking-pulse overflow-hidden rounded-[14px]",
         "border border-[rgba(255,71,87,0.35)]",
         "bg-[linear-gradient(135deg,rgba(192,57,43,0.15),rgba(255,71,87,0.08))]",
         "p-5 max-md:rounded-xl max-md:p-4",

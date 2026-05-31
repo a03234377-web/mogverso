@@ -25,6 +25,7 @@ App **Next.js 16** (App Router) en migración desde una SPA estática con estilo
 | :--- | :--- |
 | Rutas y layouts | `src/app/` (`layout.tsx`, `page.tsx`, subcarpetas por ruta) |
 | Estilos globales Tailwind | `src/app/globals.css` |
+| Fechas y horas (España) | `src/lib/spain-time.ts`, regla `.cursor/rules/spain-timezone.mdc` |
 | Design system legacy (ranking, votos, torneo, perfiles…) | `src/app/looksmax.css` |
 | Componentes reutilizables | `src/components/` (crear al migrar; colocalizar si solo una ruta) |
 | Hooks, utilidades, tipos | `src/lib/`, `src/hooks/`, `src/types/` |

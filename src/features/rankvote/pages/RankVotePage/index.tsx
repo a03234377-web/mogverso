@@ -1,8 +1,10 @@
 "use client";
 
 import { Icon, IconLabel } from "@/components/icons";
-import { ActivePage } from "@/features/shared/components/ui/ActivePage";
-import { HeroSection } from "@/features/shared/components/ui/HeroSection";
+import { ActivePage } from "@/components/ui/ActivePage";
+import { SpainTimezoneNote } from "@/components/ui/SpainTimezoneNote";
+import { HeroSection } from "@/components/ui/HeroSection";
+import { WormBorder } from "@/components/ui/WormBorder";
 import { RankVoteArena } from "./RankVoteArena";
 import { HistoryRow } from "./HistoryRow";
 import { useRankVote } from "@/features/rankvote/hooks/useRankVote";
@@ -40,14 +42,12 @@ export function RankVotePage() {
         subtitle="Vota cada 3 horas · El ganador sube 1 puesto · El perdedor baja 1 puesto"
       />
       <div className="mx-auto max-w-[1000px] px-5 pb-16 max-md:px-3 max-md:pb-[5.5rem]">
-        <div
-          className={cn(
-            "relative mb-8 overflow-hidden rounded-[20px]",
-            "border border-[rgba(46,204,113,0.3)]",
-            "bg-[linear-gradient(135deg,rgba(46,204,113,0.07),rgba(232,184,75,0.04))]",
-            "px-6 py-8 text-center max-md:mb-5 max-md:rounded-2xl max-md:px-3.5 max-md:py-5",
-          )}
+        <WormBorder
+          animated
+          theme="rankvote"
           id="rankvoteArena"
+          className="mb-8 max-md:mb-5"
+          innerClassName="overflow-hidden px-6 py-8 text-center max-md:px-3.5 max-md:py-5"
         >
           {loading || transitioning ? (
             <div className="px-6 py-12 text-center text-base font-bold text-lm-gold">
@@ -97,12 +97,13 @@ export function RankVotePage() {
               Cargando votación…
             </div>
           )}
-        </div>
+        </WormBorder>
         <div>
           <div className="mb-4 flex items-center gap-2 font-sans text-xl font-bold tracking-tight text-lm-text">
             <Icon name="scroll-text" size={22} className="text-lm-gold" />
             Historial de Votaciones
           </div>
+          <SpainTimezoneNote className="mb-4" />
           <div id="rankvoteHistoryList">
             {history.length === 0 ? (
               <div className="p-6 text-center text-base text-lm-text2">

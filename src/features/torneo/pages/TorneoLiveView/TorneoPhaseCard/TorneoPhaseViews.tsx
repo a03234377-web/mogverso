@@ -1,6 +1,7 @@
 "use client";
 
-import { CreatorImage } from "@/features/shared/components/CreatorImage";
+import { CreatorImage } from "@/components/CreatorImage";
+import { SpainTimezoneNote } from "@/components/ui/SpainTimezoneNote";
 import { CreatorIcon, Icon, IconLabel } from "@/components/icons";
 import { getPlayerByName } from "@/features/torneo/data/torneo-players";
 import {
@@ -11,9 +12,10 @@ import {
   PhaseTimer,
   PhaseTitle,
 } from "@/features/torneo/components/PhaseCard";
-import type { CountdownParts } from "@/features/shared/hooks/useCountdown";
-import type { TorneoState } from "@/features/shared/lib/types";
+import type { CountdownParts } from "@/hooks/useCountdown";
+import type { TorneoState } from "@/types/looksmax";
 import { cn } from "@/lib/cn";
+import { formatSpainTime, formatSpainWeekdayDate } from "@/lib/spain-time";
 
 export function TorneoPhaseWaitingOctavos({
   state,
@@ -22,12 +24,9 @@ export function TorneoPhaseWaitingOctavos({
   state: TorneoState;
   cd: CountdownParts;
 }) {
-  const end = new Date(state.phaseEnd);
-  const horaStr = end.toLocaleTimeString("es-ES", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  const diaStr = `${DIAS_ES[end.getDay()]} ${end.getDate()} de ${MESES_ES[end.getMonth()]}`;
+  const horaStr = formatSpainTime(state.phaseEnd);
+  const { weekday: diaStr, dateLabel } = formatSpainWeekdayDate(state.phaseEnd);
+  const diaCompleto = `${diaStr} ${dateLabel}`;
   const nextLabel = state.nextPhaseLabel ?? "Cuartos de Final";
 
   return (
@@ -52,7 +51,7 @@ export function TorneoPhaseWaitingOctavos({
         </div>
         <div className="mb-3.5 flex items-center justify-center gap-1.5 text-sm font-bold text-lm-text2">
           <Icon name="calendar" size={14} />
-          {diaStr}
+          {diaCompleto}
         </div>
         <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="orange" />
         <div className="mt-3 text-base font-semibold text-lm-text2">
@@ -60,6 +59,7 @@ export function TorneoPhaseWaitingOctavos({
             El torneo arrancará automáticamente a las {horaStr}
           </IconLabel>
         </div>
+        <SpainTimezoneNote className="mt-3 text-center" />
       </PhaseCard>
     </PhaseDisplay>
   );
@@ -120,32 +120,9 @@ export function TorneoPhaseEnded({
             NUEVO TORNEO EMPIEZA A LAS 23:00
           </div>
           <PhaseTimer h={restartCd.h} m={restartCd.m} s={restartCd.s} color="orange" />
+          <SpainTimezoneNote className="mt-3 text-center" />
         </div>
       </PhaseCard>
     </PhaseDisplay>
   );
 }
-
-const DIAS_ES = [
-  "Domingo",
-  "Lunes",
-  "Martes",
-  "Miércoles",
-  "Jueves",
-  "Viernes",
-  "Sábado",
-];
-const MESES_ES = [
-  "Enero",
-  "Febrero",
-  "Marzo",
-  "Abril",
-  "Mayo",
-  "Junio",
-  "Julio",
-  "Agosto",
-  "Septiembre",
-  "Octubre",
-  "Noviembre",
-  "Diciembre",
-];

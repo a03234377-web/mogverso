@@ -1,10 +1,11 @@
+import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import { RANKERS } from "@/features/rankings/data/rankers";
 
 const KNOWN_RANKER_NAMES = new Set(RANKERS.map((r) => r.name));
 
 /** Nombre de ranker permitido (lista cerrada del roster). */
 export function isKnownRankerName(name: string): boolean {
-  return KNOWN_RANKER_NAMES.has(name);
+  return KNOWN_RANKER_NAMES.has(resolveCanonicalRankerName(name));
 }
 
 export type RankVotePair = {
@@ -26,5 +27,6 @@ export function isValidRankVotePair(round: RankVotePair): boolean {
 
 /** Texto seguro para UI cuando el valor de Firebase no es un ranker conocido. */
 export function safeRankerLabel(name: string, fallback = "Candidato inválido"): string {
-  return isKnownRankerName(name) ? name : fallback;
+  const canonical = resolveCanonicalRankerName(name);
+  return KNOWN_RANKER_NAMES.has(canonical) ? canonical : fallback;
 }

@@ -15,7 +15,7 @@ import { isValidRankVotePair } from "@/features/rankings/lib/ranker-name";
 import { ENTRY_VOTE_MS, VOTE_ROUND_MS } from "@/lib/vote-intervals";
 import { firebaseConfig, isFirebaseConfigured } from "./config";
 import type { Ranker } from "@/features/rankings/data/rankers";
-import type { MoverStack } from "@/features/shared/lib/types";
+import type { MoverStack } from "@/types/looksmax";
 import type { IconName } from "@/types/icons";
 
 export type FirebaseBridge = {

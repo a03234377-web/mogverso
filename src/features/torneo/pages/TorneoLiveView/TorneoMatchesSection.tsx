@@ -1,10 +1,10 @@
 "use client";
 
-import { SectionTitle } from "@/features/shared/components/ui/SectionTitle";
+import { SectionTitle } from "@/components/ui/SectionTitle";
 import { MatchCard } from "./MatchCard";
-import { useCountdown } from "@/features/shared/hooks/useCountdown";
-import { formatDuration } from "@/features/shared/lib/utils";
-import type { TorneoMatch, TorneoState } from "@/features/shared/lib/types";
+import { useCountdown } from "@/hooks/useCountdown";
+import { formatDuration } from "@/lib/time";
+import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 import type { PHASES } from "@/features/torneo/data/torneo-players";
 
 export function TorneoMatchesSection({

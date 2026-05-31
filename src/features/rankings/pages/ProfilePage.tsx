@@ -3,11 +3,11 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import type { Ranker } from "@/features/rankings/data/rankers";
-import { ProfileAvatar } from "@/features/shared/components/Avatar";
+import { ProfileAvatar } from "@/components/Avatar";
 import { Icon } from "@/components/icons";
 import { sectionTitle } from "@/components/layout/header/nav-config";
 import { parseProfileFrom } from "@/features/app/routes";
-import { ActivePage } from "@/features/shared/components/ui/ActivePage";
+import { ActivePage } from "@/components/ui/ActivePage";
 import { useLooksMaxNavigate } from "@/features/app/shell/LooksMaxShell";
 import { cn } from "@/lib/cn";
 

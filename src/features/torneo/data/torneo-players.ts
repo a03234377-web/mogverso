@@ -1,12 +1,13 @@
 import { creatorImage } from "@/assets/creators";
 import { getRankerFallback, getRankerPhoto } from "@/features/rankings/data/avatars";
 import type { FirebaseBridge } from "@/lib/firebase/client";
+import { getNextMadrid23Ms } from "@/lib/spain-time";
 import type {
   TorneoMatch,
   TorneoPhase,
   TorneoPlayer,
   TorneoState,
-} from "@/features/shared/lib/types";
+} from "@/types/looksmax";
 import type { IconName } from "@/types/icons";
 
 function torneoPlayer(name: string, icon: IconName): TorneoPlayer {
@@ -101,14 +102,10 @@ export function getInitialTorneoState(now: number): TorneoState {
 }
 
 function createWaitingTorneoState(now = Date.now()): TorneoState {
-  const target23 = new Date(now);
-  target23.setHours(23, 0, 0, 0);
-  if (now >= target23.getTime()) {
-    target23.setDate(target23.getDate() + 1);
-  }
+  const phaseEnd = getNextMadrid23Ms(now);
   return {
     phase: PHASES.WAITING_OCTAVOS,
-    phaseEnd: target23.getTime(),
+    phaseEnd,
     phaseStart: now,
     nextPhaseLabel: "Cuartos de Final",
     createdAt: now,

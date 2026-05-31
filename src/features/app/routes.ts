@@ -4,7 +4,7 @@ import { rankerProfileSlug } from "@/features/rankings/lib/profile-slug";
 /** Rutas públicas de cada sección (App Router). */
 export const LOOKSMAX_PATHS: Record<Exclude<PageId, "profile">, string> = {
   rankings: "/rankings",
-  rankvote: "/rankvote",
+  rankvote: "/votar-rank",
   torneo: "/torneo",
   noticias: "/noticias",
   consejo: "/consejo",

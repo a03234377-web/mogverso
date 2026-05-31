@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { pad } from "@/features/shared/lib/utils";
+import { pad } from "@/lib/time";
 
 export type CountdownParts = {
   h: string;

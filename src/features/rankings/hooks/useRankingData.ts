@@ -12,7 +12,7 @@ import type {
   RankMovements,
   RankOverrides,
   RankVoteRound,
-} from "@/features/shared/lib/types";
+} from "@/types/looksmax";
 
 type RankingSyncState = {
   overrides: RankOverrides;

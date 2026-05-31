@@ -38,7 +38,7 @@ const CONTESTANT_NAMES = [
   "Voroby",
   "Ryux",
   "Castu",
-  "Foxtef",
+  "foxterGG",
   "Nil Ojeda",
   "Rayan McQuen",
   "Juanki Municio",

@@ -1,8 +1,16 @@
 import type { ReactNode } from "react";
+import { WormBorder, type WormBorderTheme } from "@/components/ui/WormBorder";
 import { cn } from "@/lib/cn";
 
 export type PhaseColor = "orange" | "green" | "purple" | "gold";
 export type PhaseCardVariant = "waiting" | "voting" | "break" | "semifinals";
+
+const TORNEO_WORM_THEMES: Record<PhaseCardVariant, WormBorderTheme> = {
+  waiting: "torneo-waiting",
+  voting: "torneo-voting",
+  break: "torneo-break",
+  semifinals: "torneo-semifinals",
+};
 
 export function PhaseDisplay({ children }: { children: ReactNode }) {
   return <div className="mx-auto mb-8 max-w-[860px] px-5 max-md:px-3">{children}</div>;
@@ -20,16 +28,18 @@ export function PhaseCard({
   id?: string;
 }) {
   return (
-    <div
+    <WormBorder
+      animated
       id={id}
-      className={cn(
-        "relative overflow-hidden rounded-[20px] px-6 py-8 text-center max-md:px-4",
+      theme={TORNEO_WORM_THEMES[variant]}
+      className={className}
+      innerClassName={cn(
+        "relative overflow-hidden px-6 py-8 text-center max-md:px-4",
         `phase-card--${variant}`,
-        className,
       )}
     >
       {children}
-    </div>
+    </WormBorder>
   );
 }
 

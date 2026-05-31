@@ -8,7 +8,7 @@ import {
   getInitialTorneoState,
   PHASES,
 } from "@/features/torneo/data/torneo-players";
-import type { TorneoState } from "@/features/shared/lib/types";
+import type { TorneoState } from "@/types/looksmax";
 
 type TorneoHookState = {
   state: TorneoState | null;

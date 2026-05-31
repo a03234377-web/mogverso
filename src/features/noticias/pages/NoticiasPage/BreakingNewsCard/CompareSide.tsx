@@ -1,5 +1,5 @@
 import type { CreatorPhoto } from "@/assets/creators";
-import { CreatorImage } from "@/features/shared/components/CreatorImage";
+import { CreatorImage } from "@/components/CreatorImage";
 import { CreatorIcon } from "@/components/icons";
 import { cn } from "@/lib/cn";
 

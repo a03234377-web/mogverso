@@ -3,6 +3,7 @@
 import { Icon } from "@/components/icons";
 import { RankerProfileLink } from "@/features/rankings/components/ui/RankerProfileLink";
 import { cn } from "@/lib/cn";
+import { formatSpainDateTimeCompact } from "@/lib/spain-time";
 
 type HistoryEntry = {
   winner: string;
@@ -17,13 +18,7 @@ type HistoryEntry = {
 };
 
 export function HistoryRow({ h }: { h: HistoryEntry }) {
-  const d = new Date(h.ts);
-  const fmt = d.toLocaleDateString("es-ES", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const fmt = formatSpainDateTimeCompact(h.ts);
 
   if (h.winner === "empate") {
     return (
