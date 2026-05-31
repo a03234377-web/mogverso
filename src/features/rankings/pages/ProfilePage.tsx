@@ -12,25 +12,6 @@ type ProfilePageProps = {
   rankPosition: number;
 };
 
-const tagStyles: Record<string, string> = {
-  "ptag-chad":
-    "text-[#ffd166] border-[rgba(255,209,102,0.4)] bg-[rgba(255,209,102,0.08)]",
-  "ptag-appeal":
-    "text-[#c586c0] border-[rgba(197,134,192,0.4)] bg-[rgba(197,134,192,0.08)]",
-  "ptag-new": "text-lm-green2 border-[rgba(46,204,113,0.4)] bg-[rgba(46,204,113,0.08)]",
-  "ptag-cortisol":
-    "text-[#569cd6] border-[rgba(86,156,214,0.4)] bg-[rgba(86,156,214,0.08)]",
-  "ptag-veteran":
-    "text-lm-gold border-[rgba(232,184,75,0.4)] bg-[rgba(232,184,75,0.08)]",
-  "ptag-risers":
-    "text-[#4ec9b0] border-[rgba(78,201,176,0.4)] bg-[rgba(78,201,176,0.08)]",
-  "ptag-score": "text-black bg-lm-gold border-lm-gold font-black",
-  "ptag-creator":
-    "text-lm-orange border-[rgba(249,115,22,0.4)] bg-[rgba(249,115,22,0.08)]",
-  "ptag-humor":
-    "text-[#22d3ee] border-[rgba(34,211,238,0.4)] bg-[rgba(34,211,238,0.08)]",
-};
-
 export function ProfilePage({ ranker, rankPosition }: ProfilePageProps) {
   const { backToRanking } = useLooksMaxNavigate();
 
@@ -98,7 +79,7 @@ export function ProfilePage({ ranker, rankPosition }: ProfilePageProps) {
           </div>
           <div className="mb-3 flex flex-wrap gap-1.5 max-md:justify-center">
             {r.tagNames.map((t, idx) => {
-              const cls =
+              const tagCls =
                 idx === r.tagNames.length - 1
                   ? "ptag-score"
                   : r.tags[idx] || "ptag-appeal";
@@ -107,7 +88,7 @@ export function ProfilePage({ ranker, rankPosition }: ProfilePageProps) {
                   key={t}
                   className={cn(
                     "rounded-full border px-2 py-0.5 text-sm font-bold tracking-[0.8px]",
-                    tagStyles[cls],
+                    tagCls,
                   )}
                 >
                   {t}

@@ -13,41 +13,13 @@ type RankRowProps = {
   onOpenProfile: (name: string, rank: number) => void;
 };
 
-const rankNumStyles: Record<string, string> = {
-  n1: "bg-[linear-gradient(135deg,#d4a843,#ffd166)] text-black",
-  n2: "bg-[linear-gradient(135deg,#aaa,#e8e8e8)] text-black",
-  n3: "bg-[linear-gradient(135deg,#b46428,#e07840)] text-white",
-  rest: "border border-lm-border bg-lm-bg3 text-lm-text2",
-};
-
-const topRowAfterBar = cn(
-  "after:absolute after:bottom-0 after:left-0 after:top-0 after:w-[3px]",
-  "after:rounded-l-xl after:content-['']",
-);
-
-const topRowStyles: Record<string, string> = {
-  top1: cn(
-    "border-[rgba(232,184,75,0.45)]",
-    topRowAfterBar,
-    "after:bg-[linear-gradient(180deg,var(--color-lm-gold2),var(--color-lm-gold))]",
-  ),
-  top2: cn(
-    "border-[rgba(180,180,180,0.3)]",
-    topRowAfterBar,
-    "after:bg-[linear-gradient(180deg,#e8e8e8,#aaa)]",
-  ),
-  top3: cn(
-    "border-[rgba(180,100,40,0.3)]",
-    topRowAfterBar,
-    "after:bg-[linear-gradient(180deg,#e07840,#b46428)]",
-  ),
-};
+const RANK_NUM_CLASS = ["rank-num--1", "rank-num--2", "rank-num--3", "rank-num--rest"] as const;
+const TOP_ROW_CLASS = ["rank-row--top1", "rank-row--top2", "rank-row--top3"] as const;
 
 export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
   const { ranker, rank, movement } = entry;
-  const nc = index === 0 ? "n1" : index === 1 ? "n2" : index === 2 ? "n3" : "rest";
-  const topClass =
-    index === 0 ? "top1" : index === 1 ? "top2" : index === 2 ? "top3" : "";
+  const rankNumClass = RANK_NUM_CLASS[Math.min(index, 3)];
+  const topRowClass = index < 3 ? TOP_ROW_CLASS[index] : undefined;
 
   let movBadge: ReactNode | null = null;
   if (movement) {
@@ -90,7 +62,7 @@ export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
         "hover:translate-x-1 hover:border-lm-border2 hover:bg-lm-card2",
         "max-md:gap-2.5 max-md:px-3.5 max-md:hover:translate-x-0",
         "max-md:active:scale-[0.99] max-md:active:border-lm-border2 max-md:active:bg-lm-card2",
-        topClass && topRowStyles[topClass],
+        topRowClass,
       )}
       style={{ animationDelay: `${index * 0.05}s` }}
       onClick={() => onOpenProfile(ranker.name, rank - 1)}
@@ -98,7 +70,7 @@ export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
       <div
         className={cn(
           "flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] lm-type-score text-[1.05rem]",
-          rankNumStyles[nc],
+          rankNumClass,
         )}
       >
         {rank}

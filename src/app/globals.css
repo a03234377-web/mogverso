@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./variants.css";
 
 @theme inline {
   --font-sans: var(--font-syne);

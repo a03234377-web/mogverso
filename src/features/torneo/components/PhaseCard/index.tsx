@@ -1,17 +1,8 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import {
-  cardVariants,
-  dotColors,
-  labelColors,
-  timerNumStyles,
-  timerSepColors,
-  titleGradients,
-  type PhaseCardVariant,
-  type PhaseColor,
-} from "./phase-card-styles";
 
-export type { PhaseCardVariant, PhaseColor };
+export type PhaseColor = "orange" | "green" | "purple" | "gold";
+export type PhaseCardVariant = "waiting" | "voting" | "break" | "semifinals";
 
 export function PhaseDisplay({ children }: { children: ReactNode }) {
   return <div className="mx-auto mb-8 max-w-[860px] px-5 max-md:px-3">{children}</div>;
@@ -33,7 +24,7 @@ export function PhaseCard({
       id={id}
       className={cn(
         "relative overflow-hidden rounded-[20px] px-6 py-8 text-center max-md:px-4",
-        cardVariants[variant],
+        `phase-card--${variant}`,
         className,
       )}
     >
@@ -55,16 +46,16 @@ export function PhaseLabel({
     <div
       className={cn(
         "mb-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 lm-type-label max-md:text-sm",
-        labelColors[color],
+        `phase-color--${color}`,
       )}
     >
       <span
-        className={cn("h-2 w-2 animate-pulse-soft rounded-full", dotColors[color])}
+        className={cn("h-2 w-2 animate-pulse-soft rounded-full", `phase-dot--${color}`)}
         style={pulse ? { animation: "pulse 0.8s infinite" } : undefined}
       />
       {children}
       <span
-        className={cn("h-2 w-2 animate-pulse-soft rounded-full", dotColors[color])}
+        className={cn("h-2 w-2 animate-pulse-soft rounded-full", `phase-dot--${color}`)}
       />
     </div>
   );
@@ -83,7 +74,7 @@ export function PhaseTitle({
     <div
       className={cn(
         "mb-1 font-display text-[clamp(1.8rem,5vw,4rem)] tracking-[3px]",
-        titleGradients[color],
+        `phase-title--${color}`,
         className,
       )}
     >
@@ -123,7 +114,7 @@ export function PhaseTimer({
       <div
         className={cn(
           "mb-3 animate-blink font-sans text-2xl font-bold opacity-50 max-md:text-xl",
-          timerSepColors[color],
+          `phase-timer-sep--${color}`,
         )}
       >
         :
@@ -132,7 +123,7 @@ export function PhaseTimer({
       <div
         className={cn(
           "mb-3 animate-blink font-sans text-2xl font-bold opacity-50 max-md:text-xl",
-          timerSepColors[color],
+          `phase-timer-sep--${color}`,
         )}
       >
         :
@@ -157,7 +148,7 @@ function TimerUnit({
         className={cn(
           "min-w-[65px] rounded-xl px-2 py-0.5 text-center lm-type-score",
           "text-[clamp(1.75rem,5vw,3.25rem)] max-md:min-w-12 max-md:text-[clamp(1.35rem,5vw,2.25rem)]",
-          timerNumStyles[color],
+          `phase-timer-num--${color}`,
         )}
       >
         {value}

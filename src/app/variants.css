@@ -1,0 +1,397 @@
+/* Variantes semánticas — editar aquí; en JSX solo clases base + modificador */
+
+/* ── Perfil: tags de ranker ── */
+.ptag-chad {
+  color: #ffd166;
+  border-color: rgba(255, 209, 102, 0.4);
+  background-color: rgba(255, 209, 102, 0.08);
+}
+
+.ptag-appeal {
+  color: #c586c0;
+  border-color: rgba(197, 134, 192, 0.4);
+  background-color: rgba(197, 134, 192, 0.08);
+}
+
+.ptag-new {
+  color: var(--color-lm-green2);
+  border-color: rgba(46, 204, 113, 0.4);
+  background-color: rgba(46, 204, 113, 0.08);
+}
+
+.ptag-cortisol {
+  color: #569cd6;
+  border-color: rgba(86, 156, 214, 0.4);
+  background-color: rgba(86, 156, 214, 0.08);
+}
+
+.ptag-veteran {
+  color: var(--color-lm-gold);
+  border-color: rgba(232, 184, 75, 0.4);
+  background-color: rgba(232, 184, 75, 0.08);
+}
+
+.ptag-risers {
+  color: #4ec9b0;
+  border-color: rgba(78, 201, 176, 0.4);
+  background-color: rgba(78, 201, 176, 0.08);
+}
+
+.ptag-score {
+  color: black;
+  background-color: var(--color-lm-gold);
+  border-color: var(--color-lm-gold);
+  font-weight: 900;
+}
+
+.ptag-creator {
+  color: var(--color-lm-orange);
+  border-color: rgba(249, 115, 22, 0.4);
+  background-color: rgba(249, 115, 22, 0.08);
+}
+
+.ptag-humor {
+  color: #22d3ee;
+  border-color: rgba(34, 211, 238, 0.4);
+  background-color: rgba(34, 211, 238, 0.08);
+}
+
+/* ── Ranking: fila y badge de posición ── */
+.rank-num--1 {
+  background: linear-gradient(135deg, #d4a843, #ffd166);
+  color: black;
+}
+
+.rank-num--2 {
+  background: linear-gradient(135deg, #aaa, #e8e8e8);
+  color: black;
+}
+
+.rank-num--3 {
+  background: linear-gradient(135deg, #b46428, #e07840);
+  color: white;
+}
+
+.rank-num--rest {
+  border: 1px solid var(--color-lm-border);
+  background-color: var(--color-lm-bg3);
+  color: var(--color-lm-text2);
+}
+
+.rank-row--top1,
+.rank-row--top2,
+.rank-row--top3 {
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    top: 0;
+    width: 3px;
+    border-radius: 0.75rem 0 0 0.75rem;
+  }
+}
+
+.rank-row--top1 {
+  border-color: rgba(232, 184, 75, 0.45);
+
+  &::after {
+    background: linear-gradient(180deg, var(--color-lm-gold2), var(--color-lm-gold));
+  }
+}
+
+.rank-row--top2 {
+  border-color: rgba(180, 180, 180, 0.3);
+
+  &::after {
+    background: linear-gradient(180deg, #e8e8e8, #aaa);
+  }
+}
+
+.rank-row--top3 {
+  border-color: rgba(180, 100, 40, 0.3);
+
+  &::after {
+    background: linear-gradient(180deg, #e07840, #b46428);
+  }
+}
+
+/* ── Countdown digits ── */
+.cd-box {
+  font-family: var(--font-syne), sans-serif;
+  font-variant-numeric: tabular-nums;
+  padding: 0.125rem 0.5rem;
+  text-align: center;
+}
+
+.cd-box--gold {
+  min-width: 55px;
+  border-radius: 10px;
+  border: 1px solid var(--color-lm-border);
+  background-color: rgba(232, 184, 75, 0.08);
+}
+
+.cd-box--purple {
+  min-width: 45px;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  background-color: rgba(168, 85, 247, 0.1);
+}
+
+.cd-box--green {
+  min-width: 44px;
+  border-radius: 7px;
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  background-color: rgba(46, 204, 113, 0.1);
+  padding-inline: 0.375rem;
+}
+
+@media (max-width: 768px) {
+  .cd-box--gold {
+    min-width: 44px;
+  }
+
+  .cd-box--purple,
+  .cd-box--green {
+    min-width: 38px;
+  }
+}
+
+.cd-text--gold {
+  background: linear-gradient(180deg, var(--color-lm-gold2), var(--color-lm-gold));
+  background-clip: text;
+  font-weight: 700;
+  color: transparent;
+  font-size: clamp(1.6rem, 4.5vw, 3.5rem);
+}
+
+.cd-text--purple {
+  font-size: clamp(1.35rem, 4vw, 2.25rem);
+  font-weight: 700;
+  color: var(--color-lm-purple);
+}
+
+.cd-text--green {
+  font-size: clamp(1.25rem, 4vw, 2rem);
+  font-weight: 700;
+  color: var(--color-lm-green2);
+}
+
+@media (max-width: 768px) {
+  .cd-text--gold {
+    font-size: clamp(1.35rem, 4vw, 2rem);
+  }
+
+  .cd-text--purple {
+    font-size: clamp(1.15rem, 4vw, 1.75rem);
+  }
+
+  .cd-text--green {
+    font-size: clamp(1.1rem, 4vw, 1.65rem);
+  }
+}
+
+.cd-sep--gold {
+  margin-bottom: 0.75rem;
+  font-family: var(--font-syne), sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-lm-gold);
+  opacity: 0.4;
+  animation: blink 1s step-end infinite;
+}
+
+.cd-sep--purple {
+  margin-bottom: 0.625rem;
+  font-family: var(--font-syne), sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-lm-purple);
+  opacity: 0.5;
+  animation: blink 1s step-end infinite;
+}
+
+.cd-sep--green {
+  margin-bottom: 0.5rem;
+  font-family: var(--font-syne), sans-serif;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-lm-green2);
+  opacity: 0.5;
+  animation: blink 1s step-end infinite;
+}
+
+@media (max-width: 768px) {
+  .cd-sep--gold {
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+  }
+}
+
+/* ── Torneo: phase card ── */
+.phase-card--waiting {
+  border: 2px solid rgba(255, 107, 53, 0.5);
+  background: linear-gradient(
+    135deg,
+    rgba(232, 184, 75, 0.1),
+    rgba(255, 107, 53, 0.06)
+  );
+}
+
+.phase-card--voting {
+  border: 2px solid rgba(46, 204, 113, 0.5);
+  background: linear-gradient(
+    135deg,
+    rgba(46, 204, 113, 0.1),
+    rgba(59, 130, 246, 0.06)
+  );
+}
+
+.phase-card--break {
+  border: 2px solid rgba(168, 85, 247, 0.4);
+  background: linear-gradient(
+    135deg,
+    rgba(168, 85, 247, 0.1),
+    rgba(232, 184, 75, 0.05)
+  );
+}
+
+.phase-card--semifinals {
+  border: 2px solid rgba(232, 184, 75, 0.5);
+  background: linear-gradient(
+    135deg,
+    rgba(232, 184, 75, 0.12),
+    rgba(255, 107, 53, 0.05)
+  );
+}
+
+.phase-color--orange {
+  color: #ff6b35;
+}
+
+.phase-color--green {
+  color: var(--color-lm-green2);
+}
+
+.phase-color--purple {
+  color: var(--color-lm-purple);
+}
+
+.phase-color--gold {
+  color: var(--color-lm-gold);
+}
+
+.phase-dot--orange {
+  background-color: #ff6b35;
+}
+
+.phase-dot--green {
+  background-color: var(--color-lm-green2);
+}
+
+.phase-dot--purple {
+  background-color: var(--color-lm-purple);
+}
+
+.phase-dot--gold {
+  background-color: var(--color-lm-gold);
+}
+
+.phase-title--orange {
+  background: linear-gradient(135deg, #fff, #ff9f5b, #ff6b35);
+  background-clip: text;
+  color: transparent;
+}
+
+.phase-title--green {
+  background: linear-gradient(135deg, #fff, var(--color-lm-green2));
+  background-clip: text;
+  color: transparent;
+}
+
+.phase-title--purple {
+  background: linear-gradient(135deg, #fff, #c084fc, var(--color-lm-purple));
+  background-clip: text;
+  color: transparent;
+}
+
+.phase-title--gold {
+  background: linear-gradient(135deg, #fff, var(--color-lm-gold2), var(--color-lm-gold));
+  background-clip: text;
+  color: transparent;
+}
+
+.phase-timer-num--orange {
+  color: #ff6b35;
+  border: 1px solid rgba(255, 107, 53, 0.3);
+  background-color: rgba(255, 107, 53, 0.12);
+}
+
+.phase-timer-num--green {
+  color: var(--color-lm-green2);
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  background-color: rgba(46, 204, 113, 0.12);
+}
+
+.phase-timer-num--purple {
+  color: var(--color-lm-purple);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  background-color: rgba(168, 85, 247, 0.12);
+}
+
+.phase-timer-num--gold {
+  color: var(--color-lm-gold2);
+  border: 1px solid rgba(232, 184, 75, 0.3);
+  background-color: rgba(232, 184, 75, 0.12);
+}
+
+.phase-timer-sep--orange {
+  color: #ff6b35;
+}
+
+.phase-timer-sep--green {
+  color: var(--color-lm-green2);
+}
+
+.phase-timer-sep--purple {
+  color: var(--color-lm-purple);
+}
+
+.phase-timer-sep--gold {
+  color: var(--color-lm-gold);
+}
+
+/* ── Consejo: categoría ── */
+.consejo-cat--nutricion {
+  color: #4ec9b0;
+}
+
+.consejo-cat--estilo,
+.consejo-cat--destacado {
+  color: var(--color-lm-gold);
+}
+
+.consejo-cat--gym {
+  color: #ce9178;
+}
+
+.consejo-cat--mente {
+  color: #569cd6;
+}
+
+/* ── Noticias: categoría ── */
+.noticia-cat--ranking {
+  color: var(--color-lm-gold);
+}
+
+.noticia-cat--drama {
+  color: var(--color-lm-red2);
+}
+
+.noticia-cat--ascension {
+  color: var(--color-lm-green2);
+}
+
+.noticia-cat--comunidad {
+  color: var(--color-lm-purple);
+}

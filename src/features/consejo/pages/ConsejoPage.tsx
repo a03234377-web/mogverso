@@ -84,14 +84,6 @@ export function ConsejoPage() {
   );
 }
 
-const consejoCatColors: Record<string, string> = {
-  nutricion: "text-[#4ec9b0]",
-  estilo: "text-lm-gold",
-  gym: "text-[#ce9178]",
-  mente: "text-[#569cd6]",
-  destacado: "text-lm-gold",
-};
-
 function ConsejoCard({
   cat,
   catIcon,
@@ -117,7 +109,7 @@ function ConsejoCard({
       <div
         className={cn(
           "mb-1.5 flex items-center gap-1 text-sm font-bold tracking-wide uppercase",
-          consejoCatColors[cat] ?? "text-lm-text2",
+          `consejo-cat--${cat}`,
         )}
       >
         <Icon name={catIcon} size={12} />
