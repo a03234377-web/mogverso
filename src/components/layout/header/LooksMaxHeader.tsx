@@ -96,7 +96,7 @@ export function LooksMaxHeader({ page, onOpenDiscord }: LooksMaxHeaderProps) {
           id="desktopTabs"
           aria-label="Secciones"
         >
-          <div className="scrollbar-none flex w-full max-w-full items-center gap-0.5 overflow-x-auto rounded-full border border-lm-border bg-lm-bg2/90 p-0.5 md:p-1">
+          <div className="scrollbar-none flex w-fit max-w-full items-center gap-0.5 overflow-x-auto rounded-full border border-lm-border bg-lm-bg2/90 p-0.5 max-lg:w-full md:p-1">
             {DESKTOP_TABS.map((tab) => {
               const active = page === tab.id;
               return (
