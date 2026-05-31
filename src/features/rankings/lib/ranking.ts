@@ -65,6 +65,35 @@ export function prependMoverStack(
   );
 }
 
+/** Mapa nombre → movimiento más reciente dentro de las pilas (máx. 5 por dirección). */
+export function buildMovementMapFromStacks(stacks?: {
+  up?: MoverStack | null;
+  down?: MoverStack | null;
+}): Map<string, RankMovement> {
+  const map = new Map<string, RankMovement>();
+  const entries: Array<{
+    name: string;
+    dir: RankMovement["dir"];
+    delta: number;
+    ts: number;
+  }> = [
+    ...parseMoverStack(stacks?.up ?? null).map((e) => ({ ...e, dir: "up" as const })),
+    ...parseMoverStack(stacks?.down ?? null).map((e) => ({
+      ...e,
+      dir: "down" as const,
+    })),
+  ];
+
+  for (const e of entries) {
+    const existing = map.get(e.name);
+    if (!existing || e.ts > existing.ts) {
+      map.set(e.name, { dir: e.dir, delta: e.delta, ts: e.ts });
+    }
+  }
+
+  return map;
+}
+
 /** Extrae movers desde pilas; si no hay pilas, usa rankMovements legacy. */
 export function computeMovers(
   rankedNames: string[],
@@ -119,17 +148,31 @@ export function buildRankedList(
   overrides: RankOverrides,
   movements: RankMovements | null | undefined,
   rankers: Ranker[] = RANKERS,
+  stacks?: {
+    up?: MoverStack | null;
+    down?: MoverStack | null;
+  },
   windowMs = MOVER_WINDOW_MS,
   now = Date.now(),
 ): RankedEntry[] {
   const rankedNames = getRankedNamesFromOverrides(overrides, rankers);
   const cutoff = now - windowMs;
+  const upFromStack = parseMoverStack(stacks?.up ?? null);
+  const downFromStack = parseMoverStack(stacks?.down ?? null);
+  const useStacks = upFromStack.length > 0 || downFromStack.length > 0;
+  const stackMovements = useStacks ? buildMovementMapFromStacks(stacks) : null;
 
   return rankedNames.flatMap((name, i) => {
     const ranker = rankers.find((r) => r.name === name);
     if (!ranker) return [];
-    const mov = movements?.[name];
-    const movement = mov && mov.ts > cutoff && mov.delta > 0 ? mov : null;
+    let movement: RankMovement | null = null;
+    if (stackMovements) {
+      const fromStack = stackMovements.get(name);
+      movement = fromStack && fromStack.delta > 0 ? fromStack : null;
+    } else {
+      const mov = movements?.[name];
+      movement = mov && mov.ts > cutoff && mov.delta > 0 ? mov : null;
+    }
     return [
       {
         name,
