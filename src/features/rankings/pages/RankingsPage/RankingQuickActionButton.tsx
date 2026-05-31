@@ -149,13 +149,6 @@ export function RankingQuickActionButton({
         </span>
         <span className="lm-quick-action-label relative inline-block">
           <span className="lm-quick-action-label-text block">{label}</span>
-          <span
-            aria-hidden
-            className={cn(
-              "lm-quick-action-label-line absolute -bottom-0.5 left-1/2 h-0.5 w-0",
-              "-translate-x-1/2 rounded-full bg-black/35",
-            )}
-          />
         </span>
       </span>
     </button>

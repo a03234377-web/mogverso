@@ -19,9 +19,27 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=...
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
 NEXT_PUBLIC_FIREBASE_APP_ID=...
 NEXT_PUBLIC_SITE_URL=https://tu-dominio.vercel.app
+
+# Server-only (Vercel — sin NEXT_PUBLIC_)
+FIREBASE_SERVICE_ACCOUNT_JSON={"type":"service_account",...}
+RECAPTCHA_SECRET_KEY=...
+ADMIN_SECRET=...
+CRON_SECRET=...
 ```
 
-Opcionales: `NEXT_PUBLIC_ADSENSE_CLIENT`, `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`.
+Opcionales: `NEXT_PUBLIC_ADSENSE_CLIENT`, `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`.
+
+## Vercel Cron
+
+`vercel.json` define tres tareas:
+
+| Ruta | Frecuencia |
+| :--- | :--- |
+| `/api/cron/rankvote-resolve` | Cada 5 min |
+| `/api/cron/entry-vote` | Cada 10 min |
+| `/api/cron/torneo-advance` | Cada 5 min |
+
+Define **`CRON_SECRET`** en Vercel. El scheduler envía `Authorization: Bearer <CRON_SECRET>`; el middleware rechaza peticiones sin ese valor. Los crons resuelven rondas aunque no haya visitantes.
 
 ## Dominio personalizado
 
@@ -29,24 +47,26 @@ En Vercel → **Settings → Domains**, añade tu dominio y actualiza `NEXT_PUBL
 
 ## Build
 
-El comando por defecto es `pnpm run build`. La configuración en `vercel.json` documenta `pnpm install` y el build; Vercel detecta `pnpm-lock.yaml` automáticamente.
+El comando por defecto es `pnpm run build`. Vercel detecta `pnpm-lock.yaml` automáticamente.
 
 ## Vercel Analytics y Speed Insights
 
-La app incluye `@vercel/analytics` y `@vercel/speed-insights` en el layout raíz. Tras el deploy:
+La app incluye `@vercel/analytics` y `@vercel/speed-insights` en el layout raíz. Tras el deploy, activa ambos en el dashboard de Vercel.
 
-1. En el dashboard de Vercel, activa **Web Analytics** y **Speed Insights** para el proyecto.
-2. Visita la URL de producción para registrar el primer evento (Vercel lo requiere para dejar de mostrar "Get Started").
+## Seguridad en producción
 
-No hace falta variable de entorno adicional en código.
+Checklist operativo con prioridades y ventajas de cada paso: **`docs/pasos-pendientes.md`**.
 
-## Notas
-
-- No subas `.env.local` al repositorio.
-- Configura **reglas RTDB** en Firebase Console → Realtime Database → Rules (lectura pública, escritura solo en contadores de voto y recibos `*Votes`; bloquea `rankOverrides` y `torneo/state` desde el cliente). Ajusta antes de producción; la resolución de rondas y el torneo requieren privilegios de admin o backend.
+- **No** subas `.env.local` al repositorio.
+- Configura **reglas RTDB** en Firebase Console (lectura pública en datos de juego; **escritura cliente denegada**). Votos, heal y admin usan Route Handlers + Firebase Admin SDK.
+- Restringe la API key de Firebase por HTTP referrer (dominio producción + localhost dev).
+- Define `ADMIN_SECRET` fuerte; init/reset torneo solo vía `POST /api/admin/torneo/*` con ese header.
+- Define `CRON_SECRET` para `/api/cron/*`; sin él los crons responden 401.
+- Los hooks usan **Server Actions**; las rutas `/api/vote/*` y `/api/heal/*` siguen disponibles como alternativa HTTP.
+- Opcional: Upstash Redis para rate limiting distribuido en votos y heal on-demand.
 
 ## Firebase rules
 
-1. Publica reglas restrictivas en la consola (no dejes la base sin rules).
-2. Revisa que las rutas coincidan con las que usa `src/lib/firebase/client.ts`.
-3. Para votación robusta, planifica Route Handlers en Next.js además de reglas estrictas.
+1. Publica reglas restrictivas en la consola (no en el repo).
+2. Verifica que coincidan con las rutas en `src/lib/firebase/server-*.ts`.
+3. El cliente solo lee RTDB; toda escritura pasa por `/api/vote/*`, `/api/heal/*` o `/api/admin/*`.

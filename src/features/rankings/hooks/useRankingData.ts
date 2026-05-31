@@ -7,6 +7,7 @@ import {
   computeMovers,
   getRankedNamesFromOverrides,
 } from "@/features/rankings/lib/ranking";
+import { healRankvoteApi } from "@/lib/api/vote-client";
 import type {
   MoverStack,
   RankMovements,
@@ -66,33 +67,30 @@ export function useRankingData() {
   const { fb, ready } = useFirebase();
   const [syncState, dispatch] = useReducer(rankingSyncReducer, initialRankingSyncState);
   const healInFlightRef = useRef(false);
+  const lastHealRef = useRef(0);
 
-  const healRankVoteRound = useCallback(
-    async (rv?: RankVoteRound) => {
-      if (!fb || healInFlightRef.current) return;
-      healInFlightRef.current = true;
-      try {
-        const now = Date.now();
-        if (rv && !rv.resolved && rv.endTime <= now) {
-          await fb.resolveRVIfNeeded(rv as Record<string, unknown>);
-        } else {
-          await fb.ensureRVExists();
-        }
-      } catch (err) {
-        console.error("[LooksMax] heal rankvote round:", err);
-      } finally {
-        healInFlightRef.current = false;
-      }
-    },
-    [fb],
-  );
+  const healRankVoteRound = useCallback(async (rv?: RankVoteRound) => {
+    if (healInFlightRef.current) return;
+    const now = Date.now();
+    if (now - lastHealRef.current < 2000) return;
+    lastHealRef.current = now;
+    healInFlightRef.current = true;
+    try {
+      void rv;
+      await healRankvoteApi();
+    } catch (err) {
+      console.error("[LooksMax] heal rankvote round:", err);
+    } finally {
+      healInFlightRef.current = false;
+    }
+  }, []);
 
   useEffect(() => {
     if (!fb) return;
     const { db, ref, onValue } = fb;
 
-    void fb.ensureRVExists().catch((err) => {
-      console.error("[LooksMax] ensureRVExists (rankings):", err);
+    void healRankvoteApi().catch((err) => {
+      console.error("[LooksMax] heal rankvote (rankings):", err);
     });
 
     const unsubO = onValue(ref(db, "rankOverrides"), (snap) => {

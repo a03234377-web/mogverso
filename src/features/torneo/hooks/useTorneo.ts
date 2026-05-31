@@ -5,9 +5,10 @@ import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import {
   advanceTorneoPhaseIfNeeded,
   ensureTorneoState,
-  getInitialTorneoState,
-  PHASES,
-} from "@/features/torneo/data/torneo-players";
+} from "@/features/torneo/data/torneo-client";
+import { PHASES } from "@/features/torneo/data/torneo-players";
+import { healTorneoApi, voteTorneoApi } from "@/lib/api/vote-client";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
 import type { TorneoState } from "@/types/looksmax";
 
 type TorneoHookState = {
@@ -43,6 +44,7 @@ function torneoHookReducer(
 
 export function useTorneo(active: boolean) {
   const { fb } = useFirebase();
+  const { getToken } = useRecaptcha("torneo_vote");
   const [{ state, loading }, dispatch] = useReducer(
     torneoHookReducer,
     initialTorneoHookState,
@@ -103,17 +105,23 @@ export function useTorneo(active: boolean) {
 
   const vote = useCallback(
     async (matchId: string, playerName: string) => {
-      if (!fb) return { ok: false, reason: "no_fb" };
-      return fb.castTorneoVote(matchId, playerName);
+      const token = await getToken();
+      const result = await voteTorneoApi(matchId, playerName, token);
+      if (!result.ok) {
+        return { ok: false, reason: result.reason ?? result.error ?? "vote_failed" };
+      }
+      return { ok: true };
     },
-    [fb],
+    [getToken],
   );
 
   const resetTorneo = useCallback(async () => {
+    await healTorneoApi({ restartIfEnded: true });
     if (!fb) return;
-    const fresh = getInitialTorneoState(Date.now());
-    await fb.initTorneoState(fresh as Record<string, unknown>);
-    dispatch({ type: "set", payload: fresh });
+    const snap = await fb.get(fb.ref(fb.db, "torneo/state"));
+    if (snap.exists()) {
+      dispatch({ type: "set", payload: snap.val() as TorneoState });
+    }
   }, [fb]);
 
   const getTorneoVoteKey = useCallback(
