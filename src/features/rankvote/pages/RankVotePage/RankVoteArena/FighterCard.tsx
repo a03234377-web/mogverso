@@ -106,9 +106,7 @@ export function FighterCard({
       >
         {name}
       </div>
-      <div className="mb-1 text-base font-semibold text-lm-text2">
-        {ranker.sub}
-      </div>
+      <div className="mb-1 text-base font-semibold text-lm-text2">{ranker.sub}</div>
       <div className="mb-2 font-sans text-base font-semibold text-lm-gold">
         Puesto #{idx} · Score {ranker.score}
       </div>

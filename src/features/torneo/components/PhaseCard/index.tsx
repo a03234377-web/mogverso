@@ -101,7 +101,12 @@ export function PhaseSub({
   className?: string;
 }) {
   return (
-    <div className={cn("mb-5 text-center text-base font-semibold leading-snug text-lm-text2", className)}>
+    <div
+      className={cn(
+        "mb-5 text-center text-base leading-snug font-semibold text-lm-text2",
+        className,
+      )}
+    >
       {children}
     </div>
   );

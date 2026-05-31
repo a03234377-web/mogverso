@@ -46,7 +46,11 @@ export function TorneoPhaseCard({
         <PhaseCard variant="waiting">
           <PhaseLabel color="orange">CARGANDO TORNEO</PhaseLabel>
           <PhaseTitle color="orange">
-            <Icon name="hourglass" size={18} className="mr-1.5 inline shrink-0 align-middle" />
+            <Icon
+              name="hourglass"
+              size={18}
+              className="mr-1.5 inline shrink-0 align-middle"
+            />
             Conectando…
           </PhaseTitle>
           <PhaseSub className="mb-0">Por favor espera</PhaseSub>
@@ -65,7 +69,11 @@ export function TorneoPhaseCard({
         <PhaseCard variant="voting">
           <PhaseLabel color="green">CUARTOS EN VIVO · VOTA AHORA</PhaseLabel>
           <PhaseTitle color="green">
-            <Icon name="landmark" size={18} className="mr-1.5 inline shrink-0 align-middle" />
+            <Icon
+              name="landmark"
+              size={18}
+              className="mr-1.5 inline shrink-0 align-middle"
+            />
             CUARTOS DE FINAL
           </PhaseTitle>
           <PhaseSub>
@@ -83,12 +91,20 @@ export function TorneoPhaseCard({
         <PhaseCard variant="voting">
           <PhaseLabel color="gold">
             <span>
-              <Icon name="zap" size={14} className="mr-1 inline shrink-0 align-middle" />
+              <Icon
+                name="zap"
+                size={14}
+                className="mr-1 inline shrink-0 align-middle"
+              />
               SEMIFINALES EN VIVO · VOTA AHORA
             </span>
           </PhaseLabel>
           <PhaseTitle color="gold">
-            <Icon name="trophy" size={18} className="mr-1.5 inline shrink-0 align-middle" />
+            <Icon
+              name="trophy"
+              size={18}
+              className="mr-1.5 inline shrink-0 align-middle"
+            />
             SEMIFINALES
           </PhaseTitle>
           <PhaseSub>
@@ -106,7 +122,11 @@ export function TorneoPhaseCard({
         <PhaseCard variant="break">
           <PhaseLabel color="purple">DESCANSO ANTES DE LA GRAN FINAL</PhaseLabel>
           <PhaseTitle color="purple">
-            <Icon name="crown" size={18} className="mr-1.5 inline shrink-0 align-middle" />
+            <Icon
+              name="crown"
+              size={18}
+              className="mr-1.5 inline shrink-0 align-middle"
+            />
             FINAL EN
           </PhaseTitle>
           <PhaseSub>
@@ -124,7 +144,11 @@ export function TorneoPhaseCard({
         <PhaseCard variant="semifinals">
           <PhaseLabel color="gold" pulse>
             <span>
-              <Icon name="crown" size={14} className="mr-1 inline shrink-0 align-middle" />
+              <Icon
+                name="crown"
+                size={14}
+                className="mr-1 inline shrink-0 align-middle"
+              />
               GRAN FINAL EN VIVO
             </span>
           </PhaseLabel>
