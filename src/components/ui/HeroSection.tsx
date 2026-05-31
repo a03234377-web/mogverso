@@ -10,6 +10,12 @@ type HeroSectionProps = {
   className?: string;
 };
 
+/** Torneo y rank vote: mismo peso visual (+2px vs tamaño rankvote previo). */
+const FEATURE_HERO_TITLE = cn(
+  "font-sans font-bold tracking-tight",
+  "text-[clamp(1.875rem,6.2vw,3.375rem)]",
+);
+
 export function HeroSection({
   eyebrow,
   title,
@@ -47,16 +53,8 @@ export function HeroSection({
               "hero-title--default animate-hero-entrance font-display tracking-[4px]",
               "text-[clamp(2.4rem,8vw,9rem)]",
             ),
-          variant === "torneo" &&
-            cn(
-              "hero-title--torneo font-display tracking-[4px]",
-              "text-[clamp(2.4rem,9vw,8rem)]",
-            ),
-          variant === "rankvote" &&
-            cn(
-              "hero-title--rankvote font-sans font-bold tracking-tight",
-              "text-[clamp(1.75rem,6vw,3.25rem)]",
-            ),
+          variant === "torneo" && cn("hero-title--torneo", FEATURE_HERO_TITLE),
+          variant === "rankvote" && cn("hero-title--rankvote", FEATURE_HERO_TITLE),
         )}
       >
         {title}
@@ -67,8 +65,10 @@ export function HeroSection({
           className={cn(
             "mt-2 font-sans font-semibold tracking-wide text-lm-text2 uppercase",
             variant === "default" && "text-[clamp(0.85rem,1.8vw,1.25rem)]",
-            variant === "torneo" && "text-[clamp(0.72rem,2.5vw,0.8rem)] max-md:px-2",
-            variant === "rankvote" && "text-[clamp(0.68rem,2.5vw,0.78rem)] max-md:px-2",
+            variant === "torneo" &&
+              "text-base leading-relaxed max-md:px-2 max-md:normal-case",
+            variant === "rankvote" &&
+              "text-base leading-relaxed max-md:px-2 max-md:normal-case",
           )}
         >
           {subtitle}

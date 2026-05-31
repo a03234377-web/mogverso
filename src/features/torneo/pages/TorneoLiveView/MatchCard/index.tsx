@@ -52,7 +52,7 @@ export function MatchCard({
       data-matchid={match.id}
     >
       <div className="mb-3 flex items-center justify-between">
-        <span className="flex items-center gap-1 lm-type-label text-lm-text2">
+        <span className="flex items-center gap-1 lm-type-label text-lm-text2 max-md:text-base">
           <Icon name={roundIcon} size={12} />
           {roundLabel} · Partido {idx + 1}
         </span>
@@ -60,7 +60,7 @@ export function MatchCard({
           <span
             className={cn(
               "flex items-center gap-1 rounded-full border border-[rgba(232,184,75,0.4)]",
-              "bg-[rgba(232,184,75,0.15)] px-2 py-0.5 text-sm font-black tracking-wide text-lm-gold",
+              "bg-[rgba(232,184,75,0.15)] px-2 py-0.5 text-sm font-black tracking-wide text-lm-gold max-md:text-base",
             )}
           >
             <Icon name="circle-check" size={12} />
@@ -70,7 +70,7 @@ export function MatchCard({
           <span
             className={cn(
               "flex items-center gap-1 rounded-full border border-[rgba(46,204,113,0.4)]",
-              "bg-[rgba(46,204,113,0.15)] px-2 py-0.5 text-sm font-black tracking-wide text-lm-green2",
+              "bg-[rgba(46,204,113,0.15)] px-2 py-0.5 text-sm font-black tracking-wide text-lm-green2 max-md:text-base",
             )}
           >
             <Icon name="radio" size={12} className="text-lm-red2" />
@@ -80,7 +80,7 @@ export function MatchCard({
           <span
             className={cn(
               "flex items-center gap-1 rounded-full border border-lm-border",
-              "bg-[rgba(150,150,150,0.1)] px-2 py-0.5 text-sm font-black tracking-wide text-lm-text2",
+              "bg-[rgba(150,150,150,0.1)] px-2 py-0.5 text-sm font-black tracking-wide text-lm-text2 max-md:text-base",
             )}
           >
             <Icon name="hourglass" size={12} />
@@ -135,7 +135,7 @@ export function MatchCard({
         />
       </div>
       {myVote && !isResolved && (
-        <div className="mt-2 text-center text-sm font-bold text-lm-green2">
+        <div className="mt-2 text-center text-base font-bold text-lm-green2">
           <Icon name="circle-check" size={14} className="inline" /> Votaste por{" "}
           <strong>{myVote}</strong>
         </div>

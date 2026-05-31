@@ -30,8 +30,8 @@ export function HistoryRow({ h }: { h: HistoryEntry }) {
       >
         <Icon name="vote" size={14} className="text-lm-text2" />
         <span className="font-bold text-lm-text2">Sin votos · Empate</span>
-        <span className="text-sm font-bold text-lm-text2">0–0</span>
-        <span className="text-sm font-semibold text-lm-text2">{fmt}</span>
+        <span className="text-base font-bold text-lm-text2">0–0</span>
+        <span className="text-base font-semibold text-lm-text2">{fmt}</span>
       </div>
     );
   }
@@ -58,10 +58,10 @@ export function HistoryRow({ h }: { h: HistoryEntry }) {
         ▼ <RankerProfileLink name={h.loser} from="rankvote" className="text-lm-red2" />
         {posL}
       </span>
-      <span className="text-sm font-bold text-lm-text2 max-md:basis-full max-md:text-left md:ml-auto">
+      <span className="text-base font-bold text-lm-text2 max-md:basis-full max-md:text-left md:ml-auto">
         {h.wVotes}–{h.lVotes}
       </span>
-      <span className="text-sm font-semibold text-lm-text2 max-md:basis-full max-md:text-left">
+      <span className="text-base font-semibold text-lm-text2 max-md:basis-full max-md:text-left">
         {fmt}
       </span>
     </div>

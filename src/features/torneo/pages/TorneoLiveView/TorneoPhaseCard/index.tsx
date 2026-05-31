@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { IconLabel } from "@/components/icons";
+import { Icon } from "@/components/icons";
 import { getInitialTorneoState, PHASES } from "@/features/torneo/data/torneo-players";
 import {
   PhaseCard,
@@ -46,9 +46,8 @@ export function TorneoPhaseCard({
         <PhaseCard variant="waiting">
           <PhaseLabel color="orange">CARGANDO TORNEO</PhaseLabel>
           <PhaseTitle color="orange">
-            <IconLabel icon="hourglass" iconSize={18}>
-              Conectando…
-            </IconLabel>
+            <Icon name="hourglass" size={18} className="mr-1.5 inline shrink-0 align-middle" />
+            Conectando…
           </PhaseTitle>
           <PhaseSub className="mb-0">Por favor espera</PhaseSub>
         </PhaseCard>
@@ -66,9 +65,8 @@ export function TorneoPhaseCard({
         <PhaseCard variant="voting">
           <PhaseLabel color="green">CUARTOS EN VIVO · VOTA AHORA</PhaseLabel>
           <PhaseTitle color="green">
-            <IconLabel icon="landmark" iconSize={18}>
-              CUARTOS DE FINAL
-            </IconLabel>
+            <Icon name="landmark" size={18} className="mr-1.5 inline shrink-0 align-middle" />
+            CUARTOS DE FINAL
           </PhaseTitle>
           <PhaseSub>
             30 minutos de votación · El que más votos tenga pasa a Semifinales
@@ -84,14 +82,14 @@ export function TorneoPhaseCard({
       <PhaseDisplay>
         <PhaseCard variant="voting">
           <PhaseLabel color="gold">
-            <IconLabel icon="zap" iconSize={12}>
+            <span>
+              <Icon name="zap" size={14} className="mr-1 inline shrink-0 align-middle" />
               SEMIFINALES EN VIVO · VOTA AHORA
-            </IconLabel>
+            </span>
           </PhaseLabel>
           <PhaseTitle color="gold">
-            <IconLabel icon="trophy" iconSize={18}>
-              SEMIFINALES
-            </IconLabel>
+            <Icon name="trophy" size={18} className="mr-1.5 inline shrink-0 align-middle" />
+            SEMIFINALES
           </PhaseTitle>
           <PhaseSub>
             30 minutos de votación · Los ganadores van a la Gran Final
@@ -108,9 +106,8 @@ export function TorneoPhaseCard({
         <PhaseCard variant="break">
           <PhaseLabel color="purple">DESCANSO ANTES DE LA GRAN FINAL</PhaseLabel>
           <PhaseTitle color="purple">
-            <IconLabel icon="crown" iconSize={18}>
-              FINAL EN
-            </IconLabel>
+            <Icon name="crown" size={18} className="mr-1.5 inline shrink-0 align-middle" />
+            FINAL EN
           </PhaseTitle>
           <PhaseSub>
             Las Semifinales han concluido · La Gran Final comienza en breve
@@ -126,9 +123,10 @@ export function TorneoPhaseCard({
       <PhaseDisplay>
         <PhaseCard variant="semifinals">
           <PhaseLabel color="gold" pulse>
-            <IconLabel icon="crown" iconSize={12}>
+            <span>
+              <Icon name="crown" size={14} className="mr-1 inline shrink-0 align-middle" />
               GRAN FINAL EN VIVO
-            </IconLabel>
+            </span>
           </PhaseLabel>
           <PhaseTitle color="gold">GRAN FINAL</PhaseTitle>
           <PhaseSub>El último enfrentamiento · Solo uno puede ser el Campeón</PhaseSub>

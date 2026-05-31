@@ -100,16 +100,16 @@ export function FighterCard({
       </div>
       <div
         className={cn(
-          "mb-0.5 font-sans text-lg font-bold tracking-tight max-[400px]:text-base max-md:text-base",
+          "mb-0.5 font-sans text-lg font-bold tracking-tight max-md:text-lg",
           up ? "text-lm-green2" : "text-lm-red2",
         )}
       >
         {name}
       </div>
-      <div className="mb-1 text-sm font-semibold text-lm-text2 max-md:text-sm">
+      <div className="mb-1 text-base font-semibold text-lm-text2">
         {ranker.sub}
       </div>
-      <div className="mb-2 font-sans text-sm font-semibold text-lm-gold max-md:text-sm">
+      <div className="mb-2 font-sans text-base font-semibold text-lm-gold">
         Puesto #{idx} · Score {ranker.score}
       </div>
       <div
@@ -150,7 +150,7 @@ export function FighterCard({
           "—"
         )}
       </div>
-      <div className="text-sm font-semibold text-lm-text2">
+      <div className="text-base font-semibold text-lm-text2">
         {voted ? `${votes} voto${votes !== 1 ? "s" : ""}` : ""}
       </div>
     </button>

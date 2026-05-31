@@ -19,6 +19,16 @@ function registerScrollTrigger() {
   scrollTriggerRegistered = true;
 }
 
+/** Evita SecurityError si el DOM está en transición (p. ej. navegación Next.js). */
+function safeRefreshTrigger(st: ScrollTrigger | null | undefined) {
+  if (!st) return;
+  try {
+    st.refresh();
+  } catch {
+    /* ScrollTrigger puede fallar con iframes cross-origin o DOM desmontándose */
+  }
+}
+
 const HIDDEN = (y: number) => ({ autoAlpha: 0, y, scale: 0.94 });
 const VISIBLE = { autoAlpha: 1, y: 0, scale: 1 };
 const EXIT = (y: number) => ({ autoAlpha: 0, y: -y * 0.6, scale: 0.94 });
@@ -126,8 +136,10 @@ export function ScrollReveal({
     }, el);
 
     const syncScrollState = () => {
-      ScrollTrigger.refresh();
+      if (!el.isConnected) return;
+
       const st = tl!.scrollTrigger;
+      safeRefreshTrigger(st);
       if (!st) return;
 
       const rect = el.getBoundingClientRect();
@@ -145,18 +157,23 @@ export function ScrollReveal({
     };
 
     el.dataset.revealReady = "true";
-    syncScrollState();
 
-    const refresh = () => {
-      syncScrollState();
+    let refreshRaf = 0;
+    const scheduleSync = () => {
+      cancelAnimationFrame(refreshRaf);
+      refreshRaf = requestAnimationFrame(syncScrollState);
     };
-    const ro = new ResizeObserver(refresh);
+
+    scheduleSync();
+
+    const ro = new ResizeObserver(scheduleSync);
     ro.observe(el);
-    window.addEventListener("load", refresh);
+    window.addEventListener("load", scheduleSync);
 
     return () => {
+      cancelAnimationFrame(refreshRaf);
       ro.disconnect();
-      window.removeEventListener("load", refresh);
+      window.removeEventListener("load", scheduleSync);
       el.style.willChange = "";
       delete el.dataset.revealReady;
       ctx.revert();

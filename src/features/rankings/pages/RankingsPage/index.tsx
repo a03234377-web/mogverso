@@ -51,7 +51,13 @@ export function RankingsPage({
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
-    const id = requestAnimationFrame(() => ScrollTrigger.refresh());
+    const id = requestAnimationFrame(() => {
+      try {
+        ScrollTrigger.refresh();
+      } catch {
+        /* global refresh puede fallar durante navegación o con iframes de ads */
+      }
+    });
     return () => cancelAnimationFrame(id);
   }, [entries.length]);
 
