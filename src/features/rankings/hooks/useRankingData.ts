@@ -107,8 +107,12 @@ export function useRankingData() {
   );
 
   const entries = useMemo(
-    () => buildRankedList(overrides, movements),
-    [overrides, movements],
+    () =>
+      buildRankedList(overrides, movements, undefined, {
+        up: movementsUp,
+        down: movementsDown,
+      }),
+    [overrides, movements, movementsUp, movementsDown],
   );
 
   const { upMovers, downMovers } = useMemo(
