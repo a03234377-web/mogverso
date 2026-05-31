@@ -19,9 +19,9 @@ function registerScrollTrigger() {
   scrollTriggerRegistered = true;
 }
 
-const HIDDEN = (y: number) => ({ autoAlpha: 0, y, scale: 0.96 });
+const HIDDEN = (y: number) => ({ autoAlpha: 0, y, scale: 0.94 });
 const VISIBLE = { autoAlpha: 1, y: 0, scale: 1 };
-const EXIT = (y: number) => ({ autoAlpha: 0, y: -y * 0.55, scale: 0.96 });
+const EXIT = (y: number) => ({ autoAlpha: 0, y: -y * 0.6, scale: 0.94 });
 
 export type ScrollRevealProps = {
   children: ReactNode;
@@ -44,10 +44,14 @@ export type ScrollRevealProps = {
   /** true = 1:1 con el scroll; número = suavizado mínimo en segundos. */
   scrub?: boolean | number;
   /**
-   * traverse: entra y sale mientras atraviesa el viewport (filas del ranking).
-   * inView: solo entrada mientras entra en pantalla; queda visible (bloques al final de página).
+   * traverse: recorrido start/end (filas del ranking).
+   * block: entra al bajar (aparece) y sale al subir; progress 1 = totalmente visible.
    */
-  scrollRange?: "traverse" | "inView";
+  scrollRange?: "traverse" | "block";
+  /** block: posición final del trigger (progress 1 = visible, no oculto). */
+  blockEnd?: string;
+  /** Si el bloque ya está visible al llegar al final de página, forzar estado visible. */
+  snapVisibleAtBottom?: boolean;
   /** Oculto hasta que GSAP tome el control (evita flash al hidratar). */
   hideUntilReady?: boolean;
 };
@@ -66,6 +70,8 @@ export function ScrollReveal({
   end = "bottom top+=10%",
   scrub = true,
   scrollRange = "traverse",
+  blockEnd = "top 42%",
+  snapVisibleAtBottom = true,
   hideUntilReady = true,
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -91,15 +97,17 @@ export function ScrollReveal({
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
 
-    const isInView = scrollRange === "inView";
-    const resolvedStart = isInView ? "top bottom+=8%" : start;
-    // inView: recorrido hasta el final de página (bloques al pie); traverse usa end propio.
-    const resolvedEnd = isInView ? "bottom bottom" : end;
-    const resolvedEnterSpan = isInView ? 0.22 : enterSpan;
-    const resolvedHoldSpan = isInView ? 0.78 : holdSpan;
-    const resolvedExitSpan = isInView ? 0 : exitSpan;
-    const totalSpan = resolvedEnterSpan + resolvedHoldSpan + resolvedExitSpan;
-    const enterProgress = totalSpan > 0 ? resolvedEnterSpan / totalSpan : 1;
+    const isBlock = scrollRange === "block";
+    const resolvedStart = isBlock ? "top bottom+=5%" : start;
+    const resolvedEnd = isBlock ? blockEnd : end;
+    const resolvedEnterSpan = isBlock ? 0.42 : enterSpan;
+    const resolvedHoldSpan = isBlock ? 0.58 : holdSpan;
+    const resolvedExitSpan = isBlock ? 0 : exitSpan;
+    const resolvedScrub = isBlock ? (typeof scrub === "number" ? scrub : 0.35) : scrub;
+    const enterProgress =
+      resolvedEnterSpan + resolvedHoldSpan + resolvedExitSpan > 0
+        ? resolvedEnterSpan / (resolvedEnterSpan + resolvedHoldSpan + resolvedExitSpan)
+        : 1;
 
     let tl: gsap.core.Timeline;
 
@@ -109,7 +117,8 @@ export function ScrollReveal({
           trigger: el,
           start: resolvedStart,
           end: resolvedEnd,
-          scrub,
+          scrub: resolvedScrub,
+          invalidateOnRefresh: true,
         },
       });
 
@@ -128,21 +137,30 @@ export function ScrollReveal({
       }
     }, el);
 
-    const revealIfAlreadyInZone = () => {
+    const syncScrollState = () => {
       ScrollTrigger.refresh();
       const st = tl!.scrollTrigger;
-      if (!st || st.progress > 0) return;
+      if (!st) return;
+
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight;
-      if (rect.top < vh * 0.92 && rect.bottom > 0) {
-        tl!.progress(Math.max(st.progress, enterProgress));
+      const inView = rect.top < vh && rect.bottom > 0;
+
+      if (!inView) return;
+
+      if (snapVisibleAtBottom) {
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const atBottom = window.scrollY >= maxScroll - 6;
+        if (atBottom && st.progress < enterProgress) {
+          tl!.progress(1);
+        }
       }
     };
 
     setGsapReady(true);
 
     const refresh = () => {
-      revealIfAlreadyInZone();
+      syncScrollState();
     };
     refresh();
     const ro = new ResizeObserver(refresh);
@@ -155,7 +173,19 @@ export function ScrollReveal({
       ctx.revert();
       setGsapReady(false);
     };
-  }, [y, enterSpan, holdSpan, exitSpan, delay, start, end, scrub, scrollRange]);
+  }, [
+    y,
+    enterSpan,
+    holdSpan,
+    exitSpan,
+    delay,
+    start,
+    end,
+    scrub,
+    scrollRange,
+    blockEnd,
+    snapVisibleAtBottom,
+  ]);
 
   return (
     <Tag

@@ -134,14 +134,15 @@ export function RankingsPage({
 
       <AdBanner clientId={adsenseClient} />
 
-      <div
-        className={cn(
-          "mx-auto mb-6 flex max-w-[1100px] items-center gap-4 px-5",
-          "max-md:flex-col max-md:gap-2 max-md:px-3",
-        )}
+      <ScrollReveal
+        y={56}
+        scrollRange="block"
+        className="mx-auto max-w-[1100px] px-5 pb-16 max-md:px-3 max-md:pb-4"
       >
-        <div className="h-px flex-1 bg-lm-border max-md:hidden" />
-        <ScrollReveal y={24} scrollRange="inView" className="max-md:max-w-full">
+        <div
+          className={cn("mb-6 flex items-center gap-4 max-md:flex-col max-md:gap-2")}
+        >
+          <div className="h-px flex-1 bg-lm-border max-md:hidden" />
           <div className="text-center lm-type-label leading-snug text-lm-text2 md:whitespace-nowrap">
             <IconLabel
               icon="vote"
@@ -151,21 +152,10 @@ export function RankingsPage({
               Votación Especial · Próximo Candidato
             </IconLabel>
           </div>
-        </ScrollReveal>
-        <div className="h-px flex-1 bg-lm-border max-md:hidden" />
-      </div>
-
-      <div className="mx-auto max-w-[1100px] px-5 pb-16 max-md:px-3 max-md:pb-4">
-        <ScrollReveal
-          y={36}
-          scrollRange="inView"
-          enterSpan={0.22}
-          holdSpan={0.78}
-          exitSpan={0}
-        >
-          <EntryVoteCard />
-        </ScrollReveal>
-      </div>
+          <div className="h-px flex-1 bg-lm-border max-md:hidden" />
+        </div>
+        <EntryVoteCard />
+      </ScrollReveal>
     </div>
   );
 }
