@@ -1,5 +1,5 @@
-import type { IconName } from "@/types/icons";
 import type { Ranker } from "./ranker-types";
+import { CONTESTANT_PROFILES } from "./contestant-profiles";
 
 /** Nuevos concursantes (posiciones 21–70, tras el top 20 actual). */
 export const CONTESTANT_NAMES = [
@@ -9,8 +9,8 @@ export const CONTESTANT_NAMES = [
   "JaviHoyos",
   "AlessandroRizzz",
   "Adrity",
-  "Mario",
   "Nico",
+  "Mario",
   "Lucas G",
   "Jonata",
   "Melias",
@@ -78,46 +78,22 @@ const PHOTO_BACKGROUNDS = [
   "linear-gradient(135deg,#192030,#2ecc71)",
 ] as const;
 
-const MOV_ICONS: IconName[] = [
-  "star",
-  "sparkles",
-  "flame",
-  "rocket",
-  "zap",
-  "leaf",
-  "target",
-  "turtle",
-  "smile",
-  "brain",
-  "ghost",
-  "mic",
-  "building-2",
-  "gamepad-2",
-  "laugh",
-  "cookie",
-  "goal",
-  "dumbbell",
-  "waves",
-  "crown",
-];
-
 export function buildContestants(): Ranker[] {
   return CONTESTANT_NAMES.map((name, index) => {
+    const profile = CONTESTANT_PROFILES[name];
     const score = Math.round((6.49 - index * 0.008) * 10) / 10;
-    const isLast = index === CONTESTANT_NAMES.length - 1;
+
     return {
       name,
-      title: "Nuevo contendiente",
-      sub: "España",
+      title: profile?.title ?? "Contendiente del ranking",
+      sub: profile?.sub ?? "España",
       score,
       top: "",
-      tags: ["ptag-new", "ptag-appeal", "ptag-risers"],
-      tagNames: ["Nuevo", "Contendiente", "En Ascenso"],
-      bio: `${name} entra al ranking LooksMax España como nuevo contendiente.`,
-      movement: isLast
-        ? `${name} cierra el ranking en el último puesto.`
-        : `${name} debuta en el ranking.`,
-      movIcon: MOV_ICONS[index % MOV_ICONS.length]!,
+      tags: profile?.tags ?? ["ptag-new", "ptag-appeal", "ptag-risers"],
+      tagNames: profile?.tagNames ?? ["Nuevo", "Contendiente", "En Ascenso"],
+      bio: profile?.bio ?? `${name} compite en el ranking LooksMax España.`,
+      movement: profile?.movement ?? `${name} mantiene su puesto en el ranking.`,
+      movIcon: profile?.movIcon ?? "star",
       photoBg: PHOTO_BACKGROUNDS[index % PHOTO_BACKGROUNDS.length]!,
     };
   });

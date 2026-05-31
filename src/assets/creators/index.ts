@@ -70,6 +70,7 @@ import titochape from "./titochape.webp";
 import valmaseda from "./valmaseda.webp";
 import varo from "./varo.webp";
 import voroby from "./voroby.webp";
+import xaxoym from "./xaxoym.webp";
 import yunymat from "./yunymat.webp";
 
 /** Archivos de creadores importados (optimizados por Next.js). */
@@ -144,6 +145,7 @@ export const CREATOR_IMAGE_FILES = [
   "valmaseda.webp",
   "varo.webp",
   "voroby.webp",
+  "xaxoym.webp",
   "yunymat.webp",
 ] as const;
 
@@ -220,6 +222,7 @@ const CREATOR_IMAGES: Record<CreatorImageFile, StaticImageData> = {
   "valmaseda.webp": valmaseda,
   "varo.webp": varo,
   "voroby.webp": voroby,
+  "xaxoym.webp": xaxoym,
   "yunymat.webp": yunymat,
 };
 

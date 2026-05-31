@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { profilePath } from "@/features/app/routes";
 import { ProfileRoute } from "@/features/rankings/views/ProfileRoute";
 import { RANKERS } from "@/features/rankings/data/rankers";
 import {
   findRankerByLegacyIndex,
-  rankerProfileSlug,
+  rankerProfileParam,
   resolveRankerFromProfileSlug,
 } from "@/features/rankings/lib/profile-slug";
 import { ProfilePersonJsonLd } from "@/lib/seo/json-ld";
@@ -16,7 +16,7 @@ type PageProps = {
 };
 
 export function generateStaticParams() {
-  return RANKERS.map((r) => ({ slug: rankerProfileSlug(r.name) }));
+  return RANKERS.map((r) => ({ slug: rankerProfileParam(r.name) }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -37,17 +37,18 @@ export default async function ProfilePageRoute({ params }: PageProps) {
   }
 
   const ranker = resolveRankerFromProfileSlug(slug);
+  if (!ranker) {
+    notFound();
+  }
 
   return (
     <>
-      {ranker && (
-        <ProfilePersonJsonLd
-          name={ranker.name}
-          title={ranker.title}
-          description={ranker.bio}
-        />
-      )}
-      <ProfileRoute />
+      <ProfilePersonJsonLd
+        name={ranker.name}
+        title={ranker.title}
+        description={ranker.bio}
+      />
+      <ProfileRoute ranker={ranker} />
     </>
   );
 }

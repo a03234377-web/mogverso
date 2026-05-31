@@ -1,0 +1,13 @@
+---
+description: Pull requests — usar la rama actual, no crear ramas nuevas
+alwaysApply: true
+---
+
+# Pull requests
+
+When creating a pull request on behalf of the user:
+
+- **Do not** create a new branch unless the user explicitly asks for one.
+- Commit and open the PR from the **current branch** (`HEAD`).
+- Push with `git push -u origin HEAD` only if the branch is not yet on the remote; otherwise `git push`.
+- Do not run `git checkout -b`, `git switch -c`, or similar to "prepare" a PR.

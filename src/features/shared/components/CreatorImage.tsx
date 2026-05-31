@@ -33,6 +33,24 @@ export function CreatorImage({
     return fallback ? <>{fallback}</> : null;
   }
 
+  if (fill) {
+    return (
+      <span className="relative block h-full w-full">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes={sizes}
+          priority={priority}
+          className={cn("object-cover object-top select-none", className)}
+          draggable={false}
+          style={style}
+          onError={() => setFailed(true)}
+        />
+      </span>
+    );
+  }
+
   return (
     <Image
       src={src}
@@ -41,7 +59,7 @@ export function CreatorImage({
       height={src.height}
       sizes={sizes}
       priority={priority}
-      className={cn(fill && "h-full w-full object-cover select-none", className)}
+      className={cn("select-none", className)}
       draggable={false}
       style={style}
       onError={() => setFailed(true)}

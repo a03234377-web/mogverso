@@ -39,16 +39,20 @@ export function Avatar({
   }
 
   return (
-    <Image
-      src={src}
-      alt={name}
-      width={size}
-      height={size}
-      sizes={`${size}px`}
-      className={cn("shrink-0 object-cover select-none", radiusClass, className)}
-      draggable={false}
-      onError={() => setFailed(true)}
-    />
+    <span
+      className={cn("relative inline-block shrink-0 overflow-hidden", radiusClass, className)}
+      style={{ width: size, height: size }}
+    >
+      <Image
+        src={src}
+        alt={name}
+        fill
+        sizes={`${size}px`}
+        className={cn("object-cover object-top select-none", radiusClass)}
+        draggable={false}
+        onError={() => setFailed(true)}
+      />
+    </span>
   );
 }
 
@@ -69,10 +73,9 @@ export function ProfileAvatar({ name, photoBg }: { name: string; photoBg: string
         <Image
           src={src}
           alt={name}
-          width={110}
-          height={130}
+          fill
           sizes="130px"
-          className="h-full w-full rounded-xl object-cover select-none"
+          className="rounded-xl object-cover object-top select-none"
           draggable={false}
           onError={() => setFailed(true)}
         />
