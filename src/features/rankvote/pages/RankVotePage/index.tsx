@@ -21,6 +21,8 @@ export function RankVotePage() {
     loading,
     transitioning,
     healError,
+    voteError,
+    backendUnavailable,
     voting,
     vote,
     retryHeal,
@@ -81,14 +83,23 @@ export function RankVotePage() {
               )}
             </div>
           ) : rv ? (
-            <RankVoteArena
-              rv={rv}
-              myVote={myVote}
-              overrides={overrides}
-              fb={fb}
-              voting={voting}
-              onVote={(name) => void vote(name)}
-            />
+            <>
+              {backendUnavailable && (
+                <div className="mx-auto mb-4 max-w-lg rounded-xl border border-lm-red2/40 bg-lm-red2/10 px-4 py-3 text-base leading-relaxed font-semibold text-lm-red2">
+                  {healError ??
+                    "El servidor de votos no está disponible. Los votos no se registrarán hasta configurar el backend."}
+                </div>
+              )}
+              <RankVoteArena
+                rv={rv}
+                myVote={myVote}
+                overrides={overrides}
+                fb={fb}
+                voting={voting}
+                voteError={voteError}
+                onVote={(name) => void vote(name)}
+              />
+            </>
           ) : (
             <div className="flex items-center justify-center gap-2 px-6 py-12 text-center text-lm-text2">
               <Icon name="hourglass" size={16} />

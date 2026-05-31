@@ -19,6 +19,7 @@ export function RankVoteArena({
   overrides,
   fb,
   voting,
+  voteError,
   onVote,
 }: {
   rv: {
@@ -32,6 +33,7 @@ export function RankVoteArena({
   overrides: Record<string, number>;
   fb: ReturnType<typeof useFirebase>["fb"];
   voting: boolean;
+  voteError: string | null;
   onVote: (name: string) => void;
 }) {
   const cd = useCountdown(rv.endTime);
@@ -128,6 +130,11 @@ export function RankVoteArena({
       </div>
 
       <div className="mt-1 text-center" id="rvAction">
+        {voteError ? (
+          <div className="mx-auto mb-2 max-w-md rounded-lg border border-lm-red2/35 bg-lm-red2/10 px-3 py-2 text-base leading-snug font-semibold text-lm-red2">
+            {voteError}
+          </div>
+        ) : null}
         {voted ? (
           <div className="text-center text-base leading-snug font-bold text-lm-green2">
             <Icon

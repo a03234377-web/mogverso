@@ -6,7 +6,16 @@ import {
   isKnownRankerName,
   isValidRankVotePair,
 } from "@/features/rankings/lib/ranker-name";
+import {
+  readStoredRankVote,
+  writeStoredRankVote,
+} from "@/lib/api/rankvote-vote-storage";
 import { healRankvoteApi, voteRankvoteApi } from "@/lib/api/vote-client";
+import {
+  formatHealError,
+  formatVoteError,
+  isBackendUnavailableReason,
+} from "@/lib/api/vote-errors";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import type { RankOverrides, RankVoteMyVote, RankVoteRound } from "@/types/looksmax";
 
@@ -41,12 +50,25 @@ function dedupeHistory(rows: RvHistoryRow[]): RvHistoryRow[] {
   });
 }
 
-function formatHealError(err: unknown): string {
-  const msg = err instanceof Error ? err.message : String(err);
-  if (/PERMISSION_DENIED|permission_denied/i.test(msg)) {
-    return "Firebase denegó la escritura. Revisa las reglas RTDB en la consola del proyecto.";
+function resolveMyVote(
+  roundId: string,
+  candidate: unknown,
+  previous: RankVoteMyVote | null,
+): RankVoteMyVote | null {
+  if (typeof candidate === "string" && isKnownRankerName(candidate)) {
+    return { rvId: roundId, candidate };
   }
-  return msg || "No se pudo sanear la ronda";
+
+  const stored = readStoredRankVote(roundId);
+  if (stored && isKnownRankerName(stored)) {
+    return { rvId: roundId, candidate: stored };
+  }
+
+  if (previous?.rvId === roundId && previous.candidate) {
+    return previous;
+  }
+
+  return null;
 }
 
 export function useRankVote(active: boolean) {
@@ -59,6 +81,8 @@ export function useRankVote(active: boolean) {
   const [loading, setLoading] = useState(true);
   const [transitioning, setTransitioning] = useState(false);
   const [healError, setHealError] = useState<string | null>(null);
+  const [voteError, setVoteError] = useState<string | null>(null);
+  const [backendUnavailable, setBackendUnavailable] = useState(false);
   const [voting, setVoting] = useState(false);
   const resolveInFlightRef = useRef<Promise<void> | null>(null);
   const lastHealRef = useRef(0);
@@ -70,10 +94,13 @@ export function useRankVote(active: boolean) {
     try {
       const res = await healRankvoteApi();
       if (!res.ok) {
-        setHealError(res.error ?? "heal_failed");
+        const reason = res.reason ?? res.error ?? "heal_failed";
+        setHealError(formatVoteError(reason));
+        setBackendUnavailable(isBackendUnavailableReason(reason));
         return;
       }
       setHealError(null);
+      setBackendUnavailable(false);
     } catch (err) {
       console.error("[LooksMax] healRankvoteApi:", err);
       setHealError(formatHealError(err));
@@ -131,28 +158,37 @@ export function useRankVote(active: boolean) {
       }
 
       setTransitioning(false);
-      setHealError(null);
+      if (!backendUnavailable) {
+        setHealError(null);
+      }
       setRv(round);
 
-      const [ovSnap, myVoteSnap] = await Promise.all([
-        get(ref(db, "rankOverrides")),
-        get(ref(db, `rankvoteVotes/dev_${DEVICE_ID}_${round.id}`)),
-      ]);
-      setOverrides(ovSnap.exists() ? (ovSnap.val() as RankOverrides) : {});
-      setMyVote(
-        myVoteSnap.exists()
-          ? {
-              rvId: round.id,
-              candidate: (() => {
-                const candidate = myVoteSnap.val().candidate as string;
-                return isKnownRankerName(candidate) ? candidate : "";
-              })(),
-            }
-          : null,
-      );
+      let overridesNext: RankOverrides = {};
+      try {
+        const ovSnap = await get(ref(db, "rankOverrides"));
+        overridesNext = ovSnap.exists() ? (ovSnap.val() as RankOverrides) : {};
+      } catch (err) {
+        console.error("[LooksMax] rankOverrides read:", err);
+      }
+      setOverrides(overridesNext);
+
+      let remoteCandidate: unknown;
+      try {
+        const myVoteSnap = await get(
+          ref(db, `rankvoteVotes/dev_${DEVICE_ID}_${round.id}`),
+        );
+        remoteCandidate = myVoteSnap.exists()
+          ? (myVoteSnap.val() as { candidate?: unknown }).candidate
+          : undefined;
+      } catch (err) {
+        console.error("[LooksMax] rankvoteVotes read:", err);
+        remoteCandidate = undefined;
+      }
+
+      setMyVote((previous) => resolveMyVote(round.id, remoteCandidate, previous));
       setLoading(false);
     },
-    [fb, active, runResolve, requestNewRound],
+    [fb, active, backendUnavailable, runResolve, requestNewRound],
   );
 
   useEffect(() => {
@@ -201,7 +237,16 @@ export function useRankVote(active: boolean) {
 
   const vote = useCallback(
     async (name: string) => {
-      if (!fb || !rv || voting) return;
+      if (!fb || !rv || voting) {
+        return { ok: false as const, reason: "vote_failed" as const };
+      }
+      if (!isKnownRankerName(name)) {
+        const reason = "invalid_candidate";
+        setVoteError(formatVoteError(reason));
+        return { ok: false as const, reason };
+      }
+
+      setVoteError(null);
       setVoting(true);
       try {
         const token = await getToken();
@@ -211,12 +256,18 @@ export function useRankVote(active: boolean) {
           const fresh = snap.exists() ? (snap.val() as RankVoteRound) : rv;
           setRv(fresh);
           setMyVote({ rvId: fresh.id, candidate: name });
+          writeStoredRankVote(fresh.id, name);
+          setBackendUnavailable(false);
           return { ok: true as const, rv: fresh };
         }
-        return {
-          ok: false as const,
-          reason: result.reason ?? result.error ?? "vote_failed",
-        };
+
+        const reason = result.reason ?? result.error ?? "vote_failed";
+        setVoteError(formatVoteError(reason));
+        if (isBackendUnavailableReason(reason)) {
+          setBackendUnavailable(true);
+          setHealError(formatVoteError(reason));
+        }
+        return { ok: false as const, reason };
       } finally {
         setVoting(false);
       }
@@ -245,8 +296,11 @@ export function useRankVote(active: boolean) {
     loading,
     transitioning,
     healError,
+    voteError,
+    backendUnavailable,
     voting,
     vote,
     retryHeal: requestNewRound,
+    clearVoteError: () => setVoteError(null),
   };
 }
