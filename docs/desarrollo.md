@@ -50,15 +50,15 @@ Copia el JSON de [`docs/firebase-rules.json`](firebase-rules.json) en Firebase C
 
 La app necesita escritura en:
 
-| Ruta | Uso |
-| :--- | :--- |
-| `rankvote/current` | Crear ronda cada 3 h, `resolved`, `resolving` |
-| `rankvote/current/votes/*` | Incrementar votos (validado) |
-| `rankOverrides`, `rankMovements`, `rankMovementsUp`, `rankMovementsDown` | Ranking y pilas de movimientos |
-| `rankvoteHistory/*` | Historial (solo creación, `!data.exists()`) |
-| `rankvoteVotes/*`, `entryVotes/*`, `torneoVotes/*` | Anti-fraude por dispositivo/IP |
-| `entryVote/current` | Votación de entrada |
-| `torneo/state` | Fases del torneo y votos de partidos |
+| Ruta                                                                     | Uso                                           |
+| :----------------------------------------------------------------------- | :-------------------------------------------- |
+| `rankvote/current`                                                       | Crear ronda cada 3 h, `resolved`, `resolving` |
+| `rankvote/current/votes/*`                                               | Incrementar votos (validado)                  |
+| `rankOverrides`, `rankMovements`, `rankMovementsUp`, `rankMovementsDown` | Ranking y pilas de movimientos                |
+| `rankvoteHistory/*`                                                      | Historial (solo creación, `!data.exists()`)   |
+| `rankvoteVotes/*`, `entryVotes/*`, `torneoVotes/*`                       | Anti-fraude por dispositivo/IP                |
+| `entryVote/current`                                                      | Votación de entrada                           |
+| `torneo/state`                                                           | Fases del torneo y votos de partidos          |
 
 Solo desarrollo local abierto: [`firebase-rules-dev.example.json`](firebase-rules-dev.example.json).
 
