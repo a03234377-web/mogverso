@@ -2,10 +2,7 @@
 
 import { useEffect } from "react";
 import { IconLabel } from "@/components/icons";
-import {
-  getInitialTorneoState,
-  PHASES,
-} from "@/features/torneo/data/torneo-players";
+import { getInitialTorneoState, PHASES } from "@/features/torneo/data/torneo-players";
 import {
   PhaseCard,
   PhaseDisplay,
@@ -14,10 +11,7 @@ import {
   PhaseTimer,
   PhaseTitle,
 } from "@/features/torneo/components/PhaseCard";
-import {
-  TorneoPhaseEnded,
-  TorneoPhaseWaitingOctavos,
-} from "./TorneoPhaseViews";
+import { TorneoPhaseEnded, TorneoPhaseWaitingOctavos } from "./TorneoPhaseViews";
 import { getNext23Ms } from "./getNext23Ms";
 import { useCountdown } from "@/features/shared/hooks/useCountdown";
 import type { TorneoState } from "@/features/shared/lib/types";

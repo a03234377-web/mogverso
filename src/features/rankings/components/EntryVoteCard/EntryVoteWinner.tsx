@@ -22,8 +22,7 @@ export function EntryVoteWinner({
           <Icon name="sparkles" size={24} />
         </div>
         <div className="mb-3 flex items-center justify-center gap-2 lm-type-label text-lm-gold">
-          <Icon name="star" size={12} /> VOTACIÓN CERRADA{" "}
-          <Icon name="star" size={12} />
+          <Icon name="star" size={12} /> VOTACIÓN CERRADA <Icon name="star" size={12} />
         </div>
         <h2
           className={cn(

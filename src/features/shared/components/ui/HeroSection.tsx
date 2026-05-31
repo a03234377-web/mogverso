@@ -44,7 +44,7 @@ export function HeroSection({
           "max-[360px]:tracking-[0.02em] max-md:tracking-[0.04em]",
           variant === "default" &&
             cn(
-              "animate-hero-entrance hero-title--default font-display tracking-[4px]",
+              "hero-title--default animate-hero-entrance font-display tracking-[4px]",
               "text-[clamp(2.4rem,8vw,9rem)]",
             ),
           variant === "torneo" &&

@@ -22,7 +22,10 @@ export function NoticiaCard({
   return (
     <div className="rounded-xl border border-lm-border bg-lm-card p-4">
       <div
-        className={cn("mb-1.5 flex items-center gap-1 lm-type-label", `noticia-cat--${cat}`)}
+        className={cn(
+          "mb-1.5 flex items-center gap-1 lm-type-label",
+          `noticia-cat--${cat}`,
+        )}
       >
         <Icon name={catIcon} size={12} />
         {catLabel}

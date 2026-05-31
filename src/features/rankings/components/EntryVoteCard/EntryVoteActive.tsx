@@ -76,9 +76,7 @@ export function EntryVoteActive({
               role={!voted ? "button" : undefined}
               tabIndex={!voted ? 0 : undefined}
               onClick={() => !voted && !voting && onVote(c.id)}
-              onKeyDown={(e) =>
-                e.key === "Enter" && !voted && !voting && onVote(c.id)
-              }
+              onKeyDown={(e) => e.key === "Enter" && !voted && !voting && onVote(c.id)}
             >
               {isSel && (
                 <Icon

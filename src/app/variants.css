@@ -363,7 +363,12 @@
 }
 
 .phase-title--gold {
-  background: linear-gradient(135deg, #fff, var(--color-lm-gold2), var(--color-lm-gold));
+  background: linear-gradient(
+    135deg,
+    #fff,
+    var(--color-lm-gold2),
+    var(--color-lm-gold)
+  );
   background-clip: text;
   color: transparent;
 }

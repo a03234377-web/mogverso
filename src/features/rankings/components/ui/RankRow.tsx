@@ -13,7 +13,12 @@ type RankRowProps = {
   onOpenProfile: (name: string, rank: number) => void;
 };
 
-const RANK_NUM_CLASS = ["rank-num--1", "rank-num--2", "rank-num--3", "rank-num--rest"] as const;
+const RANK_NUM_CLASS = [
+  "rank-num--1",
+  "rank-num--2",
+  "rank-num--3",
+  "rank-num--rest",
+] as const;
 const TOP_ROW_CLASS = ["rank-row--top1", "rank-row--top2", "rank-row--top3"] as const;
 
 export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
