@@ -24,14 +24,17 @@ NEXT_PUBLIC_SITE_URL=https://tu-dominio.vercel.app
 FIREBASE_SERVICE_ACCOUNT_JSON={"type":"service_account",...}
 RECAPTCHA_SECRET_KEY=...
 ADMIN_SECRET=...
-CRON_SECRET=...
 ```
 
-Opcionales: `NEXT_PUBLIC_ADSENSE_CLIENT`, `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`.
+Opcionales: `NEXT_PUBLIC_ADSENSE_CLIENT`, `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `ADMIN_SECRET`, `CRON_SECRET`.
 
-## Vercel Cron
+## Vercel Cron (opcional — plan Pro)
 
-`vercel.json` define tres tareas:
+Por defecto **`vercel.json` no define crons** para que el deploy funcione en el plan **Hobby** de Vercel. En Hobby solo se permiten crons **como máximo una vez al día**; expresiones más frecuentes (p. ej. cada 5 min) **fallan en el deploy**.
+
+El heal de rankvote, entry vote y torneo sigue activo **on-demand** cuando alguien visita o vota (Server Actions y `/api/heal/*`). No necesitas cron para el uso normal del sitio.
+
+Si tienes **Vercel Pro** y quieres heal programado sin visitantes, añade en `vercel.json`:
 
 | Ruta                         | Frecuencia  |
 | :--------------------------- | :---------- |
@@ -39,7 +42,7 @@ Opcionales: `NEXT_PUBLIC_ADSENSE_CLIENT`, `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, `UPS
 | `/api/cron/entry-vote`       | Cada 10 min |
 | `/api/cron/torneo-advance`   | Cada 5 min  |
 
-Define **`CRON_SECRET`** en Vercel. El scheduler envía `Authorization: Bearer <CRON_SECRET>`; el middleware rechaza peticiones sin ese valor. Los crons resuelven rondas aunque no haya visitantes.
+Y define **`CRON_SECRET`** en Vercel. El scheduler envía `Authorization: Bearer <CRON_SECRET>`; el middleware rechaza peticiones sin ese valor.
 
 ## Dominio personalizado
 
@@ -61,7 +64,7 @@ Checklist operativo con prioridades y ventajas de cada paso: **`docs/pasos-pendi
 - Configura **reglas RTDB** en Firebase Console (lectura pública en datos de juego; **escritura cliente denegada**). Votos, heal y admin usan Route Handlers + Firebase Admin SDK.
 - Restringe la API key de Firebase por HTTP referrer (dominio producción + localhost dev).
 - Define `ADMIN_SECRET` fuerte; init/reset torneo solo vía `POST /api/admin/torneo/*` con ese header.
-- Define `CRON_SECRET` para `/api/cron/*`; sin él los crons responden 401.
+- Crons en `vercel.json` solo con plan **Pro**; en Hobby déjalos fuera (ver arriba).
 - Los hooks usan **Server Actions**; las rutas `/api/vote/*` y `/api/heal/*` siguen disponibles como alternativa HTTP.
 - Opcional: Upstash Redis para rate limiting distribuido en votos y heal on-demand.
 
