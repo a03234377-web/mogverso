@@ -19,6 +19,14 @@ function VoteActionIcon() {
         d="M22 19H2"
         className="lm-qa-vote-slot stroke-black [stroke-linecap:round]"
       />
+      <rect
+        x="5"
+        y="7"
+        width="14"
+        height="12"
+        rx="1"
+        className="lm-qa-vote-fill fill-black/20"
+      />
       <path
         d="m9 12 2 2 4-4"
         className="lm-qa-vote-check stroke-black [stroke-linecap:round] [stroke-linejoin:round]"
@@ -38,14 +46,20 @@ function TorneoActionIcon() {
       <circle
         cx="12"
         cy="12"
-        r="8"
-        className="lm-qa-torneo-ring lm-qa-torneo-ring--outer stroke-black [stroke-linecap:round]"
+        r="7"
+        className="lm-qa-torneo-ripple lm-qa-torneo-ripple--1 stroke-black/50 [stroke-linecap:round]"
       />
       <circle
         cx="12"
         cy="12"
-        r="4.5"
-        className="lm-qa-torneo-ring lm-qa-torneo-ring--mid stroke-black [stroke-linecap:round]"
+        r="7"
+        className="lm-qa-torneo-ripple lm-qa-torneo-ripple--2 stroke-black/50 [stroke-linecap:round]"
+      />
+      <circle
+        cx="12"
+        cy="12"
+        r="8"
+        className="lm-qa-torneo-ring stroke-black [stroke-linecap:round]"
       />
       <circle cx="12" cy="12" r="1.5" className="lm-qa-torneo-core fill-black" />
       <path
@@ -94,10 +108,9 @@ export function RankingQuickActionButton({
       type="button"
       className={cn(
         "lm-quick-action-btn group/qa relative isolate min-h-[58px] w-full",
-        "cursor-pointer overflow-hidden rounded-[14px] border-none px-8 py-3",
+        "cursor-pointer overflow-hidden rounded-[14px] border border-transparent px-8 py-3",
         "font-sans text-lg leading-tight font-bold text-black lm-focus-ring-on-gold",
-        "transition-[transform,box-shadow] duration-300 ease-out",
-        "hover:-translate-y-0.5",
+        "transition-[transform,box-shadow,border-color] duration-350 ease-out",
         "max-md:min-h-[50px] max-md:flex-1 max-md:rounded-xl max-md:px-4 max-md:py-2.5 max-md:text-base",
         modifier,
       )}
@@ -105,37 +118,44 @@ export function RankingQuickActionButton({
     >
       <span
         aria-hidden
-        className="lm-quick-action-gradient pointer-events-none absolute inset-0 rounded-[inherit] opacity-0"
+        className="lm-quick-action-beam pointer-events-none absolute inset-0 rounded-[inherit]"
+      />
+      <span
+        aria-hidden
+        className="lm-quick-action-inset pointer-events-none absolute inset-0 rounded-[inherit]"
       />
       <span
         aria-hidden
         className={cn(
-          "pointer-events-none absolute inset-0 rounded-[inherit] opacity-0",
-          "bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.35),transparent_62%)]",
-          "transition-opacity duration-300 group-hover/qa:opacity-100",
+          "lm-quick-action-corner lm-quick-action-corner--tl",
+          "pointer-events-none absolute top-1.5 left-1.5 size-1.5 rounded-[2px] bg-white/70 opacity-0",
         )}
       />
       <span
         aria-hidden
         className={cn(
-          "lm-quick-action-shimmer pointer-events-none absolute inset-0 rounded-[inherit]",
-          "bg-[linear-gradient(105deg,transparent_32%,rgba(255,255,255,0.5)_50%,transparent_68%)]",
-          "opacity-0 group-hover/qa:opacity-100",
+          "lm-quick-action-corner lm-quick-action-corner--br",
+          "pointer-events-none absolute right-1.5 bottom-1.5 size-1.5 rounded-[2px] bg-white/70 opacity-0",
         )}
       />
-      <span
-        aria-hidden
-        className="lm-quick-action-aura pointer-events-none absolute -inset-1 rounded-[inherit] border opacity-0"
-      />
-      <span className="relative z-[1] flex items-center justify-center gap-2">
-        {icon}
+      <span className="relative z-[1] flex items-center justify-center gap-2.5">
         <span
           className={cn(
-            "lm-quick-action-label transition-[letter-spacing,transform] duration-300",
-            "group-hover/qa:tracking-wide",
+            "lm-quick-action-icon-shell flex size-7 shrink-0 items-center justify-center rounded-lg",
+            "bg-black/10 transition-transform duration-350",
           )}
         >
-          {label}
+          {icon}
+        </span>
+        <span className="lm-quick-action-label relative inline-block">
+          <span className="lm-quick-action-label-text block">{label}</span>
+          <span
+            aria-hidden
+            className={cn(
+              "lm-quick-action-label-line absolute -bottom-0.5 left-1/2 h-0.5 w-0",
+              "-translate-x-1/2 rounded-full bg-black/35",
+            )}
+          />
         </span>
       </span>
     </button>
