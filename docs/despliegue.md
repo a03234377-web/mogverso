@@ -33,11 +33,11 @@ Opcionales: `NEXT_PUBLIC_ADSENSE_CLIENT`, `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, `UPS
 
 `vercel.json` define tres tareas:
 
-| Ruta | Frecuencia |
-| :--- | :--- |
-| `/api/cron/rankvote-resolve` | Cada 5 min |
-| `/api/cron/entry-vote` | Cada 10 min |
-| `/api/cron/torneo-advance` | Cada 5 min |
+| Ruta                         | Frecuencia  |
+| :--------------------------- | :---------- |
+| `/api/cron/rankvote-resolve` | Cada 5 min  |
+| `/api/cron/entry-vote`       | Cada 10 min |
+| `/api/cron/torneo-advance`   | Cada 5 min  |
 
 Define **`CRON_SECRET`** en Vercel. El scheduler envía `Authorization: Bearer <CRON_SECRET>`; el middleware rechaza peticiones sin ese valor. Los crons resuelven rondas aunque no haya visitantes.
 
