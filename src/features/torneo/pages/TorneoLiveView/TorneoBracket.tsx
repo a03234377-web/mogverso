@@ -97,7 +97,9 @@ function BracketSlot({
   if (tbd) {
     return (
       <div className="flex items-center gap-1.5 rounded-lg border border-lm-border bg-lm-card px-2 py-1.5 opacity-40">
-        <div className="max-w-[75px] truncate text-base font-bold text-lm-text2 max-md:max-w-[90px]">TBD</div>
+        <div className="max-w-[75px] truncate text-base font-bold text-lm-text2 max-md:max-w-[90px]">
+          TBD
+        </div>
       </div>
     );
   }

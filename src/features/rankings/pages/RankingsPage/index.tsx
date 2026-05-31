@@ -55,7 +55,7 @@ export function RankingsPage({
       try {
         ScrollTrigger.refresh();
       } catch {
-        /* global refresh puede fallar durante navegación o con iframes de ads */
+        // ScrollTrigger.refresh may fail during navigation or with ad iframes
       }
     });
     return () => cancelAnimationFrame(id);

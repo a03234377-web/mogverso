@@ -49,8 +49,12 @@ export function TorneoPhaseWaitingOctavos({
         >
           EMPIEZA A LAS {horaStr}
         </div>
-        <div className="mb-3.5 text-center text-base font-bold leading-snug text-lm-text2">
-          <Icon name="calendar" size={14} className="mr-1 inline shrink-0 align-middle" />
+        <div className="mb-3.5 text-center text-base leading-snug font-bold text-lm-text2">
+          <Icon
+            name="calendar"
+            size={14}
+            className="mr-1 inline shrink-0 align-middle"
+          />
           {diaCompleto}
         </div>
         <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="orange" />
@@ -83,7 +87,11 @@ export function TorneoPhaseEnded({
           <Icon name="trophy" size={14} />
         </div>
         <PhaseTitle color="gold">
-          <Icon name="crown" size={18} className="mr-1.5 inline shrink-0 align-middle" />
+          <Icon
+            name="crown"
+            size={18}
+            className="mr-1.5 inline shrink-0 align-middle"
+          />
           CAMPEÓN
         </PhaseTitle>
         <PhaseSub>El mejor looksmaxer de España ha sido coronado</PhaseSub>
