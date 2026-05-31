@@ -17,9 +17,9 @@ type ProfilePageProps = {
 };
 
 function ProfileBackButton() {
-  const { get } = useSearchParams();
+  const searchParams = useSearchParams();
   const { backFromProfile } = useLooksMaxNavigate();
-  const profileFrom = parseProfileFrom(get("from"));
+  const profileFrom = parseProfileFrom(searchParams.get("from"));
   const backSection = profileFrom ?? "rankings";
   const backButtonId = `profile-back-${backSection}`;
 
