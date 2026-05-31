@@ -1,3 +1,4 @@
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { Icon } from "@/components/icons";
 import type { Mover } from "@/features/rankings/lib/ranking";
 import { cn } from "@/lib/cn";
@@ -28,9 +29,11 @@ export function MoversCard({ title, titleIcon, variant, movers }: MoversCardProp
             Sin movimientos recientes
           </div>
         ) : (
-          movers.map((m) => (
-            <div
+          movers.map((m, i) => (
+            <ScrollReveal
               key={`${m.ts}-${m.name}`}
+              delay={i * 0.03}
+              y={32}
               className="flex items-center justify-between gap-2 border-b border-lm-border py-2 last:border-b-0"
             >
               <div className="flex items-center gap-2 text-base font-bold">
@@ -53,7 +56,7 @@ export function MoversCard({ title, titleIcon, variant, movers }: MoversCardProp
                 {variant === "up" ? "+" : "-"}
                 {m.delta}
               </div>
-            </div>
+            </ScrollReveal>
           ))
         )}
       </div>
