@@ -55,7 +55,7 @@ export function PhaseLabel({
   return (
     <div
       className={cn(
-        "mb-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 lm-type-label max-md:text-sm",
+        "mb-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 lm-type-label max-md:text-base",
         `phase-color--${color}`,
       )}
     >
@@ -101,7 +101,7 @@ export function PhaseSub({
   className?: string;
 }) {
   return (
-    <div className={cn("mb-5 text-base font-semibold text-lm-text2", className)}>
+    <div className={cn("mb-5 text-center text-base font-semibold leading-snug text-lm-text2", className)}>
       {children}
     </div>
   );
@@ -163,7 +163,7 @@ function TimerUnit({
       >
         {value}
       </div>
-      <div className="lm-type-label text-lm-text2">{label}</div>
+      <div className="lm-type-label text-lm-text2 max-md:text-base">{label}</div>
     </div>
   );
 }

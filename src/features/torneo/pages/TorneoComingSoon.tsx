@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Icon, IconLabel } from "@/components/icons";
+import { Icon } from "@/components/icons";
 import { ActivePage } from "@/components/ui/ActivePage";
 import { SpainTimezoneNote } from "@/components/ui/SpainTimezoneNote";
 import { HeroSection } from "@/components/ui/HeroSection";
@@ -61,15 +61,14 @@ export function TorneoComingSoon() {
           >
             EMPIEZA A LAS {timeLabel}
           </div>
-          <div className="mb-3.5 flex items-center justify-center gap-1.5 text-sm font-bold text-lm-text2">
-            <Icon name="calendar" size={14} />
+          <div className="mb-3.5 text-center text-base font-bold leading-snug text-lm-text2">
+            <Icon name="calendar" size={14} className="mr-1 inline shrink-0 align-middle" />
             {dayName} {dateLabel}
           </div>
           <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="orange" />
           <PhaseSub className="mt-3 mb-0">
-            <IconLabel icon="zap" iconSize={14} className="justify-center">
-              El siguiente torneo será el {dayName.toLowerCase()} a las {timeLabel}
-            </IconLabel>
+            <Icon name="zap" size={14} className="mr-1 inline shrink-0 align-middle" />
+            El siguiente torneo será el {dayName.toLowerCase()} a las {timeLabel}
           </PhaseSub>
           <SpainTimezoneNote className="mt-4 text-center" />
         </PhaseCard>

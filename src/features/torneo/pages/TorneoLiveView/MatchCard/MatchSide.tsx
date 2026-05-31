@@ -75,7 +75,7 @@ export function MatchSide({
           fallback={<CreatorIcon name={player} icon={info.icon} size={22} />}
         />
       </div>
-      <div className="mb-0.5 font-sans text-base font-bold tracking-tight text-lm-text max-md:text-base">
+      <div className="mb-0.5 font-sans text-base font-bold tracking-tight text-lm-text max-md:text-lg">
         {player}
       </div>
       {showBars ? (
@@ -89,13 +89,13 @@ export function MatchSide({
               style={{ width: `${pct}%` }}
             />
           </div>
-          <div className="text-sm font-bold text-lm-green2">{pct}%</div>
-          <div className="text-sm text-lm-text2">
+          <div className="text-base font-bold text-lm-green2">{pct}%</div>
+          <div className="text-base text-lm-text2">
             {votes} voto{votes !== 1 ? "s" : ""}
           </div>
         </>
       ) : canVote ? (
-        <div className="mt-1 flex items-center justify-center gap-1 text-sm font-bold text-lm-green2">
+        <div className="mt-1 flex items-center justify-center gap-1 text-base font-bold text-lm-green2">
           <Icon name="pointer" size={12} />
           Votar
         </div>

@@ -235,7 +235,7 @@
   }
 
   .cd-text--green {
-    font-size: clamp(1.1rem, 4vw, 1.65rem);
+    font-size: clamp(1.2rem, 4.5vw, 1.85rem);
   }
 }
 
@@ -447,8 +447,9 @@
 /* Consejo del día: ancho completo — borde simple (sin cónico) */
 .consejo-destacado-card {
   border-radius: 0.75rem;
-  border: 1px solid rgba(232, 184, 75, 0.35);
+  border: 1px solid rgba(232, 184, 75, 0.38);
   background-color: var(--color-lm-card);
+  box-shadow: 0 0 0 1px rgba(232, 184, 75, 0.06);
   transition:
     transform 0.3s ease,
     border-color 0.25s ease,
@@ -459,7 +460,9 @@
 .consejo-destacado-card:focus-within {
   border-color: var(--color-lm-gold);
   transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  box-shadow:
+    0 0 0 1px rgba(232, 184, 75, 0.2),
+    0 8px 24px rgba(0, 0, 0, 0.18);
 }
 
 /* ── Borde «gusanos» (gradiente cónico) ── */
@@ -493,6 +496,11 @@
 .worm-border:not(.worm-border--animated):hover,
 .worm-border:not(.worm-border--animated):focus-within {
   transform: translateY(-1px);
+  background: transparent;
+}
+
+/* Consejo: gusano siempre visible; más contraste al hover */
+.worm-border--consejo {
   background: transparent;
 }
 
@@ -602,6 +610,15 @@
 
 .worm-border:hover .worm-border__track,
 .worm-border:focus-within .worm-border__track {
+  opacity: 1;
+}
+
+.worm-border--consejo .worm-border__track {
+  opacity: 0.38;
+}
+
+.worm-border--consejo:hover .worm-border__track,
+.worm-border--consejo:focus-within .worm-border__track {
   opacity: 1;
 }
 

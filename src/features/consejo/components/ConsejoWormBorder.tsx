@@ -2,6 +2,7 @@
 
 import type { ConsejoCategory } from "@/features/consejo/data/consejos";
 import { WormBorder } from "@/components/ui/WormBorder";
+import { cn } from "@/lib/cn";
 import type { ReactNode } from "react";
 
 type ConsejoWormTheme = ConsejoCategory | "destacado";
@@ -24,7 +25,7 @@ export function ConsejoWormBorder({
     <WormBorder
       animated={false}
       category={category}
-      className={className}
+      className={cn("worm-border--consejo", className)}
       innerClassName={innerClassName}
     >
       {children}

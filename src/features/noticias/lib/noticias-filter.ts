@@ -4,19 +4,27 @@ export const NOTICIAS_FILTERS = [
   {
     id: "informaciongeneral",
     label: "Información general",
+    shortLabel: "General",
     description: "Duelos de Rank Vote y quién vence a quién",
   },
   {
     id: "subida",
     label: "Subidas",
+    shortLabel: "Subidas",
     description: "Rankers que han subido en el ranking",
   },
   {
     id: "bajada",
     label: "Bajadas",
+    shortLabel: "Bajadas",
     description: "Rankers que han bajado en el ranking",
   },
-  { id: "todas", label: "Todas", description: "Todos los eventos recientes" },
+  {
+    id: "todas",
+    label: "Todas",
+    shortLabel: "Todas",
+    description: "Todos los eventos recientes",
+  },
 ] as const;
 
 export type NoticiasFilterId = (typeof NOTICIAS_FILTERS)[number]["id"];

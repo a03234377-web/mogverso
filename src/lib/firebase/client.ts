@@ -12,6 +12,7 @@ import {
 } from "firebase/database";
 import { prependMoverStack } from "@/features/rankings/lib/ranking";
 import { isValidRankVotePair } from "@/features/rankings/lib/ranker-name";
+import { coerceVoteCount } from "@/lib/coerce-vote-count";
 import { ENTRY_VOTE_MS, VOTE_ROUND_MS } from "@/lib/vote-intervals";
 import { firebaseConfig, isFirebaseConfigured } from "./config";
 import type { Ranker } from "@/features/rankings/data/rankers";
@@ -79,7 +80,12 @@ export function getFirebaseBridge(): FirebaseBridge | null {
 
 function getDeviceId(): string {
   if (typeof window === "undefined") return "dev_ssr";
-  let id = localStorage.getItem("lm_device_id");
+  let id: string | null = null;
+  try {
+    id = localStorage.getItem("lm_device_id");
+  } catch {
+    /* storage bloqueado (p. ej. Safari privado) */
+  }
   if (!id) {
     id = "dev_" + Math.random().toString(36).slice(2, 14) + Date.now().toString(36);
     try {
@@ -386,9 +392,9 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
 
     const p1 = fresh.p1 as string;
     const p2 = fresh.p2 as string;
-    const votes = fresh.votes as Record<string, number> | undefined;
-    const v1 = votes?.[p1] || 0;
-    const v2 = votes?.[p2] || 0;
+    const votes = fresh.votes as Record<string, unknown> | undefined;
+    const v1 = coerceVoteCount(votes?.[p1]);
+    const v2 = coerceVoteCount(votes?.[p2]);
     const tsNow = Date.now();
 
     if (v1 === 0 && v2 === 0) {
@@ -609,7 +615,7 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
     try {
       await runTransaction(
         ref(db!, "rankvote/current/votes/" + name),
-        (cur) => (cur || 0) + 1,
+        (cur) => coerceVoteCount(cur) + 1,
       );
       const writes: Record<string, unknown> = {};
       writes["rankvoteVotes/dev_" + DEVICE_ID + "_" + rv.id] = {

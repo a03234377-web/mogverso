@@ -17,7 +17,7 @@ export function TorneoBracket({ state }: { state: TorneoState | null }) {
   return (
     <div className="flex gap-2 overflow-x-auto pb-3" id="torneoBracketGrid">
       <div className="flex min-w-[110px] shrink-0 flex-col gap-1.5">
-        <div className="mb-1 border-b border-lm-border py-1 text-center lm-type-label text-lm-text2">
+        <div className="mb-1 border-b border-lm-border py-1 text-center lm-type-label text-lm-text2 max-md:text-base">
           Cuartos de Final
         </div>
         {(["cua_0", "cua_1", "cua_2", "cua_3"] as const).flatMap((matchId) => {
@@ -38,7 +38,7 @@ export function TorneoBracket({ state }: { state: TorneoState | null }) {
         })}
       </div>
       <div className="flex min-w-[110px] shrink-0 flex-col gap-1.5">
-        <div className="mb-1 border-b border-lm-border py-1 text-center lm-type-label text-lm-text2">
+        <div className="mb-1 border-b border-lm-border py-1 text-center lm-type-label text-lm-text2 max-md:text-base">
           Semifinales
         </div>
         {[0, 1, 2, 3].map((i) => {
@@ -56,7 +56,7 @@ export function TorneoBracket({ state }: { state: TorneoState | null }) {
         })}
       </div>
       <div className="flex min-w-[110px] shrink-0 flex-col gap-1.5">
-        <div className="mb-1 border-b border-lm-border py-1 text-center lm-type-label text-lm-gold">
+        <div className="mb-1 border-b border-lm-border py-1 text-center lm-type-label text-lm-gold max-md:text-base">
           Final
         </div>
         {champion ? (
@@ -73,7 +73,7 @@ export function TorneoBracket({ state }: { state: TorneoState | null }) {
             )}
           >
             <Icon name="crown" size={12} className="text-lm-gold" />
-            <div className="max-w-[75px] truncate text-sm font-bold text-lm-gold">
+            <div className="max-w-[75px] truncate text-base font-bold text-lm-gold max-md:max-w-[90px]">
               Por decidir
             </div>
           </div>
@@ -97,7 +97,7 @@ function BracketSlot({
   if (tbd) {
     return (
       <div className="flex items-center gap-1.5 rounded-lg border border-lm-border bg-lm-card px-2 py-1.5 opacity-40">
-        <div className="max-w-[75px] truncate text-sm font-bold text-lm-text2">TBD</div>
+        <div className="max-w-[75px] truncate text-base font-bold text-lm-text2 max-md:max-w-[90px]">TBD</div>
       </div>
     );
   }
@@ -126,7 +126,7 @@ function BracketSlot({
       </div>
       <div
         className={cn(
-          "max-w-[75px] truncate text-sm font-bold text-lm-text",
+          "max-w-[75px] truncate text-base font-bold text-lm-text max-md:max-w-[90px]",
           gold && "text-lm-gold2",
         )}
       >

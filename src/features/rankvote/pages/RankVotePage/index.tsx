@@ -32,9 +32,7 @@ export function RankVotePage() {
         variant="rankvote"
         title={
           <>
-            <IconLabel icon="vote" iconSize={28} className="justify-center">
-              Votar
-            </IconLabel>
+            Votar
             <br />
             Ranking
           </>
@@ -67,13 +65,13 @@ export function RankVotePage() {
                 </IconLabel>
               )}
               {healError && (
-                <div className="mx-auto mt-4 max-w-md text-sm leading-relaxed font-semibold text-lm-red2">
+                <div className="mx-auto mt-4 max-w-md text-base leading-relaxed font-semibold text-lm-red2">
                   {healError}
                   <button
                     type="button"
                     className={cn(
                       "mt-3 block w-full cursor-pointer rounded-lg border border-lm-border2",
-                      "bg-lm-card px-4 py-2 text-sm font-bold text-lm-gold lm-focus-ring",
+                      "bg-lm-card px-4 py-2 text-base font-bold text-lm-gold lm-focus-ring",
                     )}
                     onClick={() => void retryHeal()}
                   >
@@ -99,7 +97,7 @@ export function RankVotePage() {
           )}
         </WormBorder>
         <div>
-          <div className="mb-4 flex items-center gap-2 font-sans text-xl font-bold tracking-tight text-lm-text">
+          <div className="mb-4 flex items-center gap-2 font-sans text-xl font-bold tracking-tight text-lm-text max-md:text-[clamp(1.25rem,3vw,1.75rem)]">
             <Icon name="scroll-text" size={22} className="text-lm-gold" />
             Historial de Votaciones
           </div>

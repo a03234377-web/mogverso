@@ -2,7 +2,7 @@
 
 import { CreatorImage } from "@/components/CreatorImage";
 import { SpainTimezoneNote } from "@/components/ui/SpainTimezoneNote";
-import { CreatorIcon, Icon, IconLabel } from "@/components/icons";
+import { CreatorIcon, Icon } from "@/components/icons";
 import { getPlayerByName } from "@/features/torneo/data/torneo-players";
 import {
   PhaseCard,
@@ -49,16 +49,15 @@ export function TorneoPhaseWaitingOctavos({
         >
           EMPIEZA A LAS {horaStr}
         </div>
-        <div className="mb-3.5 flex items-center justify-center gap-1.5 text-sm font-bold text-lm-text2">
-          <Icon name="calendar" size={14} />
+        <div className="mb-3.5 text-center text-base font-bold leading-snug text-lm-text2">
+          <Icon name="calendar" size={14} className="mr-1 inline shrink-0 align-middle" />
           {diaCompleto}
         </div>
         <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="orange" />
-        <div className="mt-3 text-base font-semibold text-lm-text2">
-          <IconLabel icon="zap" iconSize={14} className="justify-center">
-            El torneo arrancará automáticamente a las {horaStr}
-          </IconLabel>
-        </div>
+        <PhaseSub className="mt-3 mb-0">
+          <Icon name="zap" size={14} className="mr-1 inline shrink-0 align-middle" />
+          El torneo arrancará automáticamente a las {horaStr}
+        </PhaseSub>
         <SpainTimezoneNote className="mt-3 text-center" />
       </PhaseCard>
     </PhaseDisplay>
@@ -78,15 +77,14 @@ export function TorneoPhaseEnded({
   return (
     <PhaseDisplay>
       <PhaseCard variant="semifinals">
-        <div className="mb-2.5 flex items-center justify-center gap-2 lm-type-label text-lm-gold">
+        <div className="mb-2.5 flex items-center justify-center gap-2 lm-type-label text-lm-gold max-md:text-base">
           <Icon name="trophy" size={14} />
           TORNEO FINALIZADO
           <Icon name="trophy" size={14} />
         </div>
         <PhaseTitle color="gold">
-          <IconLabel icon="crown" iconSize={18}>
-            CAMPEÓN
-          </IconLabel>
+          <Icon name="crown" size={18} className="mr-1.5 inline shrink-0 align-middle" />
+          CAMPEÓN
         </PhaseTitle>
         <PhaseSub>El mejor looksmaxer de España ha sido coronado</PhaseSub>
         <div className="my-4 flex flex-col items-center gap-3">

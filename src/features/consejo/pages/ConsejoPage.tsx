@@ -21,7 +21,7 @@ export function ConsejoPage() {
         desc="Protocolos prácticos de looksmaxing: piel, cuerpo, estilo y hábitos que se notan en cámara"
       />
       <div className="mx-auto max-w-[1000px] px-5 pb-12 max-md:px-3 max-md:pb-6">
-        <div className="mt-4 grid grid-cols-2 gap-3 max-md:grid-cols-1 max-md:gap-2.5">
+        <div className="mt-4 grid grid-cols-2 gap-x-3 gap-y-10 max-md:grid-cols-1 max-md:gap-4">
           <ConsejoDestacado
             title={consejoDelDia.title}
             body={consejoDelDia.body}
