@@ -5,6 +5,7 @@ import { CountdownDigits } from "@/features/shared/components/ui/CountdownDigits
 import { FighterCard } from "./FighterCard";
 import { useCountdown } from "@/features/shared/hooks/useCountdown";
 import { RANKERS } from "@/features/rankings/data/rankers";
+import { isKnownRankerName, safeRankerLabel } from "@/features/rankings/lib/ranker-name";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import { cn } from "@/lib/cn";
 
@@ -35,13 +36,15 @@ export function RankVoteArena({
   const total = Math.max(1, v1 + v2);
   const pct1 = Math.round((v1 / total) * 100);
   const pct2 = 100 - pct1;
+  const displayP1 = safeRankerLabel(rv.p1);
+  const displayP2 = safeRankerLabel(rv.p2);
   const r1 = RANKERS.find((r) => r.name === rv.p1) ?? {
-    name: rv.p1,
+    name: displayP1,
     score: 0,
     sub: "España",
   };
   const r2 = RANKERS.find((r) => r.name === rv.p2) ?? {
-    name: rv.p2,
+    name: displayP2,
     score: 0,
     sub: "España",
   };
@@ -51,7 +54,10 @@ export function RankVoteArena({
   const idx1 = ranked.indexOf(rv.p1) + 1;
   const idx2 = ranked.indexOf(rv.p2) + 1;
   const voted = myVote?.rvId === rv.id;
-  const myCandidate = voted ? myVote.candidate : null;
+  const myCandidate =
+    voted && myVote.candidate && isKnownRankerName(myVote.candidate)
+      ? myVote.candidate
+      : null;
   const canVote = !voted && !voting;
 
   return (
@@ -81,13 +87,13 @@ export function RankVoteArena({
       >
         <FighterCard
           side="up"
-          name={rv.p1}
+          name={displayP1}
           ranker={r1}
           idx={idx1}
           pct={pct1}
           votes={v1}
           voted={voted}
-          canVote={canVote}
+          canVote={canVote && isKnownRankerName(rv.p1)}
           selected={myCandidate === rv.p1}
           onVote={() => onVote(rv.p1)}
         />
@@ -96,13 +102,13 @@ export function RankVoteArena({
         </div>
         <FighterCard
           side="down"
-          name={rv.p2}
+          name={displayP2}
           ranker={r2}
           idx={idx2}
           pct={pct2}
           votes={v2}
           voted={voted}
-          canVote={canVote}
+          canVote={canVote && isKnownRankerName(rv.p2)}
           selected={myCandidate === rv.p2}
           onVote={() => onVote(rv.p2)}
         />
@@ -111,8 +117,14 @@ export function RankVoteArena({
         {voted ? (
           <div className="flex items-center justify-center gap-1.5 text-base font-bold text-lm-green2">
             <Icon name="circle-check" size={16} />
-            Votaste por <strong>{myCandidate}</strong> · El ranking se actualiza al
-            terminar
+            {myCandidate ? (
+              <>
+                Votaste por <strong>{myCandidate}</strong> · El ranking se actualiza al
+                terminar
+              </>
+            ) : (
+              <>Voto registrado · El ranking se actualiza al terminar</>
+            )}
           </div>
         ) : voting ? (
           <div className="flex items-center justify-center gap-1.5 text-base text-lm-text2">

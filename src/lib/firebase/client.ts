@@ -11,6 +11,7 @@ import {
   type Database,
 } from "firebase/database";
 import { prependMoverStack } from "@/features/rankings/lib/ranking";
+import { isValidRankVotePair } from "@/features/rankings/lib/ranker-name";
 import { ENTRY_VOTE_MS, VOTE_ROUND_MS } from "@/lib/vote-intervals";
 import { firebaseConfig, isFirebaseConfigured } from "./config";
 import type { Ranker } from "@/features/rankings/data/rankers";
@@ -271,10 +272,18 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
       return;
     }
     const rv = snap.val() as {
+      p1: string;
+      p2: string;
       resolved?: boolean;
       endTime: number;
     };
-    if (rv.resolved !== true && rv.endTime > Date.now()) return;
+    if (rv.resolved !== true && rv.endTime > Date.now()) {
+      if (!isValidRankVotePair(rv)) {
+        await createNewRVRound();
+        return;
+      }
+      return;
+    }
     await createNewRVRound();
   }
 
@@ -282,10 +291,16 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
     const snap = await get(ref(db!, "rankvote/current"));
     if (snap.exists()) {
       const rv = snap.val() as {
+        p1: string;
+        p2: string;
         resolved?: boolean;
         endTime: number;
         resolving?: boolean;
       };
+      if (!isValidRankVotePair(rv)) {
+        await createNewRVRound();
+        return;
+      }
       if (rv.resolved === true) {
         await createNewRVRound();
         return;
@@ -357,6 +372,10 @@ export async function initFirebaseClient(rankers?: Ranker[]): Promise<boolean> {
     }
     const fresh = freshSnap.val() as Record<string, unknown>;
     if (fresh.resolved === true) {
+      await createNewRVRound();
+      return;
+    }
+    if (!isValidRankVotePair(fresh)) {
       await createNewRVRound();
       return;
     }

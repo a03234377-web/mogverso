@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { AdBanner } from "@/features/rankings/components/AdBanner";
 import { IconLabel } from "@/components/icons";
@@ -30,6 +33,12 @@ export function RankingsPage({
   adsenseClient,
 }: RankingsPageProps) {
   const { openProfile } = useLooksMaxNavigate();
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    const id = requestAnimationFrame(() => ScrollTrigger.refresh());
+    return () => cancelAnimationFrame(id);
+  }, [entries.length]);
 
   return (
     <div id="page-rankings" className="block animate-fade-up">
@@ -88,14 +97,25 @@ export function RankingsPage({
       </div>
 
       <div className="mx-auto max-w-[1100px] px-5 pb-12 max-md:px-2.5 max-md:pb-20">
-        <SectionTitle className="mb-4">
-          <IconLabel icon="trophy" iconSize={20}>
-            Ranking Completo
-          </IconLabel>
-        </SectionTitle>
+        <ScrollReveal y={28} className="mb-4" enterSpan={0.22} holdSpan={0.56} exitSpan={0.22}>
+          <SectionTitle>
+            <IconLabel icon="trophy" iconSize={20}>
+              Ranking Completo
+            </IconLabel>
+          </SectionTitle>
+        </ScrollReveal>
         <div className="flex flex-col gap-2" id="rankList">
           {entries.map((entry, i) => (
-            <ScrollReveal key={entry.name} className="w-full" y={40}>
+            <ScrollReveal
+              key={entry.name}
+              className="w-full"
+              y={36}
+              enterSpan={0.22}
+              holdSpan={0.56}
+              exitSpan={0.22}
+              start="top bottom+=6%"
+              end="bottom top+=6%"
+            >
               <RankRow entry={entry} index={i} onOpenProfile={openProfile} />
             </ScrollReveal>
           ))}
@@ -124,7 +144,7 @@ export function RankingsPage({
       </div>
 
       <div className="mx-auto max-w-[1100px] px-5 pb-16 max-md:px-3 max-md:pb-4">
-        <ScrollReveal y={44}>
+        <ScrollReveal y={44} scrollRange="inView">
           <EntryVoteCard />
         </ScrollReveal>
       </div>
