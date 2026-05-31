@@ -1,5 +1,19 @@
 {
   "framework": "nextjs",
   "buildCommand": "pnpm run build",
-  "installCommand": "pnpm install"
+  "installCommand": "pnpm install",
+  "crons": [
+    {
+      "path": "/api/cron/rankvote-resolve",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/entry-vote",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/torneo-advance",
+      "schedule": "*/5 * * * *"
+    }
+  ]
 }

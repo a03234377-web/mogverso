@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { Icon } from "@/components/icons";
-import { getInitialTorneoState, PHASES } from "@/features/torneo/data/torneo-players";
 import {
   PhaseCard,
   PhaseDisplay,
@@ -11,11 +10,12 @@ import {
   PhaseTimer,
   PhaseTitle,
 } from "@/features/torneo/components/PhaseCard";
-import { TorneoPhaseEnded, TorneoPhaseWaitingOctavos } from "./TorneoPhaseViews";
-import { getNext23Ms } from "./getNext23Ms";
+import { PHASES } from "@/features/torneo/data/torneo-players";
+import { healTorneoApi } from "@/lib/api/vote-client";
 import { useCountdown } from "@/hooks/useCountdown";
 import type { TorneoState } from "@/types/looksmax";
-import { useFirebase } from "@/features/app/context/FirebaseProvider";
+import { TorneoPhaseEnded, TorneoPhaseWaitingOctavos } from "./TorneoPhaseViews";
+import { getNext23Ms } from "./getNext23Ms";
 
 export function TorneoPhaseCard({
   state,
@@ -26,19 +26,17 @@ export function TorneoPhaseCard({
   loading: boolean;
   onRestart: () => void;
 }) {
-  const { fb } = useFirebase();
   const cd = useCountdown(state?.phaseEnd);
   const restartEnd = state?.phase === PHASES.TORNEO_ENDED ? getNext23Ms() : null;
   const restartCd = useCountdown(restartEnd);
 
   useEffect(() => {
-    if (state?.phase !== PHASES.TORNEO_ENDED || !restartCd.expired || !fb) return;
+    if (state?.phase !== PHASES.TORNEO_ENDED || !restartCd.expired) return;
     void (async () => {
-      const fresh = getInitialTorneoState(Date.now());
-      await fb.initTorneoState(fresh as Record<string, unknown>);
+      await healTorneoApi({ restartIfEnded: true });
       onRestart();
     })();
-  }, [state?.phase, restartCd.expired, fb, onRestart]);
+  }, [state?.phase, restartCd.expired, onRestart]);
 
   if (loading || !state) {
     return (

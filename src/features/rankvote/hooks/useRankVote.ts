@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
-import type { RankOverrides, RankVoteMyVote, RankVoteRound } from "@/types/looksmax";
 import {
   isKnownRankerName,
   isValidRankVotePair,
 } from "@/features/rankings/lib/ranker-name";
+import { healRankvoteApi, voteRankvoteApi } from "@/lib/api/vote-client";
+import { useRecaptcha } from "@/hooks/useRecaptcha";
+import type { RankOverrides, RankVoteMyVote, RankVoteRound } from "@/types/looksmax";
 
 type RvHistoryRow = {
   id?: string;
@@ -44,11 +46,12 @@ function formatHealError(err: unknown): string {
   if (/PERMISSION_DENIED|permission_denied/i.test(msg)) {
     return "Firebase denegó la escritura. Revisa las reglas RTDB en la consola del proyecto.";
   }
-  return msg || "No se pudo crear la nueva ronda";
+  return msg || "No se pudo sanear la ronda";
 }
 
 export function useRankVote(active: boolean) {
   const { fb } = useFirebase();
+  const { getToken } = useRecaptcha("rankvote");
   const [rv, setRv] = useState<RankVoteRound | null>(null);
   const [myVote, setMyVote] = useState<RankVoteMyVote | null>(null);
   const [overrides, setOverrides] = useState<RankOverrides>({});
@@ -58,39 +61,41 @@ export function useRankVote(active: boolean) {
   const [healError, setHealError] = useState<string | null>(null);
   const [voting, setVoting] = useState(false);
   const resolveInFlightRef = useRef<Promise<void> | null>(null);
+  const lastHealRef = useRef(0);
 
   const requestNewRound = useCallback(async () => {
-    if (!fb) return;
+    const now = Date.now();
+    if (now - lastHealRef.current < 2000) return;
+    lastHealRef.current = now;
     try {
-      await fb.ensureRVExists();
-      setHealError(null);
-    } catch (err) {
-      console.error("[LooksMax] ensureRVExists:", err);
-      setHealError(formatHealError(err));
-    }
-  }, [fb]);
-
-  const runResolve = useCallback(
-    async (round: Record<string, unknown>) => {
-      if (!fb) return;
-      if (resolveInFlightRef.current) {
-        await resolveInFlightRef.current.catch(() => {});
+      const res = await healRankvoteApi();
+      if (!res.ok) {
+        setHealError(res.error ?? "heal_failed");
         return;
       }
-      const task = fb
-        .resolveRVIfNeeded(round)
-        .catch((err) => {
-          console.error("[LooksMax] resolveRVIfNeeded:", err);
-          setHealError(formatHealError(err));
-        })
-        .finally(() => {
-          resolveInFlightRef.current = null;
-        });
-      resolveInFlightRef.current = task;
-      await task;
-    },
-    [fb],
-  );
+      setHealError(null);
+    } catch (err) {
+      console.error("[LooksMax] healRankvoteApi:", err);
+      setHealError(formatHealError(err));
+    }
+  }, []);
+
+  const runResolve = useCallback(async () => {
+    if (resolveInFlightRef.current) {
+      await resolveInFlightRef.current.catch(() => {});
+      return;
+    }
+    const task = requestNewRound()
+      .catch((err) => {
+        console.error("[LooksMax] heal rankvote:", err);
+        setHealError(formatHealError(err));
+      })
+      .finally(() => {
+        resolveInFlightRef.current = null;
+      });
+    resolveInFlightRef.current = task;
+    await task;
+  }, [requestNewRound]);
 
   const handleSnapshot = useCallback(
     async (round: RankVoteRound | null) => {
@@ -115,7 +120,7 @@ export function useRankVote(active: boolean) {
 
       if (round.endTime <= now) {
         if (arenaActive) setTransitioning(true);
-        await runResolve(round as Record<string, unknown>);
+        await runResolve();
         return;
       }
 
@@ -199,19 +204,24 @@ export function useRankVote(active: boolean) {
       if (!fb || !rv || voting) return;
       setVoting(true);
       try {
-        const result = await fb.castRVVoteDB(name);
+        const token = await getToken();
+        const result = await voteRankvoteApi(name, token);
         if (result.ok) {
           const snap = await fb.get(fb.ref(fb.db, "rankvote/current"));
           const fresh = snap.exists() ? (snap.val() as RankVoteRound) : rv;
           setRv(fresh);
           setMyVote({ rvId: fresh.id, candidate: name });
+          return { ok: true as const, rv: fresh };
         }
-        return result;
+        return {
+          ok: false as const,
+          reason: result.reason ?? result.error ?? "vote_failed",
+        };
       } finally {
         setVoting(false);
       }
     },
-    [fb, rv, voting],
+    [fb, rv, voting, getToken],
   );
 
   useEffect(() => {
@@ -221,7 +231,7 @@ export function useRankVote(active: boolean) {
     const id = setInterval(() => {
       if (rv.endTime <= Date.now()) {
         setTransitioning(true);
-        void runResolve(rv as Record<string, unknown>);
+        void runResolve();
       }
     }, 1000);
     return () => clearInterval(id);
