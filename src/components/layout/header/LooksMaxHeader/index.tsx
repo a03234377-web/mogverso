@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Icon } from "@/components/icons";
 import { LOOKSMAX_PATHS } from "@/features/app/routes";
 import { BrandLink, NavBadge } from "./HeaderParts";
+import { JoinCommunityButton } from "./JoinCommunityButton";
 import { cn } from "@/lib/cn";
 import { DESKTOP_TABS, sectionTitle } from "@/components/layout/header/nav-config";
 import { useHeaderScroll } from "@/components/layout/header/useHeaderScroll";
@@ -116,23 +117,7 @@ export function LooksMaxHeader({ page, onOpenDiscord }: LooksMaxHeaderProps) {
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
-          <button
-            type="button"
-            aria-label="Unirse a la comunidad"
-            className={cn(
-              "flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full",
-              "border border-[rgba(232,184,75,0.35)]",
-              "bg-[linear-gradient(135deg,var(--color-lm-gold),var(--color-lm-gold3))]",
-              "px-2.5 py-1.5 font-sans text-sm leading-none font-bold tracking-normal text-black",
-              "shadow-[0_0_16px_rgba(232,184,75,0.25)] lm-focus-ring-on-gold",
-              "transition-all duration-200 hover:scale-[1.03]",
-              "hover:shadow-[0_0_22px_rgba(232,184,75,0.4)] md:px-3 md:py-2 lg:px-3.5",
-            )}
-            onClick={onOpenDiscord}
-          >
-            <Icon name="star" size={16} className="text-black" />
-            <span className="max-sm:hidden">Unirse</span>
-          </button>
+          <JoinCommunityButton onClick={onOpenDiscord} />
         </div>
       </nav>
     </header>
