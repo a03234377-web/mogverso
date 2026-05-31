@@ -7,6 +7,7 @@ import type {
   RankVoteMyVote,
   RankVoteRound,
 } from "@/features/shared/lib/types";
+import { isKnownRankerName, isValidRankVotePair } from "@/features/rankings/lib/ranker-name";
 
 type RvHistoryRow = {
   id?: string;
@@ -119,6 +120,12 @@ export function useRankVote(active: boolean) {
         return;
       }
 
+      if (!isValidRankVotePair(round)) {
+        if (arenaActive) setTransitioning(true);
+        await requestNewRound();
+        return;
+      }
+
       setTransitioning(false);
       setHealError(null);
       setRv(round);
@@ -130,7 +137,13 @@ export function useRankVote(active: boolean) {
       setOverrides(ovSnap.exists() ? (ovSnap.val() as RankOverrides) : {});
       setMyVote(
         myVoteSnap.exists()
-          ? { rvId: round.id, candidate: myVoteSnap.val().candidate as string }
+          ? {
+              rvId: round.id,
+              candidate: (() => {
+                const candidate = myVoteSnap.val().candidate as string;
+                return isKnownRankerName(candidate) ? candidate : "";
+              })(),
+            }
           : null,
       );
       setLoading(false);

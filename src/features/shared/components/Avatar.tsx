@@ -11,6 +11,8 @@ type AvatarProps = {
   size?: number;
   className?: string;
   rounded?: "full" | "md";
+  /** cover recorta; contain muestra la imagen entera centrada. */
+  fit?: "cover" | "contain";
 };
 
 export function Avatar({
@@ -18,6 +20,7 @@ export function Avatar({
   size = 40,
   className = "",
   rounded = "full",
+  fit = "cover",
 }: AvatarProps) {
   const src = getRankerPhoto(name);
   const [failed, setFailed] = useState(false);
@@ -48,7 +51,11 @@ export function Avatar({
         alt={name}
         fill
         sizes={`${size}px`}
-        className={cn("object-cover object-top select-none", radiusClass)}
+        className={cn(
+          fit === "contain" ? "object-contain object-center" : "object-cover object-top",
+          "select-none",
+          radiusClass,
+        )}
         draggable={false}
         onError={() => setFailed(true)}
       />

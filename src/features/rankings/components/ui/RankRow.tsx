@@ -85,7 +85,7 @@ export function RankRow({ entry, index, onOpenProfile }: RankRowProps) {
         {rank}
       </div>
       <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-lm-border bg-lm-bg3">
-        <Avatar name={ranker.name} size={40} />
+        <Avatar name={ranker.name} size={40} fit="contain" />
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-1.5 text-base leading-snug font-bold">

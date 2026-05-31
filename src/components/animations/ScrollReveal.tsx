@@ -4,6 +4,7 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
+  useState,
   type ElementType,
   type ReactNode,
 } from "react";
@@ -42,6 +43,13 @@ export type ScrollRevealProps = {
   end?: string;
   /** true = 1:1 con el scroll; número = suavizado mínimo en segundos. */
   scrub?: boolean | number;
+  /**
+   * traverse: entra y sale mientras atraviesa el viewport (filas del ranking).
+   * inView: solo entrada mientras entra en pantalla; queda visible (bloques al final de página).
+   */
+  scrollRange?: "traverse" | "inView";
+  /** Oculto hasta que GSAP tome el control (evita flash al hidratar). */
+  hideUntilReady?: boolean;
 };
 
 /** Entrada/salida ligada al scroll (GSAP ScrollTrigger + scrub). */
@@ -57,13 +65,21 @@ export function ScrollReveal({
   start = "top bottom+=10%",
   end = "bottom top+=10%",
   scrub = true,
+  scrollRange = "traverse",
+  hideUntilReady = true,
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [gsapReady, setGsapReady] = useState(false);
 
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      gsap.set(el, VISIBLE);
+      setGsapReady(true);
+      return;
+    }
     gsap.set(el, HIDDEN(y));
   }, [y]);
 
@@ -75,12 +91,19 @@ export function ScrollReveal({
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) return;
 
+    const isInView = scrollRange === "inView";
+    const resolvedStart = isInView ? "top bottom+=8%" : start;
+    const resolvedEnd = isInView ? "top 72%" : end;
+    const resolvedEnterSpan = isInView ? 0.28 : enterSpan;
+    const resolvedHoldSpan = isInView ? 0.72 : holdSpan;
+    const resolvedExitSpan = isInView ? 0 : exitSpan;
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: el,
-          start,
-          end,
+          start: resolvedStart,
+          end: resolvedEnd,
           scrub,
         },
       });
@@ -89,16 +112,45 @@ export function ScrollReveal({
         tl.to({}, { duration: delay });
       }
 
-      tl.fromTo(el, HIDDEN(y), { ...VISIBLE, ease: "none", duration: enterSpan })
-        .to(el, { ...VISIBLE, ease: "none", duration: holdSpan })
-        .to(el, { ...EXIT(y), ease: "none", duration: exitSpan });
+      tl.fromTo(el, HIDDEN(y), {
+        ...VISIBLE,
+        ease: "none",
+        duration: resolvedEnterSpan,
+      })
+        .to(el, { ...VISIBLE, ease: "none", duration: resolvedHoldSpan });
+
+      if (resolvedExitSpan > 0) {
+        tl.to(el, { ...EXIT(y), ease: "none", duration: resolvedExitSpan });
+      }
     }, el);
 
-    return () => ctx.revert();
-  }, [y, enterSpan, holdSpan, exitSpan, delay, start, end, scrub]);
+    setGsapReady(true);
+
+    const refresh = () => ScrollTrigger.refresh();
+    refresh();
+    const ro = new ResizeObserver(refresh);
+    ro.observe(el);
+    window.addEventListener("load", refresh);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("load", refresh);
+      ctx.revert();
+      setGsapReady(false);
+    };
+  }, [y, enterSpan, holdSpan, exitSpan, delay, start, end, scrub, scrollRange]);
 
   return (
-    <Tag ref={ref} className={className} style={{ willChange: "transform, opacity" }}>
+    <Tag
+      ref={ref}
+      className={className}
+      style={{
+        willChange: "transform, opacity",
+        ...(!gsapReady && hideUntilReady
+          ? { opacity: 0, visibility: "hidden" as const }
+          : undefined),
+      }}
+    >
       {children}
     </Tag>
   );

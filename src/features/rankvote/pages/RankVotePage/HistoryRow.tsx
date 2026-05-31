@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Icon } from "@/components/icons";
 import { profilePath } from "@/features/app/routes";
 import { resolveRankerFromProfileSlug } from "@/features/rankings/lib/profile-slug";
+import { isKnownRankerName, safeRankerLabel } from "@/features/rankings/lib/ranker-name";
 import { cn } from "@/lib/cn";
 
 type HistoryEntry = {
@@ -19,10 +20,11 @@ type HistoryEntry = {
 };
 
 function HistoryNameLink({ name, className }: { name: string; className: string }) {
-  const ranker = resolveRankerFromProfileSlug(name);
+  const label = safeRankerLabel(name, "—");
+  const ranker = isKnownRankerName(name) ? resolveRankerFromProfileSlug(name) : null;
 
   if (!ranker) {
-    return <span className={className}>{name}</span>;
+    return <span className={className}>{label}</span>;
   }
 
   return (
@@ -33,9 +35,9 @@ function HistoryNameLink({ name, className }: { name: string; className: string 
         "cursor-pointer rounded-sm underline-offset-2 transition-opacity",
         "hover:underline hover:opacity-90 lm-focus-ring",
       )}
-      title={`Ver perfil de ${name}`}
+      title={`Ver perfil de ${label}`}
     >
-      {name}
+      {label}
     </Link>
   );
 }
