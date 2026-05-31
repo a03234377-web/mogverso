@@ -4,12 +4,13 @@ import { PageHeader } from "@/components/PageHeader";
 import { ActivePage } from "@/components/ui/ActivePage";
 import { Icon } from "@/components/icons";
 import type { IconName } from "@/types/icons";
-import { cn } from "@/lib/cn";
+import { ConsejoWormBorder } from "@/features/consejo/components/ConsejoWormBorder";
 import {
   consejoDelDia,
   consejos,
   type ConsejoCategory,
 } from "@/features/consejo/data/consejos";
+import { cn } from "@/lib/cn";
 
 export function ConsejoPage() {
   return (
@@ -55,8 +56,7 @@ function ConsejoDestacado({
   return (
     <div
       className={cn(
-        "col-span-full flex items-start gap-5 rounded-xl border border-[rgba(232,184,75,0.35)]",
-        "bg-lm-card p-5 max-md:flex-row",
+        "consejo-destacado-card col-span-full flex items-start gap-5 p-5 max-md:flex-row",
       )}
     >
       <Icon name="sun" size={36} className="shrink-0 text-lm-gold max-md:w-7" />
@@ -100,12 +100,7 @@ function ConsejoCard({
   tag: string;
 }) {
   return (
-    <div
-      className={cn(
-        "rounded-xl border border-lm-border bg-lm-card p-5 transition-all duration-300",
-        "hover:-translate-y-0.5 hover:border-lm-border2",
-      )}
-    >
+    <ConsejoWormBorder category={category} innerClassName="p-5">
       <div
         className={cn(
           "mb-1.5 flex items-center gap-1 text-sm font-bold tracking-wide uppercase",
@@ -124,6 +119,6 @@ function ConsejoCard({
           {tag}
         </span>
       </div>
-    </div>
+    </ConsejoWormBorder>
   );
 }

@@ -50,6 +50,7 @@ function DiscordModalContent() {
           "mb-1 bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2)_50%,var(--color-lm-gold)_100%)]",
           "bg-clip-text text-center font-sans text-[clamp(1.35rem,5vw,2rem)] leading-tight font-bold",
           "tracking-tight text-transparent max-md:text-[clamp(1.5rem,5vw,2.2rem)]",
+          "text-center w-full"
         )}
       >
         Únete a la

@@ -1,13 +1,15 @@
 "use client";
 
-import { Avatar } from "@/components/Avatar";
-import { Icon, IconLabel } from "@/components/icons";
+import { CreatorImage } from "@/components/CreatorImage";
+import { CreatorIcon, Icon, IconLabel } from "@/components/icons";
+import { getRankerPhoto } from "@/features/rankings/data/avatars";
 import { RANKERS } from "@/features/rankings/data/rankers";
 import { cn } from "@/lib/cn";
 
 export function FighterCard({
   side,
   name,
+  photoName,
   ranker,
   idx,
   pct,
@@ -19,6 +21,8 @@ export function FighterCard({
 }: {
   side: "up" | "down";
   name: string;
+  /** Nombre canónico para resolver la foto (p. ej. clave Firebase). */
+  photoName: string;
   ranker: { sub: string; score: number };
   idx: number;
   pct: number;
@@ -29,6 +33,8 @@ export function FighterCard({
   onVote: () => void;
 }) {
   const up = side === "up";
+  const photo = getRankerPhoto(photoName);
+
   return (
     <button
       type="button"
@@ -69,12 +75,28 @@ export function FighterCard({
       )}
       <div
         className={cn(
-          "relative mx-auto mb-2 h-20 w-20 shrink-0 overflow-hidden rounded-full",
+          "relative mx-auto mb-2 size-20 shrink-0 overflow-hidden rounded-full",
           "border-2 border-lm-border bg-lm-bg3",
-          "max-[400px]:h-[54px] max-[400px]:w-[54px] max-md:h-16 max-md:w-16",
+          "max-[400px]:size-[54px] max-md:size-16",
         )}
       >
-        <Avatar name={name} size={80} />
+        {photo ? (
+          <CreatorImage
+            src={photo}
+            alt={name}
+            className="rounded-full object-contain object-center"
+            sizes="80px"
+            fallback={
+              <span className="flex size-full items-center justify-center">
+                <CreatorIcon name={photoName} size={36} />
+              </span>
+            }
+          />
+        ) : (
+          <span className="flex size-full items-center justify-center">
+            <CreatorIcon name={photoName} size={36} className="max-[400px]:scale-90" />
+          </span>
+        )}
       </div>
       <div
         className={cn(

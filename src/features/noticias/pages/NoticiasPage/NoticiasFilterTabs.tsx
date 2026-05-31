@@ -52,7 +52,8 @@ export function NoticiasFilterTabs({
               {tab.label}
               <span
                 className={cn(
-                  "min-w-[1.25rem] rounded-full px-1 py-px text-center text-xs font-bold tabular-nums",
+                  "inline-flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1",
+                  "text-xs leading-none font-bold tabular-nums",
                   active
                     ? "bg-lm-gold/20 text-lm-gold"
                     : "bg-lm-bg3 text-lm-text2 group-hover:text-lm-gold2",

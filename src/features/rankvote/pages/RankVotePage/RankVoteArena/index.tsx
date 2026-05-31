@@ -91,6 +91,7 @@ export function RankVoteArena({
         <FighterCard
           side="up"
           name={displayP1}
+          photoName={rv.p1}
           ranker={r1}
           idx={idx1}
           pct={pct1}
@@ -106,6 +107,7 @@ export function RankVoteArena({
         <FighterCard
           side="down"
           name={displayP2}
+          photoName={rv.p2}
           ranker={r2}
           idx={idx2}
           pct={pct2}
