@@ -30,10 +30,10 @@ export function MoreMenu({
     >
       <div className="mb-2.5 px-1.5 lm-type-label text-lm-text2">Más secciones</div>
       <MoreLinkItem
-        href={LOOKSMAX_PATHS.consejo}
-        icon="book-open"
-        title="Consejos"
-        sub="Guías diarias de looksmaxing"
+        href={LOOKSMAX_PATHS.aura}
+        icon="sparkles"
+        title="Aura"
+        sub="Vota +230 o −100 aura al top 70"
         onClose={onClose}
       />
       <button

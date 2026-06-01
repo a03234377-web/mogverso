@@ -15,6 +15,13 @@ import {
 import type { CountdownParts } from "@/hooks/useCountdown";
 import type { TorneoState } from "@/types/looksmax";
 import { cn } from "@/lib/cn";
+import {
+  TORNEO_PRESTART_BRACKET,
+  TORNEO_PRESTART_FIRST_ROUND,
+  TORNEO_PRESTART_FOOTER,
+  TORNEO_PRESTART_HEADLINE,
+  TORNEO_PRESTART_LABEL,
+} from "@/features/torneo/components/torneo-prestart-copy";
 import { formatSpainTime, formatSpainWeekdayDate } from "@/lib/spain-time";
 
 export function TorneoPhaseWaitingOctavos({
@@ -27,18 +34,19 @@ export function TorneoPhaseWaitingOctavos({
   const horaStr = formatSpainTime(state.phaseEnd);
   const { weekday: diaStr, dateLabel } = formatSpainWeekdayDate(state.phaseEnd);
   const diaCompleto = `${diaStr} ${dateLabel}`;
-  const nextLabel = state.nextPhaseLabel ?? "Cuartos de Final";
-
   return (
     <PhaseDisplay>
       <PhaseCard variant="waiting">
-        <PhaseLabel color="orange">PRÓXIMAMENTE</PhaseLabel>
+        <PhaseLabel color="orange">{TORNEO_PRESTART_LABEL}</PhaseLabel>
         <div className="my-1 font-display text-[clamp(0.9rem,2.5vw,1.3rem)] tracking-[3px] text-lm-text2">
           Torneo de LooksMaxing
         </div>
         <PhaseTitle color="orange" className="text-[clamp(2rem,6vw,4.5rem)]">
-          {nextLabel}
+          {TORNEO_PRESTART_HEADLINE}
         </PhaseTitle>
+        <div className="mb-2 text-center text-base font-bold text-lm-text2">
+          {TORNEO_PRESTART_FIRST_ROUND}
+        </div>
         <div
           className={cn(
             "mx-auto my-1 mb-2.5 w-fit max-w-full font-display text-transparent",
@@ -60,7 +68,9 @@ export function TorneoPhaseWaitingOctavos({
         <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="orange" />
         <PhaseSub className="mt-3 mb-0">
           <Icon name="zap" size={14} className="mr-1 inline shrink-0 align-middle" />
-          El torneo arrancará automáticamente a las {horaStr}
+          {TORNEO_PRESTART_BRACKET}
+          <br />
+          {TORNEO_PRESTART_FOOTER} {horaStr}
         </PhaseSub>
         <SpainTimezoneNote className="mt-3 text-center" />
       </PhaseCard>

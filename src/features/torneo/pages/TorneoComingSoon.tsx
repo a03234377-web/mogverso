@@ -16,6 +16,13 @@ import {
 import { useCountdown } from "@/hooks/useCountdown";
 import { formatTorneoStartDate, getUpcomingTorneoStartMs } from "@/lib/torneo-schedule";
 import {
+  TORNEO_PRESTART_BRACKET,
+  TORNEO_PRESTART_FIRST_ROUND,
+  TORNEO_PRESTART_FOOTER,
+  TORNEO_PRESTART_HEADLINE,
+  TORNEO_PRESTART_LABEL,
+} from "@/features/torneo/components/torneo-prestart-copy";
+import {
   TORNEO_HERO_EYEBROW,
   TORNEO_HERO_SUBTITLE,
   TORNEO_HERO_TITLE,
@@ -44,13 +51,16 @@ export function TorneoComingSoon() {
 
       <PhaseDisplay>
         <PhaseCard variant="waiting">
-          <PhaseLabel color="orange">PRÓXIMO TORNEO</PhaseLabel>
+          <PhaseLabel color="orange">{TORNEO_PRESTART_LABEL}</PhaseLabel>
           <div className="my-1 font-display text-[clamp(0.9rem,2.5vw,1.3rem)] tracking-[3px] text-lm-text2">
             Torneo de LooksMaxing
           </div>
           <PhaseTitle color="orange" className="text-[clamp(2rem,6vw,4.5rem)]">
-            Viernes · 23:00
+            {TORNEO_PRESTART_HEADLINE}
           </PhaseTitle>
+          <div className="mb-2 text-center text-base font-bold text-lm-text2">
+            {TORNEO_PRESTART_FIRST_ROUND}
+          </div>
           <div
             className={cn(
               "mx-auto my-1 mb-2.5 w-fit max-w-full font-display text-transparent",
@@ -72,7 +82,9 @@ export function TorneoComingSoon() {
           <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="orange" />
           <PhaseSub className="mt-3 mb-0">
             <Icon name="zap" size={14} className="mr-1 inline shrink-0 align-middle" />
-            El siguiente torneo será el {dayName.toLowerCase()} a las {timeLabel}
+            {TORNEO_PRESTART_BRACKET}
+            <br />
+            {TORNEO_PRESTART_FOOTER} {timeLabel} · {dayName.toLowerCase()} {dateLabel}
           </PhaseSub>
           <SpainTimezoneNote className="mt-4 text-center" />
         </PhaseCard>

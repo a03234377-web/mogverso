@@ -20,9 +20,9 @@ export function RankingsQuickActions() {
         onClick={() => navigate("rankvote")}
       />
       <QuickActionRow
-        variant="torneo"
-        caption="¡El torneo ha comenzado: vota los partidos!"
-        onClick={() => navigate("torneo")}
+        variant="aura"
+        caption="Vota al que tiene más aura en el ranking"
+        onClick={() => navigate("aura")}
       />
     </div>
   );
