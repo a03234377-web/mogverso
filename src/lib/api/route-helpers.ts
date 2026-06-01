@@ -18,4 +18,3 @@ export async function guardVoteRequest() {
 export async function guardHealRequest() {
   return requireAdminBackend();
 }
-

@@ -1,5 +1,8 @@
 import { sanitizeDeviceId } from "@/lib/api/route-helpers";
-import { ensureAuraPeriods, readAuraDeviceWeekBallot } from "@/lib/firebase/server-aura";
+import {
+  ensureAuraPeriods,
+  readAuraDeviceWeekBallot,
+} from "@/lib/firebase/server-aura";
 import { AURA_VOTES_PER_WEEK } from "@/lib/aura/constants";
 import { getMadridWeekId } from "@/lib/aura/periods";
 import { ballotVotedNames } from "@/lib/aura/week-ballot";
