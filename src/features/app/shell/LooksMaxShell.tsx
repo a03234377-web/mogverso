@@ -27,7 +27,6 @@ export function LooksMaxShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { page } = pageIdFromPathname(pathname);
   const { announcements } = useFirebase();
-  const [moreOpen, setMoreOpen] = useState(false);
   const [discordOpen, setDiscordOpen] = useState(false);
 
   useSecurityGuard();
@@ -38,11 +37,6 @@ export function LooksMaxShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!isEscape(e.key)) return;
-      if (moreOpen) {
-        setMoreOpen(false);
-        e.preventDefault();
-        return;
-      }
       if (discordOpen) {
         setDiscordOpen(false);
         e.preventDefault();
@@ -50,7 +44,7 @@ export function LooksMaxShell({ children }: { children: ReactNode }) {
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [moreOpen, discordOpen]);
+  }, [discordOpen]);
 
   return (
     <div id="looksmax-root" className="relative">
@@ -61,12 +55,7 @@ export function LooksMaxShell({ children }: { children: ReactNode }) {
       <Ticker />
       <GlobalAnnouncements items={announcements} />
       <LooksMaxHeader page={navPage} onOpenDiscord={() => setDiscordOpen(true)} />
-      <LooksMaxFooter
-        page={navPage}
-        onOpenDiscord={() => setDiscordOpen(true)}
-        moreOpen={moreOpen}
-        onToggleMore={() => setMoreOpen((o) => !o)}
-      />
+      <LooksMaxFooter page={navPage} />
 
       <main
         id="main-content"
