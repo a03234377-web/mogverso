@@ -158,10 +158,7 @@ export async function castAuraVoteServer(
     db.ref(ipPath).get(),
   ]);
 
-  const ballot = mergeAuraWeekBallots(
-    deviceBallot,
-    parseAuraWeekBallot(ipSnap.val()),
-  );
+  const ballot = mergeAuraWeekBallots(deviceBallot, parseAuraWeekBallot(ipSnap.val()));
 
   if (hasAuraVoteFor(ballot, canonical)) {
     return { ok: false, reason: "aura_already_voted_candidate" };

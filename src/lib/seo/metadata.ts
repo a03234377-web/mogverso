@@ -47,10 +47,7 @@ function twitterImagesFromOg(
 }
 
 /** Campos de metadatos por ruta (sin imagen OG: la define el App Router en `app/`). */
-export function resolvePageMetadata(
-  input: PageMetaInput,
-  parent: Metadata,
-): Metadata {
+export function resolvePageMetadata(input: PageMetaInput, parent: Metadata): Metadata {
   const description = input.description ?? DEFAULT_DESCRIPTION;
   const canonical = pageCanonical(input.path);
   const fullTitle = pageFullTitle(input.title);
@@ -76,7 +73,9 @@ export function resolvePageMetadata(
       description,
       ...(images ? { images: twitterImagesFromOg(images) } : {}),
     },
-    robots: input.noIndex ? { index: false, follow: false } : { index: true, follow: true },
+    robots: input.noIndex
+      ? { index: false, follow: false }
+      : { index: true, follow: true },
   };
 }
 
@@ -85,10 +84,8 @@ export function resolvePageMetadata(
  * y imagen compartida vía convención de archivos (`app/opengraph-image.png`).
  */
 export function buildPageGenerateMetadata(input: PageMetaInput) {
-  return async (
-    _props: unknown,
-    parent: ResolvingMetadata,
-  ): Promise<Metadata> => resolvePageMetadata(input, (await parent) as Metadata);
+  return async (_props: unknown, parent: ResolvingMetadata): Promise<Metadata> =>
+    resolvePageMetadata(input, (await parent) as Metadata);
 }
 
 export function rootLayoutMetadata(): Metadata {
