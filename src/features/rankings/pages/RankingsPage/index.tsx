@@ -15,6 +15,7 @@ import { RankRow } from "@/features/rankings/components/ui/RankRow";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { useLooksMaxNavigate } from "@/features/app/shell/LooksMaxShell";
 import type { Mover, RankedEntry } from "@/features/rankings/lib/ranking";
+import type { AuraScores } from "@/types/aura";
 import { cn } from "@/lib/cn";
 
 const RANKINGS_HERO_BADGES = (
@@ -37,6 +38,7 @@ type RankingsPageProps = {
   upMovers: Mover[];
   downMovers: Mover[];
   rankVoteEnd: number | null;
+  auraScores: AuraScores;
   adsenseClient?: string;
 };
 
@@ -45,6 +47,7 @@ export function RankingsPage({
   upMovers,
   downMovers,
   rankVoteEnd,
+  auraScores,
   adsenseClient,
 }: RankingsPageProps) {
   const { openProfile } = useLooksMaxNavigate();
@@ -133,6 +136,7 @@ export function RankingsPage({
               <RankRow
                 entry={entry}
                 index={i}
+                auraScores={auraScores}
                 onOpenProfile={(name, rank) => openProfile(name, rank, "rankings")}
               />
             </ScrollReveal>

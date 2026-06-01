@@ -35,9 +35,23 @@ export async function verifyRecaptchaToken(
     success?: boolean;
     score?: number;
     action?: string;
+    "error-codes"?: string[];
   };
 
   if (!data.success) {
+    const code = data["error-codes"]?.[0];
+    if (code === "invalid-input-secret") {
+      return { ok: false, reason: "recaptcha_bad_secret" };
+    }
+    if (code === "invalid-input-response" || code === "browser-error") {
+      return { ok: false, reason: "recaptcha_bad_token" };
+    }
+    if (code === "timeout-or-duplicate") {
+      return { ok: false, reason: "recaptcha_expired" };
+    }
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("[recaptcha] verify failed:", data["error-codes"]);
+    }
     return { ok: false, reason: "recaptcha_invalid" };
   }
 

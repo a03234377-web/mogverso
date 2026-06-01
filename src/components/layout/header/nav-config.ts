@@ -26,7 +26,7 @@ export const DESKTOP_TABS: {
     badge: "HOT",
     badgeClass: "tab-badge",
   },
-  { id: "consejo", label: "Consejos", icon: "book-open" },
+  { id: "aura", label: "Aura", icon: "sparkles" },
 ];
 
 export function sectionTitle(page: PageId): string {

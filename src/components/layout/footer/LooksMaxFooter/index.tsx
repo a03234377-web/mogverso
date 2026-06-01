@@ -14,7 +14,7 @@ export function LooksMaxFooter({
   moreOpen,
   onToggleMore,
 }: LooksMaxFooterProps) {
-  const moreActive = page === "consejo";
+  const moreActive = page === "aura";
 
   return (
     <>

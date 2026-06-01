@@ -35,7 +35,7 @@ function VoteActionIcon() {
   );
 }
 
-function TorneoActionIcon() {
+function AuraActionIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -43,34 +43,16 @@ function TorneoActionIcon() {
       fill="none"
       aria-hidden
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="7"
-        className="lm-qa-torneo-ripple lm-qa-torneo-ripple--1 stroke-black/50 [stroke-linecap:round]"
-      />
-      <circle
-        cx="12"
-        cy="12"
-        r="7"
-        className="lm-qa-torneo-ripple lm-qa-torneo-ripple--2 stroke-black/50 [stroke-linecap:round]"
-      />
-      <circle
-        cx="12"
-        cy="12"
-        r="8"
-        className="lm-qa-torneo-ring stroke-black [stroke-linecap:round]"
-      />
-      <circle cx="12" cy="12" r="1.5" className="lm-qa-torneo-core fill-black" />
       <path
-        d="M12 4v2M12 18v2M4 12h2M18 12h2"
-        className="lm-qa-torneo-cross stroke-black [stroke-linecap:round]"
+        d="M12 3l1.4 4.3H18l-3.6 2.6 1.4 4.3L12 11.6 8.2 14.2l1.4-4.3L6 7.3h4.6L12 3Z"
+        className="fill-black/85"
       />
+      <path d="M5 19h14" className="stroke-black/40 [stroke-linecap:round]" />
     </svg>
   );
 }
 
-type QuickActionVariant = "vote" | "torneo";
+type QuickActionVariant = "vote" | "aura";
 
 const VARIANT_CONFIG: Record<
   QuickActionVariant,
@@ -85,9 +67,9 @@ const VARIANT_CONFIG: Record<
     icon: <VoteActionIcon />,
     modifier: "lm-quick-action-btn--vote",
   },
-  torneo: {
-    label: "TORNEO EN VIVO",
-    icon: <TorneoActionIcon />,
+  aura: {
+    label: "VOTA AURA",
+    icon: <AuraActionIcon />,
     modifier: "lm-quick-action-btn--torneo",
   },
 };

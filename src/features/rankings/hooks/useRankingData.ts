@@ -8,6 +8,7 @@ import {
   getRankedNamesFromOverrides,
 } from "@/features/rankings/lib/ranking";
 import { healRankvoteApi } from "@/lib/api/vote-client";
+import type { AuraScores } from "@/types/aura";
 import type {
   MoverStack,
   RankMovements,
@@ -22,6 +23,7 @@ type RankingSyncState = {
   movementsUp: MoverStack;
   movementsDown: MoverStack;
   rankVoteEnd: number | null;
+  auraScores: AuraScores;
 };
 
 const initialRankingSyncState: RankingSyncState = {
@@ -31,6 +33,7 @@ const initialRankingSyncState: RankingSyncState = {
   movementsUp: {},
   movementsDown: {},
   rankVoteEnd: null,
+  auraScores: {},
 };
 
 type RankingSyncAction =
@@ -39,7 +42,8 @@ type RankingSyncAction =
   | { type: "movementsUp"; payload: MoverStack }
   | { type: "movementsDown"; payload: MoverStack }
   | { type: "rankVoteActive"; payload: number }
-  | { type: "rankVoteInactive" };
+  | { type: "rankVoteInactive" }
+  | { type: "auraScores"; payload: AuraScores };
 
 function rankingSyncReducer(
   state: RankingSyncState,
@@ -58,6 +62,8 @@ function rankingSyncReducer(
       return { ...state, rankVoteEnd: action.payload };
     case "rankVoteInactive":
       return { ...state, rankVoteEnd: null };
+    case "auraScores":
+      return { ...state, auraScores: action.payload };
     default:
       return state;
   }
@@ -117,6 +123,12 @@ export function useRankingData() {
         payload: snap.exists() ? (snap.val() as MoverStack) : {},
       });
     });
+    const unsubAura = onValue(ref(db, "aura/scores"), (snap) => {
+      dispatch({
+        type: "auraScores",
+        payload: snap.exists() ? (snap.val() as AuraScores) : {},
+      });
+    });
     const unsubRv = onValue(ref(db, "rankvote/current"), (snap) => {
       if (!snap.exists()) {
         dispatch({ type: "rankVoteInactive" });
@@ -145,6 +157,7 @@ export function useRankingData() {
       unsubM();
       unsubUp();
       unsubDown();
+      unsubAura();
       unsubRv();
       clearInterval(healPoll);
     };
@@ -157,6 +170,7 @@ export function useRankingData() {
     movementsUp,
     movementsDown,
     rankVoteEnd,
+    auraScores,
   } = syncState;
 
   const rankedNames = useMemo(
@@ -193,6 +207,7 @@ export function useRankingData() {
     upMovers: rankingReady ? upMovers : [],
     downMovers: rankingReady ? downMovers : [],
     rankVoteEnd,
+    auraScores,
     overrides,
   };
 }

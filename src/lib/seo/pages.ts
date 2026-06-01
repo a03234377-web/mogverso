@@ -37,11 +37,12 @@ export const noticiasMetadata: Metadata = buildPageMetadata({
   path: LOOKSMAX_PATHS.noticias,
 });
 
-export const consejoMetadata: Metadata = buildPageMetadata({
-  title: "Consejos looksmax",
+export const auraMetadata: Metadata = buildPageMetadata({
+  title: "Aura LooksMax",
   description:
-    "Protocolos de looksmaxing en España: piel, postura, nutrición, estilo, sueño y grooming con impacto real en cámara.",
-  path: LOOKSMAX_PATHS.consejo,
+    "Vota aura del top 70 del ranking oficial: +230 o −100 por voto. 10 votos semanales y reinicio mensual de puntuaciones.",
+  path: LOOKSMAX_PATHS.aura,
+  keywords: ["aura looksmax", "votación aura", "ranking looksmax españa"],
 });
 
 export const homeRedirectMetadata: Metadata = buildPageMetadata({

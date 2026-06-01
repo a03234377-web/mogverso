@@ -1,5 +1,12 @@
-import { getInitialTorneoState, PHASES } from "@/features/torneo/data/torneo-players";
-import { getNextMadrid23Ms } from "@/lib/spain-time";
+import {
+  createWaitingTorneoState,
+  getInitialTorneoState,
+  PHASES,
+} from "@/features/torneo/data/torneo-players";
+import {
+  getUpcomingTorneoStartMs,
+  shouldForceTorneoWaitingBeforeStart,
+} from "@/lib/torneo-schedule";
 import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 import { getAdminDatabase } from "./admin";
 
@@ -10,17 +17,6 @@ let torneoAdvancing = false;
 
 function cloneMatches<T>(obj: T): T {
   return structuredClone(obj);
-}
-
-function createWaitingTorneoState(now = Date.now()): TorneoState {
-  const phaseEnd = getNextMadrid23Ms(now);
-  return {
-    phase: PHASES.WAITING_OCTAVOS,
-    phaseEnd,
-    phaseStart: now,
-    nextPhaseLabel: "Cuartos de Final",
-    createdAt: now,
-  };
 }
 
 function resolveCuartosMatches(cuartosObj: Record<string, TorneoMatch>) {
@@ -289,9 +285,36 @@ export async function healTorneo(options?: {
     return { healed: true };
   }
 
+  const editionStart = getUpcomingTorneoStartMs(now);
+
+  if (shouldForceTorneoWaitingBeforeStart(now, existing.phase)) {
+    const waiting = createWaitingTorneoState(now);
+    await initTorneoState(waiting as Record<string, unknown>);
+    return { healed: true };
+  }
+
+  if (
+    now < editionStart &&
+    (existing.phase !== PHASES.WAITING_OCTAVOS ||
+      Math.abs(existing.phaseEnd - editionStart) > 60_000)
+  ) {
+    const waiting = createWaitingTorneoState(now);
+    await initTorneoState(waiting as Record<string, unknown>);
+    return { healed: true };
+  }
+
   if (options?.restartIfEnded && existing.phase === PHASES.TORNEO_ENDED) {
     const fresh = getInitialTorneoState(now);
     await initTorneoState(fresh as Record<string, unknown>);
+    return { healed: true };
+  }
+
+  if (
+    existing.phase === PHASES.BREAK_FINAL &&
+    (!existing.semisMatches || Object.keys(existing.semisMatches).length === 0)
+  ) {
+    const waiting = createWaitingTorneoState(now);
+    await initTorneoState(waiting as Record<string, unknown>);
     return { healed: true };
   }
 

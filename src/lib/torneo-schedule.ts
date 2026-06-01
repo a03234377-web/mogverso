@@ -1,5 +1,4 @@
 import type { TorneoPhase } from "@/types/looksmax";
-import { PHASES } from "@/features/torneo/data/torneo-players";
 import {
   SPAIN_TIMEZONE,
   addDaysMadrid,
@@ -66,6 +65,37 @@ export function formatTorneoStartDate(ms: number) {
   };
 }
 
+const MID_TOURNAMENT_PHASES: TorneoPhase[] = [
+  "octavos_voting",
+  "break_cuartos",
+  "cuartos_voting",
+  "semifinals_promo",
+  "semifinals_voting",
+  "break_final",
+  "final_voting",
+];
+
+/** Fases que implican que el torneo ya está en marcha (no cuenta atrás previa). */
+export function isTorneoMidRunPhase(phase: TorneoPhase | null | undefined): boolean {
+  if (!phase) return false;
+  return MID_TOURNAMENT_PHASES.includes(phase);
+}
+
+/**
+ * Antes del viernes de inicio, Firebase no debe quedar en fase intermedia
+ * (p. ej. break_final): parece “espera de la gran final” en vez de arranque desde cero.
+ */
+export function shouldForceTorneoWaitingBeforeStart(
+  now: number,
+  phase?: TorneoPhase | null,
+): boolean {
+  const editionStart = getUpcomingTorneoStartMs(now);
+  if (now >= editionStart) return false;
+  if (!phase || phase === "waiting_octavos") return false;
+  if (phase === "torneo_ended") return false;
+  return true;
+}
+
 /** Pantalla de espera hasta el próximo torneo (no la UI en vivo). */
 export function shouldShowTorneoComingSoon(
   now: number,
@@ -73,7 +103,7 @@ export function shouldShowTorneoComingSoon(
 ): boolean {
   const upcomingStart = getUpcomingTorneoStartMs(now);
   if (now < upcomingStart) return true;
-  if (phase === PHASES.TORNEO_ENDED) {
+  if (phase === "torneo_ended") {
     return now < getUpcomingTorneoStartMs(upcomingStart + 60_000);
   }
   return false;

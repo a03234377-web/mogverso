@@ -3,5 +3,5 @@ export type PageId =
   | "rankvote"
   | "torneo"
   | "noticias"
-  | "consejo"
+  | "aura"
   | "profile";

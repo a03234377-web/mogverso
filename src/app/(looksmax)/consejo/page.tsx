@@ -1,8 +1,7 @@
-import { ConsejoPage } from "@/features/consejo/pages/ConsejoPage";
-import { consejoMetadata } from "@/lib/seo/pages";
+import { redirect } from "next/navigation";
+import { LOOKSMAX_PATHS } from "@/features/app/routes";
 
-export const metadata = consejoMetadata;
-
-export default function ConsejoPageRoute() {
-  return <ConsejoPage />;
+/** Ruta legacy: Consejos sustituido por Aura. */
+export default function ConsejoRedirectPage() {
+  redirect(LOOKSMAX_PATHS.aura);
 }

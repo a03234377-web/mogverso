@@ -1,8 +1,10 @@
 "use client";
 
+import { healAuraAction, submitAuraVote } from "@/features/aura/actions";
 import { healEntryVoteAction, submitEntryVote } from "@/features/rankings/actions";
 import { healRankvoteAction, submitRankVote } from "@/features/rankvote/actions";
 import { healTorneoAction, submitTorneoVote } from "@/features/torneo/actions";
+import type { AuraVoteKind } from "@/types/aura";
 import type { ActionResult } from "@/lib/firebase/perform";
 import { getDeviceId } from "./device-id";
 
@@ -43,4 +45,16 @@ export async function voteTorneoApi(
   recaptchaToken?: string,
 ): Promise<VoteApiResponse> {
   return submitTorneoVote(matchId, candidateName, getDeviceId(), recaptchaToken);
+}
+
+export async function healAuraApi(): Promise<HealResponse> {
+  return healAuraAction();
+}
+
+export async function voteAuraApi(
+  name: string,
+  kind: AuraVoteKind,
+  recaptchaToken?: string,
+): Promise<VoteApiResponse & { votesRemaining?: number; aura?: number }> {
+  return submitAuraVote(name, kind, getDeviceId(), recaptchaToken);
 }

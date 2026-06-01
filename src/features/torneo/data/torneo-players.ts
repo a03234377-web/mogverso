@@ -1,6 +1,6 @@
 import { creatorImage } from "@/assets/creators";
 import { getRankerFallback, getRankerPhoto } from "@/features/rankings/data/avatars";
-import { getNextMadrid23Ms } from "@/lib/spain-time";
+import { getUpcomingTorneoStartMs } from "@/lib/torneo-schedule";
 import type {
   TorneoMatch,
   TorneoPhase,
@@ -90,8 +90,9 @@ export function getInitialTorneoState(now: number): TorneoState {
   };
 }
 
+/** Cuenta atrás hasta el próximo viernes 23:00 (inicio del torneo desde cero). */
 export function createWaitingTorneoState(now = Date.now()): TorneoState {
-  const phaseEnd = getNextMadrid23Ms(now);
+  const phaseEnd = getUpcomingTorneoStartMs(now);
   return {
     phase: PHASES.WAITING_OCTAVOS,
     phaseEnd,
