@@ -70,7 +70,15 @@ export async function performAuraVote(
   deviceId: string,
   ip: string,
   recaptchaToken?: string,
-): Promise<ActionResult & { votesRemaining?: number; aura?: number }> {
+): Promise<
+  ActionResult & {
+    votesRemaining?: number;
+    aura?: number;
+    delta?: number;
+    weekId?: string;
+    votedNames?: string[];
+  }
+> {
   if (!isAdminConfigured()) return notConfigured();
 
   const rl = await checkRateLimit("vote-aura", ip, 20, 3600);
@@ -85,6 +93,9 @@ export async function performAuraVote(
     ok: true,
     votesRemaining: result.votesRemaining,
     aura: result.aura,
+    delta: result.delta,
+    weekId: result.weekId,
+    votedNames: result.votedNames,
   };
 }
 
@@ -94,8 +105,9 @@ export async function performHealAura(ip: string): Promise<ActionResult> {
   const rl = await checkRateLimit("heal-aura", ip, 12, 60);
   if (!rl.allowed) return { ok: false, error: "rate_limit", reason: "rate_limit" };
 
-  const { ensureAuraPeriods } = await import("./server-aura");
+  const { ensureAuraPeriods, normalizeAuraScoresInDb } = await import("./server-aura");
   await ensureAuraPeriods();
+  await normalizeAuraScoresInDb();
   return { ok: true, healed: true };
 }
 

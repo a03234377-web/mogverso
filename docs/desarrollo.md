@@ -71,11 +71,19 @@ Rutas que usa el código: `src/lib/firebase/client.ts` (lectura), `src/lib/fireb
 - Restringe la API key de Firebase por dominio en Google Cloud Console.
 - `useSecurityGuard` es anti-copia UX, no un control de seguridad.
 
+## reCAPTCHA en local
+
+En `pnpm run dev` **no hace falta** configurar reCAPTCHA: ni `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` ni `RECAPTCHA_SECRET_KEY`. Los votos (aura, rankvote, etc.) funcionan sin captcha aunque copies otras variables de producción.
+
+En **Vercel/producción** sí debes tener las dos claves del mismo sitio reCAPTCHA v3 y el dominio desplegado autorizado en [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin).
+
 ## Depuración
 
 - Si el loader de Firebase no desaparece, revisa `.env.local` y la consola del navegador.
 - Si los votos fallan con 503, falta `FIREBASE_SERVICE_ACCOUNT_JSON`.
+- **Aura (`/aura`)**: el cupo semanal y la papeleta se leen con `GET /api/aura/quota` (Admin SDK). Sin la cuenta de servicio, el cupo solo persiste en `localStorage` del mismo navegador; al cambiar de dispositivo no verás votos previos. Tras votar, en Firebase Console revisa `auraDeviceWeek/dev_<deviceId>_<weekId>` y `aura/scores`.
 - Si faltan fotos, las rutas en `/img/` devolverán 404; la UI muestra emojis de respaldo.
+- Si reCAPTCHA falla **solo en producción**, revisa dominio en Google, par site key + secret y variables en Vercel.
 
 ## Editar estilos
 

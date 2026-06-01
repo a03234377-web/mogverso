@@ -40,6 +40,9 @@ export async function POST(request: Request) {
     return jsonOk({
       votesRemaining: result.votesRemaining,
       aura: result.aura,
+      delta: result.delta,
+      weekId: result.weekId,
+      votedNames: result.votedNames,
     });
   } catch (err) {
     console.error("[api/vote/aura]", err);

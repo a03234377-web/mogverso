@@ -1,4 +1,7 @@
-/** Votos de aura disponibles por semana (hora España). */
+/**
+ * Votos de aura por semana (lunes 00:00 hora España).
+ * Cada semana se restauran a este máximo; los no usados no se acumulan.
+ */
 export const AURA_VOTES_PER_WEEK = 10;
 
 export const AURA_BOOST = 230;

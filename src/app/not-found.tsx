@@ -2,9 +2,9 @@ import Link from "next/link";
 import { Icon } from "@/components/icons";
 import { cn } from "@/lib/cn";
 import { BackgroundEffects } from "@/features/app/components/BackgroundEffects";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildPageGenerateMetadata } from "@/lib/seo/metadata";
 
-export const metadata = buildPageMetadata({
+export const generateMetadata = buildPageGenerateMetadata({
   title: "404 — Página no encontrada",
   description: "La página que buscas no existe en LooksMax España.",
   path: "/404",

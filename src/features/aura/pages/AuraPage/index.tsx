@@ -1,32 +1,90 @@
 "use client";
 
-import { useMemo } from "react";
-import { ScrollReveal } from "@/components/animations/ScrollReveal";
+import { useCallback, useMemo, useState } from "react";
 import { IconLabel } from "@/components/icons";
 import { HeroBadge, HeroSection } from "@/components/ui/HeroSection";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { AuraLeadersCard } from "@/features/aura/components/AuraLeadersCard";
+import { AuraQuotaNotice } from "@/features/aura/components/AuraQuotaNotice";
 import { AuraVoteRow } from "@/features/aura/components/AuraVoteRow";
 import { useAuraQuota } from "@/features/aura/hooks/useAuraQuota";
-import { useAuraScores } from "@/features/aura/hooks/useAuraScores";
 import { useAuraVote } from "@/features/aura/hooks/useAuraVote";
+import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import { useLooksMaxNavigate } from "@/features/app/shell/LooksMaxShell";
+import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import { AURA_RANKING_SIZE, AURA_VOTES_PER_WEEK } from "@/lib/aura/constants";
 import { computeAuraLeaders } from "@/lib/aura/leaderboard";
 import { SPAIN_TIMEZONE_LABEL } from "@/lib/spain-time";
 import type { RankedEntry } from "@/features/rankings/lib/ranking";
+import type { AuraScores } from "@/types/aura";
 import { cn } from "@/lib/cn";
 
 type AuraPageProps = {
   entries: RankedEntry[];
   rankingReady: boolean;
+  initialScores: AuraScores;
 };
 
-export function AuraPage({ entries, rankingReady }: AuraPageProps) {
+export function AuraPage({ entries, rankingReady, initialScores }: AuraPageProps) {
+  const { fb, error: firebaseInitError } = useFirebase();
   const { openProfile } = useLooksMaxNavigate();
-  const { scores, ready: scoresReady } = useAuraScores();
-  const { votesRemaining, ready: quotaReady } = useAuraQuota();
-  const { votingName, voteError, castVote, clearError } = useAuraVote();
+  const [scorePatches, setScorePatches] = useState<AuraScores>({});
+
+  const scores = useMemo(
+    () => ({ ...initialScores, ...scorePatches }),
+    [initialScores, scorePatches],
+  );
+
+  const patchScore = useCallback((name: string, aura: number) => {
+    const canonical = resolveCanonicalRankerName(name);
+    setScorePatches((prev) => ({ ...prev, [canonical]: aura }));
+  }, []);
+
+  const {
+    votesRemaining,
+    votesUsed,
+    votedNames,
+    hasVotedFor,
+    quotaReady,
+    firebaseError,
+    applyVoteResult,
+    refreshQuota,
+    serverQuotaUnavailable,
+  } = useAuraQuota();
+
+  const [lastVoteDelta, setLastVoteDelta] = useState<{
+    name: string;
+    delta: number;
+  } | null>(null);
+
+  const onVoteSuccess = useCallback(
+    (result: {
+      name: string;
+      aura: number;
+      votesRemaining: number;
+      delta: number;
+      weekId: string;
+      votedNames: string[];
+    }) => {
+      patchScore(result.name, result.aura);
+      applyVoteResult(result.votesRemaining, result.votedNames, result.weekId);
+      void refreshQuota();
+      setLastVoteDelta({ name: result.name, delta: result.delta });
+      window.setTimeout(() => {
+        setLastVoteDelta((current) => (current?.name === result.name ? null : current));
+      }, 2500);
+    },
+    [patchScore, applyVoteResult, refreshQuota],
+  );
+
+  const {
+    votingName,
+    voteError,
+    voteSuccess,
+    backendUnavailable,
+    castVote,
+    clearError,
+  } = useAuraVote(onVoteSuccess);
 
   const auraEntries = useMemo(() => entries.slice(0, AURA_RANKING_SIZE), [entries]);
 
@@ -37,8 +95,18 @@ export function AuraPage({ entries, rankingReady }: AuraPageProps) {
     [rankedNames, scores],
   );
 
-  const ready = rankingReady && scoresReady && quotaReady;
-  const noVotesLeft = votesRemaining <= 0;
+  const pageReady = rankingReady && quotaReady;
+  const listReady = rankingReady;
+  const votesBackendReady = !serverQuotaUnavailable && !backendUnavailable;
+  const canVote = Boolean(fb) && pageReady && votesBackendReady;
+  const noVotesLeft = quotaReady && votesRemaining <= 0;
+
+  const isRowDisabled = (name: string) => {
+    if (hasVotedFor(name)) return true;
+    if (!canVote) return true;
+    if (noVotesLeft) return true;
+    return false;
+  };
 
   const handleBoost = async (name: string) => {
     clearError();
@@ -49,6 +117,8 @@ export function AuraPage({ entries, rankingReady }: AuraPageProps) {
     clearError();
     await castVote(name, "penalty");
   };
+
+  const connectionError = firebaseInitError ?? firebaseError;
 
   return (
     <div id="page-aura" className="block animate-fade-up">
@@ -65,7 +135,9 @@ export function AuraPage({ entries, rankingReady }: AuraPageProps) {
         badges={
           <HeroBadge>
             <IconLabel icon="sparkles" iconSize={12}>
-              {votesRemaining}/{AURA_VOTES_PER_WEEK} votos esta semana
+              {pageReady
+                ? `${votesRemaining}/${AURA_VOTES_PER_WEEK} votos esta semana`
+                : "Cargando cupo…"}
             </IconLabel>
           </HeroBadge>
         }
@@ -73,9 +145,44 @@ export function AuraPage({ entries, rankingReady }: AuraPageProps) {
 
       <div className="mx-auto mb-4 max-w-[1100px] px-5 max-md:px-4">
         <p className="text-center text-sm leading-relaxed text-lm-text2">
-          +230 aura o −100 aura por voto. Los votos se reinician cada lunes. Las
-          puntuaciones de aura se reinician el día 1 de cada mes.
+          {AURA_VOTES_PER_WEEK} votos cada lunes (hora España), siempre desde cero — no
+          se acumulan los de la semana anterior. Un voto por candidato (+230 / −100 al
+          total del mes; puntos de aura se reinician el día 1).
         </p>
+        {pageReady ? (
+          <AuraQuotaNotice
+            votesRemaining={votesRemaining}
+            votesUsed={votesUsed}
+            votedNames={votedNames}
+          />
+        ) : null}
+        {connectionError ? (
+          <p
+            className="mt-3 text-center text-sm font-semibold text-lm-red2"
+            role="alert"
+          >
+            Firebase: {connectionError}
+          </p>
+        ) : null}
+        {!fb && pageReady ? (
+          <p
+            className="mt-3 text-center text-sm font-semibold text-lm-red2"
+            role="alert"
+          >
+            Firebase no está configurado. Los votos de aura no están disponibles.
+          </p>
+        ) : null}
+        {backendUnavailable || serverQuotaUnavailable ? (
+          <p
+            className="mt-3 text-center text-sm font-semibold text-lm-red2"
+            role="alert"
+          >
+            Los votos de aura no se guardan en el servidor: falta{" "}
+            <code className="text-xs">FIREBASE_SERVICE_ACCOUNT_JSON</code> en{" "}
+            <code className="text-xs">.env.local</code>. Reinicia{" "}
+            <code className="text-xs">pnpm run dev</code> tras añadirla.
+          </p>
+        ) : null}
         {voteError ? (
           <p
             className="mt-3 text-center text-sm font-semibold text-lm-red2"
@@ -92,49 +199,51 @@ export function AuraPage({ entries, rankingReady }: AuraPageProps) {
           "max-md:grid-cols-1 max-md:gap-2.5 max-md:px-4",
         )}
       >
-        <ScrollReveal y={36}>
-          <AuraLeadersCard
-            title="Más Aura"
-            titleIcon="trending-up"
-            variant="up"
-            leaders={ready ? top : []}
-          />
-        </ScrollReveal>
-        <ScrollReveal y={36} delay={0.04}>
-          <AuraLeadersCard
-            title="Menos Aura"
-            titleIcon="trending-down"
-            variant="down"
-            leaders={ready ? bottom : []}
-          />
-        </ScrollReveal>
+        <AuraLeadersCard
+          title="Más Aura"
+          titleIcon="trending-up"
+          variant="up"
+          leaders={pageReady ? top : []}
+        />
+        <AuraLeadersCard
+          title="Menos Aura"
+          titleIcon="trending-down"
+          variant="down"
+          leaders={pageReady ? bottom : []}
+        />
       </div>
 
       <div className="mx-auto max-w-[1100px] px-5 pb-16 max-md:px-3 max-md:pb-20">
-        <ScrollReveal y={28} className="mb-4">
+        <div className="mb-4">
           <SectionTitle>
             <IconLabel icon="sparkles" iconSize={20}>
               Top {AURA_RANKING_SIZE} — Votar aura
             </IconLabel>
           </SectionTitle>
-        </ScrollReveal>
+        </div>
 
-        {!ready ? (
+        {!listReady ? (
           <div className="py-8 text-center text-lm-text2">Cargando aura…</div>
         ) : (
           <div className="flex flex-col gap-2">
-            {auraEntries.map((entry, i) => (
-              <ScrollReveal key={entry.name} y={32} delay={Math.min(i * 0.01, 0.3)}>
-                <AuraVoteRow
-                  entry={entry}
-                  scores={scores}
-                  disabled={noVotesLeft}
-                  votingName={votingName}
-                  onBoost={handleBoost}
-                  onPenalty={handlePenalty}
-                  onOpenProfile={(name, rank) => openProfile(name, rank, "aura")}
-                />
-              </ScrollReveal>
+            {auraEntries.map((entry) => (
+              <AuraVoteRow
+                key={entry.name}
+                entry={entry}
+                scores={scores}
+                disabled={isRowDisabled(entry.ranker.name)}
+                alreadyVoted={
+                  hasVotedFor(entry.ranker.name) || voteSuccess === entry.ranker.name
+                }
+                votingName={votingName}
+                voteSuccessName={voteSuccess}
+                voteDelta={
+                  lastVoteDelta?.name === entry.ranker.name ? lastVoteDelta.delta : null
+                }
+                onBoost={handleBoost}
+                onPenalty={handlePenalty}
+                onOpenProfile={(name, rank) => openProfile(name, rank, "aura")}
+              />
             ))}
           </div>
         )}

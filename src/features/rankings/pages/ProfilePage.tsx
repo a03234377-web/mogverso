@@ -8,6 +8,7 @@ import { Icon } from "@/components/icons";
 import { sectionTitle } from "@/components/layout/header/nav-config";
 import { parseProfileFrom } from "@/features/app/routes";
 import { ActivePage } from "@/components/ui/ActivePage";
+import { ProfileAuraCard } from "@/features/rankings/components/profile/ProfileAuraCard";
 import { useLooksMaxNavigate } from "@/features/app/shell/LooksMaxShell";
 import { cn } from "@/lib/cn";
 
@@ -147,6 +148,7 @@ export function ProfilePage({ ranker, rankPosition }: ProfilePageProps) {
               {r.bio}
             </div>
           </div>
+          <ProfileAuraCard name={r.name} />
           <div
             className={cn(
               "rounded-[14px] border border-lm-border bg-lm-card p-5",

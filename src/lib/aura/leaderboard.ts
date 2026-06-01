@@ -1,4 +1,6 @@
+import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import { AURA_LEADERS_COUNT, AURA_RANKING_SIZE } from "@/lib/aura/constants";
+import { coerceAuraScore } from "@/lib/aura/coerce-score";
 
 export type AuraLeader = {
   name: string;
@@ -7,8 +9,44 @@ export type AuraLeader = {
 };
 
 export function auraForName(scores: Record<string, number>, name: string): number {
-  const v = scores[name];
-  return typeof v === "number" && Number.isFinite(v) ? v : 0;
+  const canonical = resolveCanonicalRankerName(name);
+  if (Object.prototype.hasOwnProperty.call(scores, canonical)) {
+    return coerceAuraScore(scores[canonical]);
+  }
+  return coerceAuraScore(scores[name]);
+}
+
+export type AuraStanding = {
+  aura: number;
+  /** Posición por puntuación entre el top AURA_RANKING_SIZE (1 = más aura). */
+  auraRank: number | null;
+  eligible: boolean;
+};
+
+/** Puntuación y posición en el ranking de aura para un participante. */
+export function computeAuraStanding(
+  rankedNames: string[],
+  scores: Record<string, number>,
+  name: string,
+): AuraStanding {
+  const eligible = rankedNames.slice(0, AURA_RANKING_SIZE);
+  const rows = eligible.map((n, i) => ({
+    name: n,
+    officialRank: i + 1,
+    aura: auraForName(scores, n),
+  }));
+
+  const row = rows.find((r) => r.name === name);
+  if (!row) {
+    return { aura: auraForName(scores, name), auraRank: null, eligible: false };
+  }
+
+  const sorted = [...rows].sort(
+    (a, b) => b.aura - a.aura || a.officialRank - b.officialRank,
+  );
+  const auraRank = sorted.findIndex((r) => r.name === name) + 1;
+
+  return { aura: row.aura, auraRank, eligible: true };
 }
 
 /** Top N del ranking oficial por puntuación de aura. */
@@ -26,10 +64,12 @@ export function computeAuraLeaders(
 
   const top = [...rows]
     .sort((a, b) => b.aura - a.aura || a.rank - b.rank)
-    .slice(0, count);
+    .slice(0, count)
+    .map((row, i) => ({ ...row, rank: i + 1 }));
   const bottom = [...rows]
     .sort((a, b) => a.aura - b.aura || a.rank - b.rank)
-    .slice(0, count);
+    .slice(0, count)
+    .map((row, i) => ({ ...row, rank: i + 1 }));
 
   return { top, bottom };
 }

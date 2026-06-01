@@ -55,6 +55,53 @@ export async function voteAuraApi(
   name: string,
   kind: AuraVoteKind,
   recaptchaToken?: string,
-): Promise<VoteApiResponse & { votesRemaining?: number; aura?: number }> {
-  return submitAuraVote(name, kind, getDeviceId(), recaptchaToken);
+): Promise<
+  VoteApiResponse & {
+    votesRemaining?: number;
+    aura?: number;
+    delta?: number;
+    weekId?: string;
+    votedNames?: string[];
+  }
+> {
+  try {
+    const res = await fetch("/api/vote/aura", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        kind,
+        deviceId: getDeviceId(),
+        recaptchaToken,
+      }),
+    });
+
+    const data = (await res.json()) as {
+      ok?: boolean;
+      error?: string;
+      reason?: string;
+      votesRemaining?: number;
+      aura?: number;
+      delta?: number;
+      weekId?: string;
+      votedNames?: string[];
+    };
+
+    if (!res.ok || !data.ok) {
+      const reason = data.error ?? data.reason ?? "vote_failed";
+      return { ok: false, reason, error: reason };
+    }
+
+    return {
+      ok: true,
+      votesRemaining: data.votesRemaining,
+      aura: data.aura,
+      delta: data.delta,
+      weekId: data.weekId,
+      votedNames: data.votedNames,
+    };
+  } catch (err) {
+    console.error("[voteAuraApi] fetch failed, trying server action:", err);
+    return submitAuraVote(name, kind, getDeviceId(), recaptchaToken);
+  }
 }

@@ -1,18 +1,88 @@
+import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import {
   AURA_BOOST,
   AURA_PENALTY,
   AURA_RANKING_SIZE,
   AURA_VOTES_PER_WEEK,
 } from "@/lib/aura/constants";
+import {
+  auraDeviceWeekLegacyPath,
+  auraDeviceWeekPath,
+  auraIpWeekPath,
+} from "@/lib/aura/device-week-path";
+import { coerceAuraScore, parseAuraScores } from "@/lib/aura/coerce-score";
+import { auraScoreKey } from "@/lib/aura/firebase-keys";
+import { ballotVotedNames } from "@/lib/aura/week-ballot";
 import { getMadridMonthId, getMadridWeekId } from "@/lib/aura/periods";
+import {
+  hasAuraVoteFor,
+  mergeAuraWeekBallots,
+  parseAuraWeekBallot,
+  type AuraWeekBallot,
+} from "@/lib/aura/week-ballot";
 import { hashIpForVote } from "@/lib/security/client-ip";
 import { getAdminDatabase } from "./admin";
 import { getRankedNamesFromOverrides } from "./rank-overrides";
 import type { AuraMeta, AuraVoteKind } from "@/types/aura";
 
 export type AuraVoteResult =
-  | { ok: true; votesRemaining: number; aura: number }
+  | {
+      ok: true;
+      votesRemaining: number;
+      aura: number;
+      delta: number;
+      weekId: string;
+      votedNames: string[];
+    }
   | { ok: false; reason: string };
+
+/** Lee papeleta (ruta canónica + legacy por compatibilidad). */
+export async function readAuraDeviceWeekBallot(
+  deviceId: string,
+  weekId: string,
+): Promise<AuraWeekBallot> {
+  const db = getAdminDatabase();
+  const primaryPath = auraDeviceWeekPath(deviceId, weekId);
+  const legacyPath = auraDeviceWeekLegacyPath(deviceId, weekId);
+
+  const [primarySnap, legacySnap] = await Promise.all([
+    db.ref(primaryPath).get(),
+    db.ref(legacyPath).get(),
+  ]);
+
+  const primary = parseAuraWeekBallot(primarySnap.val());
+  const legacy = parseAuraWeekBallot(legacySnap.val());
+  const merged = mergeAuraWeekBallots(primary, legacy);
+
+  const primaryEmpty = Object.keys(primary.byName).length === 0;
+  const hasVotes = Object.keys(merged.byName).length > 0;
+
+  if (primaryEmpty && hasVotes) {
+    await db.ref(primaryPath).set(merged);
+  }
+
+  return merged;
+}
+
+/** Reescribe puntuaciones como enteros (corrige strings legacy en RTDB). */
+export async function normalizeAuraScoresInDb(): Promise<number> {
+  const db = getAdminDatabase();
+  const snap = await db.ref("aura/scores").get();
+  if (!snap.exists()) return 0;
+
+  const parsed = parseAuraScores(snap.val());
+  const normalized: Record<string, number> = { ...parsed };
+  let fixed = 0;
+
+  for (const [key, value] of Object.entries(snap.val() as Record<string, unknown>)) {
+    const canonical = resolveCanonicalRankerName(key);
+    if (canonical !== key.trim()) fixed += 1;
+    if (coerceAuraScore(value) !== parsed[canonical]) fixed += 1;
+  }
+
+  await db.ref("aura/scores").set(normalized);
+  return fixed;
+}
 
 export async function ensureAuraPeriods(): Promise<AuraMeta> {
   const db = getAdminDatabase();
@@ -34,6 +104,7 @@ export async function ensureAuraPeriods(): Promise<AuraMeta> {
     await db.ref("aura/meta").set({ weekId, monthId });
   }
 
+  // Cupo semanal: claves auraDeviceWeek/*_${weekId} — semana nueva = papeleta vacía = 10 votos.
   return { weekId, monthId };
 }
 
@@ -56,11 +127,7 @@ export async function getAuraVotesUsed(
   deviceId: string,
   weekId: string,
 ): Promise<number> {
-  const db = getAdminDatabase();
-  const snap = await db.ref(`auraDeviceWeek/dev_${deviceId}_${weekId}`).get();
-  if (!snap.exists()) return 0;
-  const used = Number((snap.val() as { used?: number })?.used);
-  return Number.isFinite(used) && used > 0 ? used : 0;
+  return (await readAuraDeviceWeekBallot(deviceId, weekId)).used;
 }
 
 export async function castAuraVoteServer(
@@ -72,62 +139,98 @@ export async function castAuraVoteServer(
   const trimmed = name.trim();
   if (!trimmed) return { ok: false, reason: "invalid_candidate" };
 
-  const meta = await ensureAuraPeriods();
-  const { weekId } = meta;
+  const canonical = resolveCanonicalRankerName(trimmed);
 
-  if (!(await isEligibleAuraName(trimmed))) {
+  const meta = await ensureAuraPeriods();
+  const weekId = meta.weekId || getMadridWeekId();
+
+  if (!(await isEligibleAuraName(canonical))) {
     return { ok: false, reason: "invalid_candidate" };
   }
 
   const db = getAdminDatabase();
   const ipHash = hashIpForVote(ip);
-  const devKey = `auraDeviceWeek/dev_${deviceId}_${weekId}`;
-  const ipKey = `auraIpWeek/ip_${ipHash}_${weekId}`;
+  const devPath = auraDeviceWeekPath(deviceId, weekId);
+  const ipPath = auraIpWeekPath(ipHash, weekId);
 
-  const [devSnap, ipSnap] = await Promise.all([
-    db.ref(devKey).get(),
-    db.ref(ipKey).get(),
+  const [deviceBallot, ipSnap] = await Promise.all([
+    readAuraDeviceWeekBallot(deviceId, weekId),
+    db.ref(ipPath).get(),
   ]);
 
-  const devUsed = Number((devSnap.val() as { used?: number })?.used) || 0;
-  const ipUsed = Number((ipSnap.val() as { used?: number })?.used) || 0;
-  const used = Math.max(devUsed, ipUsed);
+  const ballot = mergeAuraWeekBallots(
+    deviceBallot,
+    parseAuraWeekBallot(ipSnap.val()),
+  );
 
-  if (used >= AURA_VOTES_PER_WEEK) {
+  if (hasAuraVoteFor(ballot, canonical)) {
+    return { ok: false, reason: "aura_already_voted_candidate" };
+  }
+
+  if (ballot.used >= AURA_VOTES_PER_WEEK) {
     return { ok: false, reason: "aura_votes_exhausted" };
   }
 
   const delta = deltaForKind(kind);
-  const scorePath = `aura/scores/${trimmed}`;
+  const scoreRef = db.ref("aura/scores").child(auraScoreKey(canonical));
+  const ts = Date.now();
+  const nextBallot: AuraWeekBallot = {
+    byName: {
+      ...ballot.byName,
+      [canonical]: { kind, ts, delta },
+    },
+    used: 0,
+  };
+  nextBallot.used = Object.keys(nextBallot.byName).length;
+
+  const previousDeviceBallot = deviceBallot;
+  const previousIpBallot = parseAuraWeekBallot(ipSnap.val());
 
   try {
-    const scoreResult = await db.ref(scorePath).transaction((cur) => {
-      const base = typeof cur === "number" && Number.isFinite(cur) ? cur : 0;
-      return base + delta;
-    });
+    await Promise.all([
+      db.ref(devPath).set(nextBallot),
+      db.ref(ipPath).set(nextBallot),
+    ]);
 
-    if (!scoreResult.committed) {
+    const verified = await readAuraDeviceWeekBallot(deviceId, weekId);
+    if (!hasAuraVoteFor(verified, canonical)) {
+      console.error("[aura] ballot verify failed after write", { devPath, weekId });
       return { ok: false, reason: "transaction_failed" };
     }
 
-    const aura =
-      typeof scoreResult.snapshot.val() === "number"
-        ? scoreResult.snapshot.val()
-        : delta;
-
-    const nextUsed = used + 1;
-    const ts = Date.now();
-    await db.ref("/").update({
-      [devKey]: { used: nextUsed, ts, name: trimmed, kind, delta },
-      [ipKey]: { used: nextUsed, ts, name: trimmed, kind, delta },
+    const scoreResult = await scoreRef.transaction((cur) => {
+      const next = coerceAuraScore(cur) + delta;
+      return Number(next);
     });
+
+    if (!scoreResult.committed) {
+      await Promise.all([
+        db.ref(devPath).set(previousDeviceBallot),
+        db.ref(ipPath).set(previousIpBallot),
+      ]);
+      return { ok: false, reason: "transaction_failed" };
+    }
+
+    const aura = coerceAuraScore(scoreResult.snapshot.val());
 
     return {
       ok: true,
-      votesRemaining: Math.max(0, AURA_VOTES_PER_WEEK - nextUsed),
+      votesRemaining: Math.max(0, AURA_VOTES_PER_WEEK - nextBallot.used),
       aura,
+      delta,
+      weekId,
+      votedNames: ballotVotedNames(nextBallot),
     };
-  } catch {
+  } catch (err) {
+    console.error("[aura] castAuraVoteServer:", err);
+    try {
+      await Promise.all([
+        db.ref(devPath).set(previousDeviceBallot),
+        db.ref(ipPath).set(previousIpBallot),
+      ]);
+    } catch (rollbackErr) {
+      console.error("[aura] ballot rollback failed:", rollbackErr);
+    }
     return { ok: false, reason: "transaction_failed" };
   }
 }
