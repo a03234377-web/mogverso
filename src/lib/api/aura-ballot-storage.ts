@@ -82,3 +82,19 @@ export function clearAllStoredAuraBallots(): void {
     /* ignore */
   }
 }
+
+/** Elimina papeletas de semanas distintas a la actual (residuos en localStorage). */
+export function purgeStaleAuraBallots(currentWeekId = getMadridWeekId()): void {
+  if (typeof window === "undefined") return;
+  const keep = `${STORAGE_PREFIX}${currentWeekId}`;
+  try {
+    const keys: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(STORAGE_PREFIX) && key !== keep) keys.push(key);
+    }
+    for (const key of keys) localStorage.removeItem(key);
+  } catch {
+    /* ignore */
+  }
+}
