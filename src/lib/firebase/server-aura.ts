@@ -70,15 +70,34 @@ export async function normalizeAuraScoresInDb(): Promise<number> {
   const snap = await db.ref("aura/scores").get();
   if (!snap.exists()) return 0;
 
-  const parsed = parseAuraScores(snap.val());
+  const raw = snap.val();
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return 0;
+
+  const rawRecord = raw as Record<string, unknown>;
+  const rawKeys = Object.keys(rawRecord);
+  const parsed = parseAuraScores(raw);
+
+  if (rawKeys.length > 0 && Object.keys(parsed).length === 0) {
+    console.error(
+      "[aura] normalize: parse yielded empty scores; skipping write to avoid wipe",
+    );
+    return 0;
+  }
+
   const normalized: Record<string, number> = { ...parsed };
   let fixed = 0;
 
-  for (const [key, value] of Object.entries(snap.val() as Record<string, unknown>)) {
+  for (const [key, value] of Object.entries(rawRecord)) {
     const canonical = resolveCanonicalRankerName(key);
     if (canonical !== key.trim()) fixed += 1;
     if (coerceAuraScore(value) !== parsed[canonical]) fixed += 1;
   }
+
+  const keysDiffer =
+    rawKeys.length !== Object.keys(normalized).length ||
+    rawKeys.some((key) => !Object.prototype.hasOwnProperty.call(normalized, resolveCanonicalRankerName(key)));
+
+  if (fixed === 0 && !keysDiffer) return 0;
 
   await db.ref("aura/scores").set(normalized);
   return fixed;
@@ -90,17 +109,19 @@ export async function ensureAuraPeriods(): Promise<AuraMeta> {
   const monthId = getMadridMonthId();
   const snap = await db.ref("aura/meta").get();
   const meta = (snap.val() ?? {}) as Partial<AuraMeta>;
+  const storedMonth = typeof meta.monthId === "string" ? meta.monthId.trim() : "";
 
-  const updates: Record<string, unknown> = {};
-
-  if (meta.monthId !== monthId) {
-    updates["aura/scores"] = {};
-    updates["aura/meta"] = { weekId, monthId };
-    await db.ref("/").update(updates);
+  // Mes nuevo (p. ej. día 1): reinicio mensual de puntuaciones.
+  if (storedMonth && storedMonth !== monthId) {
+    await db.ref("/").update({
+      "aura/scores": {},
+      "aura/meta": { weekId, monthId },
+    });
     return { weekId, monthId };
   }
 
-  if (meta.weekId !== weekId || !meta.monthId) {
+  // Reparar meta sin borrar puntuaciones (meta ausente o semana distinta).
+  if (!storedMonth || meta.weekId !== weekId) {
     await db.ref("aura/meta").set({ weekId, monthId });
   }
 
