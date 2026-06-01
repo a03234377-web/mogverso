@@ -1,5 +1,8 @@
+import { sanitizeDeviceId } from "@/lib/api/sanitize-device-id";
 import { isAdminConfigured } from "@/lib/firebase/admin";
 import { serviceUnavailable } from "@/lib/security/api-response";
+
+export { sanitizeDeviceId };
 
 export async function requireAdminBackend() {
   if (!isAdminConfigured()) return serviceUnavailable();
@@ -16,8 +19,3 @@ export async function guardHealRequest() {
   return requireAdminBackend();
 }
 
-export function sanitizeDeviceId(raw: unknown): string {
-  if (typeof raw !== "string") return "unknown_device";
-  const trimmed = raw.trim().slice(0, 64);
-  return trimmed || "unknown_device";
-}

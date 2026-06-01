@@ -24,7 +24,9 @@ const VOTE_ERROR_MESSAGES: Record<string, string> = {
   vote_failed: "No se pudo registrar el voto. Inténtalo de nuevo.",
   heal_failed: "No se pudo sanear la ronda de votación.",
   aura_votes_exhausted:
-    "Has usado tus 10 votos de aura esta semana. Vuelven el próximo lunes (hora de España).",
+    "Has usado tus 10 votos de aura esta semana. El próximo lunes tendrás 10 votos nuevos (no se acumulan los que no gastes).",
+  aura_already_voted_candidate:
+    "Ya votaste a este candidato esta semana. Solo puedes votar una vez por persona (elige otro del top 70).",
 };
 
 export function formatVoteError(reason: string | undefined): string {

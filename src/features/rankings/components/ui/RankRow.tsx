@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { Pressable } from "@/components/a11y/Pressable";
 import { Icon } from "@/components/icons";
 import { Avatar } from "@/components/Avatar";
+import { AuraScoreBadge } from "@/features/aura/components/AuraScoreBadge";
 import { auraForName } from "@/lib/aura/leaderboard";
 import { cn } from "@/lib/cn";
 import type { RankedEntry } from "@/features/rankings/lib/ranking";
@@ -26,6 +27,7 @@ const TOP_ROW_CLASS = ["rank-row--top1", "rank-row--top2", "rank-row--top3"] as 
 
 export function RankRow({ entry, index, auraScores, onOpenProfile }: RankRowProps) {
   const { ranker, rank, movement } = entry;
+  const aura = auraScores ? auraForName(auraScores, ranker.name) : null;
   const rankNumClass = RANK_NUM_CLASS[Math.min(index, 3)];
   const topRowClass = index < 3 ? TOP_ROW_CLASS[index] : undefined;
 
@@ -93,17 +95,7 @@ export function RankRow({ entry, index, auraScores, onOpenProfile }: RankRowProp
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-1.5 text-base leading-snug font-bold">
           {ranker.name}
-          {auraScores ? (
-            <span
-              className={cn(
-                "inline-flex items-center gap-1 rounded-full border border-[rgba(232,184,75,0.35)]",
-                "bg-[rgba(232,184,75,0.12)] px-2 py-0.5 text-sm font-black text-lm-gold",
-              )}
-            >
-              <Icon name="sparkles" size={12} className="text-lm-gold" />
-              {auraForName(auraScores, ranker.name).toLocaleString("es-ES")}
-            </span>
-          ) : null}
+          {aura !== null ? <AuraScoreBadge total={aura} /> : null}
           {movBadge}
         </div>
         <div className="mt-0.5 truncate text-base leading-snug font-semibold text-lm-text2">

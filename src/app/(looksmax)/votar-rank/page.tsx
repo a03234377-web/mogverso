@@ -1,7 +1,6 @@
 import { RankVotePage } from "@/features/rankvote/pages/RankVotePage";
-import { rankvoteMetadata } from "@/lib/seo/pages";
 
-export const metadata = rankvoteMetadata;
+export { generateRankvoteMetadata as generateMetadata } from "@/lib/seo/pages";
 
 export default function VotarRankPageRoute() {
   return <RankVotePage />;

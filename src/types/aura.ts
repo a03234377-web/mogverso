@@ -5,8 +5,21 @@ export type AuraMeta = {
   monthId: string;
 };
 
-export type AuraDeviceWeek = {
-  used: number;
+export type AuraVoteKind = "boost" | "penalty";
+
+export type AuraWeekVoteEntry = {
+  kind: AuraVoteKind;
+  ts: number;
+  delta: number;
 };
 
-export type AuraVoteKind = "boost" | "penalty";
+/** Papeleta semanal en RTDB (`auraDeviceWeek/*`, `auraIpWeek/*`). */
+export type AuraDeviceWeek = {
+  used: number;
+  byName?: Record<string, AuraWeekVoteEntry>;
+  /** Legacy: último voto (se migra al leer con `parseAuraWeekBallot`). */
+  name?: string;
+  kind?: AuraVoteKind;
+  ts?: number;
+  delta?: number;
+};

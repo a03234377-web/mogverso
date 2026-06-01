@@ -8,6 +8,7 @@ import {
   getRankedNamesFromOverrides,
 } from "@/features/rankings/lib/ranking";
 import { healRankvoteApi } from "@/lib/api/vote-client";
+import { parseAuraScores } from "@/lib/aura/coerce-score";
 import type { AuraScores } from "@/types/aura";
 import type {
   MoverStack,
@@ -126,7 +127,7 @@ export function useRankingData() {
     const unsubAura = onValue(ref(db, "aura/scores"), (snap) => {
       dispatch({
         type: "auraScores",
-        payload: snap.exists() ? (snap.val() as AuraScores) : {},
+        payload: snap.exists() ? parseAuraScores(snap.val()) : {},
       });
     });
     const unsubRv = onValue(ref(db, "rankvote/current"), (snap) => {

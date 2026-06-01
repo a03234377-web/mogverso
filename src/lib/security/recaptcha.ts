@@ -1,12 +1,15 @@
+import { isServerRecaptchaSkipped } from "@/lib/security/recaptcha-config";
+
 export async function verifyRecaptchaToken(
   token: string | undefined,
   remoteIp: string,
 ): Promise<{ ok: true } | { ok: false; reason: string }> {
+  if (isServerRecaptchaSkipped()) {
+    return { ok: true };
+  }
+
   const secret = process.env.RECAPTCHA_SECRET_KEY?.trim();
   if (!secret) {
-    if (process.env.NODE_ENV === "development") {
-      return { ok: true };
-    }
     return { ok: false, reason: "recaptcha_not_configured" };
   }
 

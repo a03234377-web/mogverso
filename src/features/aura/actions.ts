@@ -14,7 +14,15 @@ export async function submitAuraVote(
   kind: AuraVoteKind,
   deviceId: string,
   recaptchaToken?: string,
-): Promise<ActionResult & { votesRemaining?: number; aura?: number }> {
+): Promise<
+  ActionResult & {
+    votesRemaining?: number;
+    aura?: number;
+    delta?: number;
+    weekId?: string;
+    votedNames?: string[];
+  }
+> {
   const ip = await getServerClientIp();
   return performAuraVote(name, kind, sanitizeDeviceId(deviceId), ip, recaptchaToken);
 }

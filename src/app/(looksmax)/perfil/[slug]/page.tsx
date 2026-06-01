@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { profilePath } from "@/features/app/routes";
 import { ProfileRoute } from "@/features/rankings/views/ProfileRoute";
@@ -9,7 +9,10 @@ import {
   resolveRankerFromProfileSlug,
 } from "@/features/rankings/lib/profile-slug";
 import { ProfilePersonJsonLd } from "@/lib/seo/json-ld";
-import { buildProfileMetadata, profileNotFoundMetadata } from "@/lib/seo/pages";
+import {
+  buildProfileGenerateMetadata,
+  generateProfileNotFoundMetadata,
+} from "@/lib/seo/pages";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -19,13 +22,16 @@ export function generateStaticParams() {
   return RANKERS.map((r) => ({ slug: rankerProfileParam(r.name) }));
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: PageProps,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { slug } = await params;
   const ranker = resolveRankerFromProfileSlug(slug);
   if (!ranker) {
-    return profileNotFoundMetadata;
+    return generateProfileNotFoundMetadata({}, parent);
   }
-  return buildProfileMetadata(ranker);
+  return buildProfileGenerateMetadata(ranker)({}, parent);
 }
 
 export default async function ProfilePageRoute({ params }: PageProps) {

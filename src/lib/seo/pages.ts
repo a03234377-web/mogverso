@@ -1,9 +1,8 @@
-import type { Metadata } from "next";
 import { RANKERS, type Ranker } from "@/features/rankings/data/rankers";
 import { LOOKSMAX_PATHS, profilePath } from "@/features/app/routes";
-import { buildPageMetadata } from "@/lib/seo/metadata";
+import { buildPageGenerateMetadata } from "@/lib/seo/metadata";
 
-export const rankingsMetadata: Metadata = buildPageMetadata({
+export const generateRankingsMetadata = buildPageGenerateMetadata({
   title: "Rankings LooksMax",
   description:
     "Ranking oficial de looksmaxing en España. Consulta posiciones, scores y movimientos en tiempo real.",
@@ -16,28 +15,28 @@ export const rankingsMetadata: Metadata = buildPageMetadata({
   ],
 });
 
-export const rankvoteMetadata: Metadata = buildPageMetadata({
+export const generateRankvoteMetadata = buildPageGenerateMetadata({
   title: "Votar ranking",
   description:
     "Vota en el duelo de ranking looksmaxer. Tu voto decide quién sube o baja en la comunidad.",
   path: LOOKSMAX_PATHS.rankvote,
 });
 
-export const torneoMetadata: Metadata = buildPageMetadata({
+export const generateTorneoMetadata = buildPageGenerateMetadata({
   title: "Torneo en vivo",
   description:
     "Torneo looksmaxer en directo. Vota los partidos y sigue las fases del bracket.",
   path: LOOKSMAX_PATHS.torneo,
 });
 
-export const noticiasMetadata: Metadata = buildPageMetadata({
+export const generateNoticiasMetadata = buildPageGenerateMetadata({
   title: "Noticias",
   description:
     "Últimas noticias y novedades del mundo looksmaxer español: rankings, ascensos y comunidad.",
   path: LOOKSMAX_PATHS.noticias,
 });
 
-export const auraMetadata: Metadata = buildPageMetadata({
+export const generateAuraMetadata = buildPageGenerateMetadata({
   title: "Aura LooksMax",
   description:
     "Vota aura del top 70 del ranking oficial: +230 o −100 por voto. 10 votos semanales y reinicio mensual de puntuaciones.",
@@ -45,26 +44,26 @@ export const auraMetadata: Metadata = buildPageMetadata({
   keywords: ["aura looksmax", "votación aura", "ranking looksmax españa"],
 });
 
-export const homeRedirectMetadata: Metadata = buildPageMetadata({
+export const generateHomeRedirectMetadata = buildPageGenerateMetadata({
   title: "Ranking Oficial",
   description:
     "Ranking oficial de looksmaxing en España. Votaciones en tiempo real, torneo y comunidad.",
   path: "/rankings",
 });
 
-export function buildProfileMetadata(ranker: Ranker, rank?: number): Metadata {
+export const generateProfileNotFoundMetadata = buildPageGenerateMetadata({
+  title: "Perfil no encontrado",
+  description: "Este perfil no existe en el ranking de LooksMax España.",
+  path: "/rankings",
+  noIndex: true,
+});
+
+export function buildProfileGenerateMetadata(ranker: Ranker, rank?: number) {
   const position = rank ?? RANKERS.findIndex((r) => r.name === ranker.name) + 1;
-  return buildPageMetadata({
+  return buildPageGenerateMetadata({
     title: `${ranker.name} — Puesto #${position}`,
     description: `${ranker.title} · ${ranker.sub}. Score ${ranker.score}. ${ranker.bio.slice(0, 140)}…`,
     path: profilePath(ranker.name),
     keywords: [ranker.name, "looksmax españa", "ranking looksmax", ranker.title],
   });
 }
-
-export const profileNotFoundMetadata: Metadata = buildPageMetadata({
-  title: "Perfil no encontrado",
-  description: "Este perfil no existe en el ranking de LooksMax España.",
-  path: "/rankings",
-  noIndex: true,
-});

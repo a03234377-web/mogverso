@@ -1,6 +1,10 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import {
+  getRecaptchaSiteKey,
+  isClientRecaptchaRequired,
+} from "@/lib/security/recaptcha-config";
 
 declare global {
   interface Window {
@@ -12,7 +16,7 @@ declare global {
 }
 
 const SCRIPT_ID = "recaptcha-v3-script";
-const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ?? "";
+const siteKey = getRecaptchaSiteKey();
 
 function loadRecaptchaScript(): Promise<void> {
   if (typeof window === "undefined") return Promise.resolve();
@@ -39,7 +43,7 @@ function loadRecaptchaScript(): Promise<void> {
 let recaptchaLoadPromise: Promise<void> | null = null;
 
 function ensureRecaptchaLoaded(): Promise<void> {
-  if (!siteKey) return Promise.resolve();
+  if (!siteKey || !isClientRecaptchaRequired()) return Promise.resolve();
   if (!recaptchaLoadPromise) {
     recaptchaLoadPromise = loadRecaptchaScript().catch((err) => {
       recaptchaLoadPromise = null;
@@ -50,20 +54,24 @@ function ensureRecaptchaLoaded(): Promise<void> {
 }
 
 export function useRecaptcha(action = "vote") {
-  const [ready, setReady] = useState(!siteKey);
+  const required = isClientRecaptchaRequired();
+  const [ready, setReady] = useState(!required);
 
   const getToken = useCallback(async (): Promise<string | undefined> => {
-    if (!siteKey) return undefined;
+    if (!required) return undefined;
     try {
       await ensureRecaptchaLoaded();
       setReady(true);
       if (!window.grecaptcha) return undefined;
       return window.grecaptcha.execute(siteKey, { action });
-    } catch {
+    } catch (err) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("[useRecaptcha] no se pudo obtener token:", err);
+      }
       setReady(false);
       return undefined;
     }
-  }, [action]);
+  }, [action, required]);
 
-  return { ready, getToken, enabled: Boolean(siteKey) };
+  return { ready, getToken, enabled: required };
 }
