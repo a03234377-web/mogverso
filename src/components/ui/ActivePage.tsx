@@ -8,15 +8,30 @@ type ActivePageProps = {
   active: boolean;
   children?: ReactNode;
   className?: string;
+  /** Entrada con fade-up (desactivar en torneo live). */
+  entrance?: boolean;
 };
 
-export function ActivePage({ id, active, children, className }: ActivePageProps) {
+export function ActivePage({
+  id,
+  active,
+  children,
+  className,
+  entrance = true,
+}: ActivePageProps) {
   if (!active && !children) {
     return <div id={id} className="hidden" />;
   }
 
   return (
-    <div id={id} className={cn(active ? "block animate-fade-up" : "hidden", className)}>
+    <div
+      id={id}
+      className={cn(
+        active ? "block" : "hidden",
+        entrance && active && "animate-fade-up",
+        className,
+      )}
+    >
       {active ? children : null}
     </div>
   );

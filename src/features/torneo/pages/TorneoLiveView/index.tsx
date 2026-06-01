@@ -21,7 +21,7 @@ export function TorneoLiveView() {
   const refresh = useCallback(() => setTick((t) => t + 1), []);
 
   return (
-    <ActivePage id="page-torneo" active>
+    <ActivePage id="page-torneo" active entrance={false}>
       <HeroSection
         variant="torneo"
         eyebrow={TORNEO_HERO_EYEBROW}

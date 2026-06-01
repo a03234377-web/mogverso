@@ -78,11 +78,11 @@ export function useAuraVote(onSuccess?: (result: AuraVoteSuccess) => void) {
           ? res.votedNames.map((n) => resolveCanonicalRankerName(n))
           : [canon];
 
-        onSuccess?.({ name, aura, votesRemaining, delta, weekId, votedNames });
-        setVoteSuccess(name);
+        onSuccess?.({ name: canon, aura, votesRemaining, delta, weekId, votedNames });
+        setVoteSuccess(canon);
         window.setTimeout(() => {
-          setVoteSuccess((current) => (current === name ? null : current));
-        }, 2000);
+          setVoteSuccess((current) => (current === canon ? null : current));
+        }, 2500);
 
         return res;
       } catch (err) {

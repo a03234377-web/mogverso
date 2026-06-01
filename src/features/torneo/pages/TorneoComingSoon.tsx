@@ -41,7 +41,7 @@ export function TorneoComingSoon() {
   }, []);
 
   return (
-    <ActivePage id="page-torneo" active>
+    <ActivePage id="page-torneo" active entrance={false}>
       <HeroSection
         variant="torneo"
         eyebrow={TORNEO_HERO_EYEBROW}

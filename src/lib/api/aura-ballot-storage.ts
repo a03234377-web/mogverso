@@ -58,3 +58,27 @@ export function writeStoredAuraBallot(weekId: string, ballot: AuraWeekBallot): v
     /* ignore */
   }
 }
+
+/** Quita la papeleta en caché del navegador (p. ej. tras reset admin). */
+export function clearStoredAuraBallot(weekId = getMadridWeekId()): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(`${STORAGE_PREFIX}${weekId}`);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function clearAllStoredAuraBallots(): void {
+  if (typeof window === "undefined") return;
+  try {
+    const keys: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(STORAGE_PREFIX)) keys.push(key);
+    }
+    for (const key of keys) localStorage.removeItem(key);
+  } catch {
+    /* ignore */
+  }
+}

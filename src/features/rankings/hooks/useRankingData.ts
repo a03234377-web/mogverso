@@ -7,6 +7,7 @@ import {
   computeMovers,
   getRankedNamesFromOverrides,
 } from "@/features/rankings/lib/ranking";
+import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import { healRankvoteApi } from "@/lib/api/vote-client";
 import { parseAuraScores } from "@/lib/aura/coerce-score";
 import type { AuraScores } from "@/types/aura";
@@ -25,6 +26,8 @@ type RankingSyncState = {
   movementsDown: MoverStack;
   rankVoteEnd: number | null;
   auraScores: AuraScores;
+  /** Optimistic aura tras votar hasta que RTDB confirma el mismo valor. */
+  auraScorePatches: AuraScores;
 };
 
 const initialRankingSyncState: RankingSyncState = {
@@ -35,6 +38,7 @@ const initialRankingSyncState: RankingSyncState = {
   movementsDown: {},
   rankVoteEnd: null,
   auraScores: {},
+  auraScorePatches: {},
 };
 
 type RankingSyncAction =
@@ -44,7 +48,8 @@ type RankingSyncAction =
   | { type: "movementsDown"; payload: MoverStack }
   | { type: "rankVoteActive"; payload: number }
   | { type: "rankVoteInactive" }
-  | { type: "auraScores"; payload: AuraScores };
+  | { type: "auraScores"; payload: AuraScores }
+  | { type: "patchAuraScore"; name: string; aura: number };
 
 function rankingSyncReducer(
   state: RankingSyncState,
@@ -63,8 +68,28 @@ function rankingSyncReducer(
       return { ...state, rankVoteEnd: action.payload };
     case "rankVoteInactive":
       return { ...state, rankVoteEnd: null };
-    case "auraScores":
-      return { ...state, auraScores: action.payload };
+    case "auraScores": {
+      const remote = action.payload;
+      const merged: AuraScores = { ...remote };
+      const nextPatches = { ...state.auraScorePatches };
+      for (const [key, patchValue] of Object.entries(state.auraScorePatches)) {
+        const remoteValue = remote[key];
+        if (remoteValue === patchValue) {
+          delete nextPatches[key];
+        } else {
+          merged[key] = patchValue;
+        }
+      }
+      return { ...state, auraScores: merged, auraScorePatches: nextPatches };
+    }
+    case "patchAuraScore": {
+      const canonical = resolveCanonicalRankerName(action.name);
+      return {
+        ...state,
+        auraScores: { ...state.auraScores, [canonical]: action.aura },
+        auraScorePatches: { ...state.auraScorePatches, [canonical]: action.aura },
+      };
+    }
     default:
       return state;
   }
@@ -202,6 +227,10 @@ export function useRankingData() {
 
   const rankingReady = ready && (!fb || overridesReady);
 
+  const patchAuraScore = useCallback((name: string, aura: number) => {
+    dispatch({ type: "patchAuraScore", name, aura });
+  }, []);
+
   return {
     ready: rankingReady,
     entries: rankingReady ? entries : [],
@@ -209,6 +238,7 @@ export function useRankingData() {
     downMovers: rankingReady ? downMovers : [],
     rankVoteEnd,
     auraScores,
+    patchAuraScore,
     overrides,
   };
 }
