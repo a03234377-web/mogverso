@@ -1,0 +1,13 @@
+---
+description: Este repo vive dentro del monorepo web-mogverso
+alwaysApply: true
+---
+
+# Monorepo padre
+
+Si el workspace abierto es la **raíz** `web-mogverso/`, las reglas canónicas están en **`../.cursor/`** (enrutado mogverso vs scripts).
+
+Si solo abres la carpeta `mogverso/`, siguen aplicando las reglas de esta carpeta `.cursor/`. Para **scripts** y base de datos admin, el proyecto hermano está en `../scripts/` (reglas en el padre: `scripts-scope.mdc`).
+
+- **Git / PR / commits** → este directorio (`mogverso/`).
+- **Firestore admin, seeds, exports** → `../scripts/`.
