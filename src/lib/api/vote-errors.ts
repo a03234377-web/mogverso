@@ -2,7 +2,8 @@ const VOTE_ERROR_MESSAGES: Record<string, string> = {
   server_not_configured:
     "El servidor de votos no está configurado. Falta FIREBASE_SERVICE_ACCOUNT_JSON en el entorno.",
   rate_limit: "Demasiados intentos. Espera un momento e inténtalo de nuevo.",
-  missing_recaptcha: "No se pudo verificar reCAPTCHA. Recarga la página e inténtalo otra vez.",
+  missing_recaptcha:
+    "No se pudo verificar reCAPTCHA. Recarga la página e inténtalo otra vez.",
   recaptcha_not_configured:
     "reCAPTCHA no está configurado en el servidor (RECAPTCHA_SECRET_KEY).",
   recaptcha_verify_failed: "Error al verificar reCAPTCHA. Inténtalo de nuevo.",
@@ -11,7 +12,8 @@ const VOTE_ERROR_MESSAGES: Record<string, string> = {
     "RECAPTCHA_SECRET_KEY no coincide con NEXT_PUBLIC_RECAPTCHA_SITE_KEY. Usa el par de claves del mismo proyecto reCAPTCHA v3.",
   recaptcha_bad_token:
     "Token reCAPTCHA inválido. Añade tu dominio (p. ej. mogverso.vercel.app) en Google reCAPTCHA Admin y redeploy en Vercel.",
-  recaptcha_expired: "Token reCAPTCHA expirado. Recarga la página e inténtalo otra vez.",
+  recaptcha_expired:
+    "Token reCAPTCHA expirado. Recarga la página e inténtalo otra vez.",
   recaptcha_low_score: "Actividad sospechosa detectada. Inténtalo más tarde.",
   already_voted: "Ya has votado en esta ronda (1 voto por dispositivo e IP).",
   expired: "Esta ronda ha terminado. Se cargará una nueva votación en breve.",

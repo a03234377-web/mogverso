@@ -28,15 +28,9 @@ export function AuraPage({ entries, rankingReady }: AuraPageProps) {
   const { votesRemaining, ready: quotaReady } = useAuraQuota();
   const { votingName, voteError, castVote, clearError } = useAuraVote();
 
-  const auraEntries = useMemo(
-    () => entries.slice(0, AURA_RANKING_SIZE),
-    [entries],
-  );
+  const auraEntries = useMemo(() => entries.slice(0, AURA_RANKING_SIZE), [entries]);
 
-  const rankedNames = useMemo(
-    () => auraEntries.map((e) => e.name),
-    [auraEntries],
-  );
+  const rankedNames = useMemo(() => auraEntries.map((e) => e.name), [auraEntries]);
 
   const { top, bottom } = useMemo(
     () => computeAuraLeaders(rankedNames, scores),

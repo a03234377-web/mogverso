@@ -85,8 +85,7 @@ export function AuraVoteRow({
           )}
           onClick={() => onBoost(ranker.name)}
         >
-          <Icon name="trending-up" size={14} />
-          +{AURA_BOOST}
+          <Icon name="trending-up" size={14} />+{AURA_BOOST}
         </Pressable>
         <Pressable
           type="button"

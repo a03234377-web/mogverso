@@ -47,10 +47,7 @@ function AuraActionIcon() {
         d="M12 3l1.4 4.3H18l-3.6 2.6 1.4 4.3L12 11.6 8.2 14.2l1.4-4.3L6 7.3h4.6L12 3Z"
         className="fill-black/85"
       />
-      <path
-        d="M5 19h14"
-        className="stroke-black/40 [stroke-linecap:round]"
-      />
+      <path d="M5 19h14" className="stroke-black/40 [stroke-linecap:round]" />
     </svg>
   );
 }

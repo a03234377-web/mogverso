@@ -24,7 +24,9 @@ export function computeAuraLeaders(
     aura: auraForName(scores, name),
   }));
 
-  const top = [...rows].sort((a, b) => b.aura - a.aura || a.rank - b.rank).slice(0, count);
+  const top = [...rows]
+    .sort((a, b) => b.aura - a.aura || a.rank - b.rank)
+    .slice(0, count);
   const bottom = [...rows]
     .sort((a, b) => a.aura - b.aura || a.rank - b.rank)
     .slice(0, count);

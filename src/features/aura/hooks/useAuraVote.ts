@@ -2,10 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { voteAuraApi } from "@/lib/api/vote-client";
-import {
-  formatVoteError,
-  isBackendUnavailableReason,
-} from "@/lib/api/vote-errors";
+import { formatVoteError, isBackendUnavailableReason } from "@/lib/api/vote-errors";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import type { AuraVoteKind } from "@/types/aura";
 

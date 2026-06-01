@@ -9,5 +9,4 @@ export const TORNEO_PRESTART_FIRST_ROUND = "Primera fase: Cuartos de Final";
 export const TORNEO_PRESTART_BRACKET =
   "Cuartos → Semifinales → Gran Final · Arranque desde cero";
 
-export const TORNEO_PRESTART_FOOTER =
-  "El torneo arrancará automáticamente a las";
+export const TORNEO_PRESTART_FOOTER = "El torneo arrancará automáticamente a las";
