@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import {
-  readStoredAuraBallot,
+  purgeStaleAuraBallots,
   writeStoredAuraBallot,
 } from "@/lib/api/aura-ballot-storage";
 import { getDeviceId } from "@/lib/api/device-id";
@@ -31,14 +31,8 @@ export function useAuraQuota() {
   const { fb, ready, error: firebaseError } = useFirebase();
   const [monthId, setMonthId] = useState("");
   const weekId = getMadridWeekId();
-  const initialBallot =
-    typeof window !== "undefined"
-      ? readStoredAuraBallot(weekId)
-      : parseAuraWeekBallot(null);
-  const [ballot, setBallot] = useState<AuraWeekBallot>(initialBallot);
-  const [ballotHydrated, setBallotHydrated] = useState(
-    () => typeof window !== "undefined" && Object.keys(initialBallot.byName).length > 0,
-  );
+  const [ballot, setBallot] = useState<AuraWeekBallot>(() => parseAuraWeekBallot(null));
+  const [ballotHydrated, setBallotHydrated] = useState(false);
   const [serverQuotaUnavailable, setServerQuotaUnavailable] = useState(false);
   const [usedOverride, setUsedOverride] = useState<{
     weekId: string;
@@ -47,6 +41,10 @@ export function useAuraQuota() {
   } | null>(null);
   const [, setWeekTick] = useState(0);
   const prevWeekRef = useRef(weekId);
+
+  useEffect(() => {
+    purgeStaleAuraBallots(weekId);
+  }, [weekId]);
 
   useEffect(() => {
     const id = window.setInterval(() => setWeekTick((n) => n + 1), 60_000);
@@ -58,18 +56,15 @@ export function useAuraQuota() {
     prevWeekRef.current = weekId;
     setUsedOverride(null);
     setServerQuotaUnavailable(false);
-    setBallot(readStoredAuraBallot(weekId));
+    setBallot(parseAuraWeekBallot(null));
     setBallotHydrated(false);
   }, [weekId]);
 
-  const mergeBallot = useCallback(
+  const applyServerBallot = useCallback(
     (incoming: AuraWeekBallot, storageWeekId?: string) => {
       const key = storageWeekId ?? weekId;
-      setBallot((prev) => {
-        const merged = mergeAuraWeekBallots(prev, incoming);
-        writeStoredAuraBallot(key, merged);
-        return merged;
-      });
+      setBallot(incoming);
+      writeStoredAuraBallot(key, incoming);
     },
     [weekId],
   );
@@ -95,7 +90,7 @@ export function useAuraQuota() {
     if (!data.ok || !Array.isArray(data.votedNames)) return false;
 
     const apiWeek = data.weekId ?? weekId;
-    mergeBallot(
+    applyServerBallot(
       ballotFromVotedNames(
         data.votedNames,
         typeof data.votesUsed === "number" ? data.votesUsed : data.votedNames.length,
@@ -103,7 +98,7 @@ export function useAuraQuota() {
       apiWeek,
     );
     return true;
-  }, [weekId, mergeBallot]);
+  }, [weekId, applyServerBallot]);
 
   const refreshQuota = useCallback(async () => {
     try {
