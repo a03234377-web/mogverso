@@ -95,7 +95,13 @@ export async function normalizeAuraScoresInDb(): Promise<number> {
 
   const keysDiffer =
     rawKeys.length !== Object.keys(normalized).length ||
-    rawKeys.some((key) => !Object.prototype.hasOwnProperty.call(normalized, resolveCanonicalRankerName(key)));
+    rawKeys.some(
+      (key) =>
+        !Object.prototype.hasOwnProperty.call(
+          normalized,
+          resolveCanonicalRankerName(key),
+        ),
+    );
 
   if (fixed === 0 && !keysDiffer) return 0;
 
