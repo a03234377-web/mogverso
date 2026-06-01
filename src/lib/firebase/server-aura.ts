@@ -231,3 +231,48 @@ export async function castAuraVoteServer(
     return { ok: false, reason: "transaction_failed" };
   }
 }
+
+export type AuraResetOptions = {
+  /** Borra `aura/scores` (por defecto true). */
+  clearScores?: boolean;
+  /** Borra todas las papeletas `auraDeviceWeek` y `auraIpWeek`. */
+  clearBallots?: boolean;
+};
+
+export type AuraResetResult = {
+  weekId: string;
+  monthId: string;
+  scoresCleared: boolean;
+  ballotsCleared: boolean;
+};
+
+/** Reinicia votos de aura (papeletas semanales y, opcionalmente, puntuaciones del mes). */
+export async function resetAuraVotesServer(
+  options: AuraResetOptions = {},
+): Promise<AuraResetResult> {
+  const clearScores = options.clearScores !== false;
+  const clearBallots = options.clearBallots !== false;
+  const db = getAdminDatabase();
+  const weekId = getMadridWeekId();
+  const monthId = getMadridMonthId();
+
+  if (clearBallots) {
+    await Promise.all([
+      db.ref("auraDeviceWeek").remove(),
+      db.ref("auraIpWeek").remove(),
+    ]);
+  }
+
+  if (clearScores) {
+    await db.ref("aura/scores").set({});
+  }
+
+  await db.ref("aura/meta").set({ weekId, monthId });
+
+  return {
+    weekId,
+    monthId,
+    scoresCleared: clearScores,
+    ballotsCleared: clearBallots,
+  };
+}

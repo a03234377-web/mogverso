@@ -11,6 +11,7 @@ import {
   castTorneoVoteServer,
   type VoteResult,
 } from "./server-vote";
+import type { AuraResetResult } from "@/lib/firebase/server-aura";
 import type { AuraVoteKind } from "@/types/aura";
 import { isValidEntryVoteCandidate } from "./validate-vote";
 
@@ -97,6 +98,20 @@ export async function performAuraVote(
     weekId: result.weekId,
     votedNames: result.votedNames,
   };
+}
+
+export async function performResetAuraVotes(
+  ip: string,
+  options?: { clearScores?: boolean; clearBallots?: boolean },
+): Promise<ActionResult | ({ ok: true } & AuraResetResult)> {
+  if (!isAdminConfigured()) return notConfigured();
+
+  const rl = await checkRateLimit("reset-aura", ip, 6, 60);
+  if (!rl.allowed) return { ok: false, error: "rate_limit", reason: "rate_limit" };
+
+  const { resetAuraVotesServer } = await import("./server-aura");
+  const result = await resetAuraVotesServer(options);
+  return { ok: true, ...result };
 }
 
 export async function performHealAura(ip: string): Promise<ActionResult> {

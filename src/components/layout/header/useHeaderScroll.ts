@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 const SCROLL_RANGE_PX = 100;
 
-function readScrollState() {
+function readScrollState(disableFade: boolean) {
   if (typeof window === "undefined") {
     return { headerOpacity: 0, logoOpacity: 0 };
   }
@@ -12,7 +12,7 @@ function readScrollState() {
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const desktop = window.matchMedia("(min-width: 768px)").matches;
 
-  if (prefersReduced || !desktop) {
+  if (prefersReduced || !desktop || disableFade) {
     return { headerOpacity: 1, logoOpacity: 1 };
   }
 
@@ -20,40 +20,34 @@ function readScrollState() {
   return { headerOpacity: progress, logoOpacity: progress };
 }
 
-export function useHeaderScroll() {
+export function useHeaderScroll(disableFade = false) {
   const [headerOpacity, setHeaderOpacity] = useState(
-    () => readScrollState().headerOpacity,
+    () => readScrollState(disableFade).headerOpacity,
   );
-  const [logoOpacity, setLogoOpacity] = useState(() => readScrollState().logoOpacity);
-
-  const handleScrollRef = useRef(() => {
-    const next = readScrollState();
-    setHeaderOpacity(next.headerOpacity);
-    setLogoOpacity(next.logoOpacity);
-  });
+  const [logoOpacity, setLogoOpacity] = useState(
+    () => readScrollState(disableFade).logoOpacity,
+  );
 
   useEffect(() => {
-    handleScrollRef.current = () => {
-      const next = readScrollState();
+    const sync = () => {
+      const next = readScrollState(disableFade);
       setHeaderOpacity(next.headerOpacity);
       setLogoOpacity(next.logoOpacity);
     };
-  });
 
-  useEffect(() => {
-    const onScroll = () => handleScrollRef.current();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
+    sync();
+    window.addEventListener("scroll", sync, { passive: true });
+    window.addEventListener("resize", sync, { passive: true });
 
     const motionMq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    motionMq.addEventListener("change", onScroll);
+    motionMq.addEventListener("change", sync);
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      motionMq.removeEventListener("change", onScroll);
+      window.removeEventListener("scroll", sync);
+      window.removeEventListener("resize", sync);
+      motionMq.removeEventListener("change", sync);
     };
-  }, []);
+  }, [disableFade]);
 
   const isLogoInteractive = logoOpacity > 0.05;
 

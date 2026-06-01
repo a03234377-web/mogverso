@@ -6,7 +6,7 @@ import { useRankingData } from "@/features/rankings/hooks/useRankingData";
 import { healAuraApi } from "@/lib/api/vote-client";
 
 export function AuraRoute() {
-  const { entries, ready, auraScores } = useRankingData();
+  const { entries, ready, auraScores, patchAuraScore } = useRankingData();
 
   useEffect(() => {
     void healAuraApi().catch((err) => {
@@ -14,5 +14,12 @@ export function AuraRoute() {
     });
   }, []);
 
-  return <AuraPage entries={entries} rankingReady={ready} initialScores={auraScores} />;
+  return (
+    <AuraPage
+      entries={entries}
+      rankingReady={ready}
+      scores={auraScores}
+      onPatchScore={patchAuraScore}
+    />
+  );
 }

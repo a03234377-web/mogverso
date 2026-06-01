@@ -175,16 +175,32 @@ export function useAuraQuota() {
   const applyVoteResult = useCallback(
     (remaining: number, votedNamesFromServer: string[], responseWeekId?: string) => {
       const activeWeek = responseWeekId ?? weekId;
-      const canonical = votedNamesFromServer.map((n) => resolveCanonicalRankerName(n));
-      const used = Math.max(0, AURA_VOTES_PER_WEEK - remaining, canonical.length);
-      setUsedOverride({
-        weekId: activeWeek,
-        used,
-        votedNames: canonical,
+      const incoming = votedNamesFromServer.map((n) => resolveCanonicalRankerName(n));
+
+      setBallot((prev) => {
+        const merged = mergeAuraWeekBallots(
+          prev,
+          ballotFromVotedNames(incoming, incoming.length),
+        );
+        const allNames = Object.keys(merged.byName);
+        const used = Math.max(
+          0,
+          AURA_VOTES_PER_WEEK - remaining,
+          incoming.length,
+          allNames.length,
+        );
+        const ballotWithUsed = { ...merged, used };
+
+        setUsedOverride({
+          weekId: activeWeek,
+          used,
+          votedNames: allNames,
+        });
+        writeStoredAuraBallot(activeWeek, ballotWithUsed);
+        return ballotWithUsed;
       });
-      mergeBallot(ballotFromVotedNames(canonical, used), activeWeek);
     },
-    [weekId, mergeBallot],
+    [weekId],
   );
 
   /** @deprecated Usa `applyVoteResult` */

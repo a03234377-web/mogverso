@@ -22,23 +22,18 @@ import { cn } from "@/lib/cn";
 type AuraPageProps = {
   entries: RankedEntry[];
   rankingReady: boolean;
-  initialScores: AuraScores;
+  scores: AuraScores;
+  onPatchScore: (name: string, aura: number) => void;
 };
 
-export function AuraPage({ entries, rankingReady, initialScores }: AuraPageProps) {
+export function AuraPage({
+  entries,
+  rankingReady,
+  scores,
+  onPatchScore,
+}: AuraPageProps) {
   const { fb, error: firebaseInitError } = useFirebase();
   const { openProfile } = useLooksMaxNavigate();
-  const [scorePatches, setScorePatches] = useState<AuraScores>({});
-
-  const scores = useMemo(
-    () => ({ ...initialScores, ...scorePatches }),
-    [initialScores, scorePatches],
-  );
-
-  const patchScore = useCallback((name: string, aura: number) => {
-    const canonical = resolveCanonicalRankerName(name);
-    setScorePatches((prev) => ({ ...prev, [canonical]: aura }));
-  }, []);
 
   const {
     votesRemaining,
@@ -66,15 +61,16 @@ export function AuraPage({ entries, rankingReady, initialScores }: AuraPageProps
       weekId: string;
       votedNames: string[];
     }) => {
-      patchScore(result.name, result.aura);
+      const canon = resolveCanonicalRankerName(result.name);
+      onPatchScore(canon, result.aura);
       applyVoteResult(result.votesRemaining, result.votedNames, result.weekId);
       void refreshQuota();
-      setLastVoteDelta({ name: result.name, delta: result.delta });
+      setLastVoteDelta({ name: canon, delta: result.delta });
       window.setTimeout(() => {
         setLastVoteDelta((current) => (current?.name === result.name ? null : current));
       }, 2500);
     },
-    [patchScore, applyVoteResult, refreshQuota],
+    [onPatchScore, applyVoteResult, refreshQuota],
   );
 
   const {
@@ -232,13 +228,13 @@ export function AuraPage({ entries, rankingReady, initialScores }: AuraPageProps
                 entry={entry}
                 scores={scores}
                 disabled={isRowDisabled(entry.ranker.name)}
-                alreadyVoted={
-                  hasVotedFor(entry.ranker.name) || voteSuccess === entry.ranker.name
-                }
+                alreadyVoted={hasVotedFor(entry.ranker.name)}
                 votingName={votingName}
                 voteSuccessName={voteSuccess}
                 voteDelta={
-                  lastVoteDelta?.name === entry.ranker.name ? lastVoteDelta.delta : null
+                  lastVoteDelta?.name === resolveCanonicalRankerName(entry.ranker.name)
+                    ? lastVoteDelta.delta
+                    : null
                 }
                 onBoost={handleBoost}
                 onPenalty={handlePenalty}
