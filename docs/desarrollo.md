@@ -92,6 +92,7 @@ En **Vercel/producción** sí debes tener las dos claves del mismo sitio reCAPTC
   ```
 
   Borra papeletas semanales (`auraDeviceWeek`, `auraIpWeek`) y puntuaciones (`aura/scores`). Tras el reset, recarga `/aura` y borra datos del sitio en el navegador (o `localStorage` con prefijo `lm_aura_ballot_`) para que el cupo local coincida.
+
 - Si faltan fotos, las rutas en `/img/` devolverán 404; la UI muestra emojis de respaldo.
 - Si reCAPTCHA falla **solo en producción**, revisa dominio en Google, par site key + secret y variables en Vercel.
 
