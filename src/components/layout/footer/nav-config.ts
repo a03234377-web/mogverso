@@ -12,4 +12,5 @@ export const BNAV: {
   { id: "rankvote", label: "Votar", icon: "vote", tabIdx: 1 },
   { id: "torneo", label: "Torneo", icon: "goal", badge: "LIVE", tabIdx: 2 },
   { id: "noticias", label: "Noticias", icon: "newspaper", badge: "HOT", tabIdx: 3 },
+  { id: "aura", label: "Aura", icon: "sparkles", tabIdx: 4 },
 ];

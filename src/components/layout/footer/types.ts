@@ -1,6 +1,5 @@
-import type { LooksMaxHeaderProps } from "@/components/layout/header/types";
+import type { PageId } from "@/features/app/types";
 
-export type LooksMaxFooterProps = LooksMaxHeaderProps & {
-  moreOpen: boolean;
-  onToggleMore: () => void;
+export type LooksMaxFooterProps = {
+  page: PageId;
 };
