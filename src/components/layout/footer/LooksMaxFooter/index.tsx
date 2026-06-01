@@ -17,8 +17,7 @@ export function LooksMaxFooter({ page }: LooksMaxFooterProps) {
       id="bottomNav"
       style={{
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
-        height:
-          "calc(var(--lm-bottom-nav-height) + env(safe-area-inset-bottom, 0px))",
+        height: "calc(var(--lm-bottom-nav-height) + env(safe-area-inset-bottom, 0px))",
       }}
     >
       <nav
