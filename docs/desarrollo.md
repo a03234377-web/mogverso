@@ -81,7 +81,7 @@ En **Vercel/producción** sí debes tener las dos claves del mismo sitio reCAPTC
 
 - Si el loader de Firebase no desaparece, revisa `.env.local` y la consola del navegador.
 - Si los votos fallan con 503, falta `FIREBASE_SERVICE_ACCOUNT_JSON`.
-- **Aura (`/aura`)**: el cupo semanal y la papeleta se leen con `GET /api/aura/quota` (Admin SDK). Sin la cuenta de servicio, el cupo solo persiste en `localStorage` del mismo navegador; al cambiar de dispositivo no verás votos previos. Tras votar, en Firebase Console revisa `auraDeviceWeek/dev_<deviceId>_<weekId>` y `aura/scores`.
+- **Aura (`/aura`)**: el cupo semanal y la papeleta se leen con `GET /api/aura/quota` (Admin SDK); las puntuaciones del mes con `GET /api/aura/scores`. Sin la cuenta de servicio en el servidor, votos y cupo no persisten. Tras votar, en Firebase Console revisa `auraDeviceWeek/dev_<deviceId>_<weekId>` y `aura/scores`.
 - **Reiniciar votos de aura** (dev/staging, requiere `ADMIN_SECRET` + `FIREBASE_SERVICE_ACCOUNT_JSON`):
 
   ```bash
@@ -91,7 +91,7 @@ En **Vercel/producción** sí debes tener las dos claves del mismo sitio reCAPTC
     -d '{}'
   ```
 
-  Borra papeletas semanales (`auraDeviceWeek`, `auraIpWeek`) y puntuaciones (`aura/scores`). Tras el reset, recarga `/aura` y borra datos del sitio en el navegador (o `localStorage` con prefijo `lm_aura_ballot_`) para que el cupo local coincida.
+  Borra papeletas semanales (`auraDeviceWeek`, `auraIpWeek`) y puntuaciones (`aura/scores`). Tras el reset, recarga `/aura` para que el cupo se vuelva a leer desde la API.
 
 - Si faltan fotos, las rutas en `/img/` devolverán 404; la UI muestra emojis de respaldo.
 - Si reCAPTCHA falla **solo en producción**, revisa dominio en Google, par site key + secret y variables en Vercel.
