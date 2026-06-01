@@ -3,10 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
-import {
-  purgeStaleAuraBallots,
-  writeStoredAuraBallot,
-} from "@/lib/api/aura-ballot-storage";
 import { getDeviceId } from "@/lib/api/device-id";
 import { AURA_VOTES_PER_WEEK } from "@/lib/aura/constants";
 import { getMadridWeekId } from "@/lib/aura/periods";
@@ -43,10 +39,6 @@ export function useAuraQuota() {
   const prevWeekRef = useRef(weekId);
 
   useEffect(() => {
-    purgeStaleAuraBallots(weekId);
-  }, [weekId]);
-
-  useEffect(() => {
     const id = window.setInterval(() => setWeekTick((n) => n + 1), 60_000);
     return () => window.clearInterval(id);
   }, []);
@@ -60,14 +52,9 @@ export function useAuraQuota() {
     setBallotHydrated(false);
   }, [weekId]);
 
-  const applyServerBallot = useCallback(
-    (incoming: AuraWeekBallot, storageWeekId?: string) => {
-      const key = storageWeekId ?? weekId;
-      setBallot(incoming);
-      writeStoredAuraBallot(key, incoming);
-    },
-    [weekId],
-  );
+  const applyServerBallot = useCallback((incoming: AuraWeekBallot) => {
+    setBallot(incoming);
+  }, []);
 
   const fetchQuotaFromApi = useCallback(async () => {
     const deviceId = getDeviceId();
@@ -89,13 +76,11 @@ export function useAuraQuota() {
 
     if (!data.ok || !Array.isArray(data.votedNames)) return false;
 
-    const apiWeek = data.weekId ?? weekId;
     applyServerBallot(
       ballotFromVotedNames(
         data.votedNames,
         typeof data.votesUsed === "number" ? data.votesUsed : data.votedNames.length,
       ),
-      apiWeek,
     );
     return true;
   }, [weekId, applyServerBallot]);
@@ -191,7 +176,6 @@ export function useAuraQuota() {
           used,
           votedNames: allNames,
         });
-        writeStoredAuraBallot(activeWeek, ballotWithUsed);
         return ballotWithUsed;
       });
     },
@@ -210,7 +194,7 @@ export function useAuraQuota() {
 
   return {
     ready: ready && ballotHydrated,
-    /** Cupo cargado (API/local/Firebase); la lista puede pintar votos desde localStorage antes. */
+    /** Cupo cargado desde la API (Admin SDK / RTDB). */
     quotaReady: ballotHydrated,
     firebaseError,
     votesRemaining,
