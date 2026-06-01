@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
-import { healAuraApi } from "@/lib/api/vote-client";
 import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import { parseAuraScores } from "@/lib/aura/coerce-score";
 import type { AuraScores } from "@/types/aura";
@@ -10,12 +9,6 @@ import type { AuraScores } from "@/types/aura";
 export function useAuraScores() {
   const { fb, ready } = useFirebase();
   const [scores, setScores] = useState<AuraScores>({});
-
-  useEffect(() => {
-    void healAuraApi().catch((err) => {
-      console.error("[Aura] heal periods:", err);
-    });
-  }, []);
 
   useEffect(() => {
     if (!fb) return;

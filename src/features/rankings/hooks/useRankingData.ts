@@ -117,6 +117,29 @@ export function useRankingData() {
     }
   }, []);
 
+  const fetchAuraScoresFromApi = useCallback(async () => {
+    try {
+      const res = await fetch("/api/aura/scores", { cache: "no-store" });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        scores?: Record<string, unknown>;
+        error?: string;
+      };
+      if (res.status === 503 || data.error === "server_not_configured") return;
+      if (!data.ok || !data.scores) return;
+      const parsed = parseAuraScores(data.scores);
+      if (Object.keys(parsed).length === 0) return;
+      dispatch({ type: "auraScores", payload: parsed });
+    } catch (err) {
+      console.error("[LooksMax] aura scores API:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    void fetchAuraScoresFromApi();
+  }, [ready, fetchAuraScoresFromApi]);
+
   useEffect(() => {
     if (!fb) return;
     const { db, ref, onValue } = fb;
@@ -150,10 +173,10 @@ export function useRankingData() {
       });
     });
     const unsubAura = onValue(ref(db, "aura/scores"), (snap) => {
-      dispatch({
-        type: "auraScores",
-        payload: snap.exists() ? parseAuraScores(snap.val()) : {},
-      });
+      if (!snap.exists()) return;
+      const parsed = parseAuraScores(snap.val());
+      if (Object.keys(parsed).length === 0) return;
+      dispatch({ type: "auraScores", payload: parsed });
     });
     const unsubRv = onValue(ref(db, "rankvote/current"), (snap) => {
       if (!snap.exists()) {
@@ -231,6 +254,10 @@ export function useRankingData() {
     dispatch({ type: "patchAuraScore", name, aura });
   }, []);
 
+  const refreshAuraScores = useCallback(async () => {
+    await fetchAuraScoresFromApi();
+  }, [fetchAuraScoresFromApi]);
+
   return {
     ready: rankingReady,
     entries: rankingReady ? entries : [],
@@ -239,6 +266,7 @@ export function useRankingData() {
     rankVoteEnd,
     auraScores,
     patchAuraScore,
+    refreshAuraScores,
     overrides,
   };
 }
