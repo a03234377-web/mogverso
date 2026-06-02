@@ -85,7 +85,8 @@ export function RankVoteArena({
       </div>
 
       <div className="mb-5 text-base font-semibold text-lm-text2">
-        Vota cada 1 hora y 30 minutos · El ganador sube 1 puesto · El perdedor baja 1 puesto
+        Vota cada 1 hora y 30 minutos · El ganador sube 1 puesto · El perdedor baja 1
+        puesto
       </div>
 
       <CountdownDigits h={cd.h} m={cd.m} s={cd.s} variant="green" className="mb-6" />

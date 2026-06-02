@@ -6,7 +6,7 @@ import type { Ranker } from "@/features/rankings/data/rankers";
 import { ProfileAvatar } from "@/components/Avatar";
 import { Icon } from "@/components/icons";
 import { sectionTitle } from "@/components/layout/header/nav-config";
-import { parseProfileFrom } from "@/features/app/routes";
+import { parseProfileFrom, parseProfileTarget } from "@/features/app/routes";
 import { ActivePage } from "@/components/ui/ActivePage";
 import { ProfileAuraCard } from "@/features/rankings/components/profile/ProfileAuraCard";
 import { useLooksMaxNavigate } from "@/features/app/shell/LooksMaxShell";
@@ -21,6 +21,7 @@ function ProfileBackButton() {
   const searchParams = useSearchParams();
   const { backFromProfile } = useLooksMaxNavigate();
   const profileFrom = parseProfileFrom(searchParams.get("from"));
+  const profileTarget = parseProfileTarget(searchParams.get("target"));
   const backSection = profileFrom ?? "rankings";
   const backButtonId = `profile-back-${backSection}`;
 
@@ -35,7 +36,7 @@ function ProfileBackButton() {
         "hover:-translate-x-1 hover:border-lm-border2 hover:text-lm-text max-md:ml-4",
       )}
       aria-label={`Volver a ${sectionTitle(backSection)}`}
-      onClick={() => backFromProfile(profileFrom)}
+      onClick={() => backFromProfile(profileFrom, profileTarget)}
     >
       ← Volver a {sectionTitle(backSection)}
     </button>

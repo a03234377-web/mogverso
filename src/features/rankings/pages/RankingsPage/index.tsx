@@ -14,6 +14,7 @@ import { MoversCard } from "@/features/rankings/components/ui/MoversCard";
 import { RankRow } from "@/features/rankings/components/ui/RankRow";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { useLooksMaxNavigate } from "@/features/app/shell/LooksMaxShell";
+import { useProfileReturnRestore } from "@/features/app/hooks/useProfileReturnRestore";
 import type { Mover, RankedEntry } from "@/features/rankings/lib/ranking";
 import type { AuraScores } from "@/types/aura";
 import { cn } from "@/lib/cn";
@@ -51,6 +52,7 @@ export function RankingsPage({
   adsenseClient,
 }: RankingsPageProps) {
   const { openProfile } = useLooksMaxNavigate();
+  useProfileReturnRestore("rankings", entries.length > 0);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);

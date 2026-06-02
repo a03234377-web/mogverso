@@ -9,6 +9,7 @@ import { AURA_BOOST, AURA_PENALTY } from "@/lib/aura/constants";
 import { cn } from "@/lib/cn";
 import type { RankedEntry } from "@/features/rankings/lib/ranking";
 import type { AuraScores } from "@/types/aura";
+import { rankerProfileSlug } from "@/features/rankings/lib/profile-slug";
 
 type AuraVoteRowProps = {
   entry: RankedEntry;
@@ -36,6 +37,7 @@ export function AuraVoteRow({
   onOpenProfile,
 }: AuraVoteRowProps) {
   const { ranker, rank } = entry;
+  const target = rankerProfileSlug(ranker.name);
   const aura = auraForName(scores, ranker.name);
   const busy = votingName === ranker.name;
   const justVoted = voteSuccessName === ranker.name;
@@ -51,6 +53,8 @@ export function AuraVoteRow({
       )}
     >
       <Pressable
+        id={`profile-target-${target}`}
+        data-profile-target={target}
         aria-label={`Ver perfil de ${ranker.name}`}
         className={cn(
           "flex min-w-0 items-center gap-3 text-left select-none",
