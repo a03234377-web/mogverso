@@ -7,7 +7,7 @@ export function getRecaptchaSiteKey(): string {
   return process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY?.trim() ?? "";
 }
 
-export function isDevelopmentEnv(): boolean {
+function isDevelopmentEnv(): boolean {
   return process.env.NODE_ENV === "development";
 }
 

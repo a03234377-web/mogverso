@@ -1,0 +1,8 @@
+{
+  "$schema": "https://react.doctor/schema/config.json",
+  "serverAuthFunctionNames": ["assertVoteServerAction", "assertHealServerAction"],
+  "ignore": {
+    "rules": ["react-doctor/nextjs-missing-metadata"],
+    "files": ["src/features/aura/hooks/useAuraQuota.ts"]
+  }
+}

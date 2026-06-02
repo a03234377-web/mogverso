@@ -1,6 +1,6 @@
 "use client";
 
-import { healAuraAction, submitAuraVote } from "@/features/aura/actions";
+import { submitAuraVote } from "@/features/aura/actions";
 import { healEntryVoteAction, submitEntryVote } from "@/features/rankings/actions";
 import { healRankvoteAction, submitRankVote } from "@/features/rankvote/actions";
 import { healTorneoAction, submitTorneoVote } from "@/features/torneo/actions";
@@ -45,10 +45,6 @@ export async function voteTorneoApi(
   recaptchaToken?: string,
 ): Promise<VoteApiResponse> {
   return submitTorneoVote(matchId, candidateName, getDeviceId(), recaptchaToken);
-}
-
-export async function healAuraApi(): Promise<HealResponse> {
-  return healAuraAction();
 }
 
 export async function voteAuraApi(

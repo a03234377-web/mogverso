@@ -89,7 +89,7 @@ export function AuraVoteRow({
         )}
         onClick={() => onOpenProfile(ranker.name, rank - 1)}
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] bg-lm-bg3 lm-type-score text-[1.05rem] text-lm-text2">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-[9px] bg-lm-bg3 lm-type-score text-[1.05rem] text-lm-text2">
           {rank}
         </div>
         <div className="relative size-10 shrink-0 overflow-hidden rounded-full border-2 border-lm-border bg-lm-bg3">
@@ -123,7 +123,7 @@ export function AuraVoteRow({
             aria-disabled="true"
           >
             <Icon name="lock" size={14} className="shrink-0 text-lm-text2" />
-            Voto registrado — no puedes votar otra vez
+            Voto registrado: no puedes votar otra vez
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-2">

@@ -56,7 +56,7 @@ export function NoticiaTextWithProfiles({
   className?: string;
   linkClassName?: string;
 }) {
-  const uniqueNames = [...new Set(profileNames.filter(Boolean))].sort(
+  const uniqueNames = [...new Set(profileNames.filter(Boolean))].toSorted(
     (a, b) => b.length - a.length,
   );
 

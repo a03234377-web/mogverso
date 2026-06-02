@@ -65,22 +65,6 @@ export function formatTorneoStartDate(ms: number) {
   };
 }
 
-const MID_TOURNAMENT_PHASES: TorneoPhase[] = [
-  "octavos_voting",
-  "break_cuartos",
-  "cuartos_voting",
-  "semifinals_promo",
-  "semifinals_voting",
-  "break_final",
-  "final_voting",
-];
-
-/** Fases que implican que el torneo ya está en marcha (no cuenta atrás previa). */
-export function isTorneoMidRunPhase(phase: TorneoPhase | null | undefined): boolean {
-  if (!phase) return false;
-  return MID_TOURNAMENT_PHASES.includes(phase);
-}
-
 /**
  * Antes del viernes de inicio, Firebase no debe quedar en fase intermedia
  * (p. ej. break_final): parece “espera de la gran final” en vez de arranque desde cero.

@@ -56,10 +56,12 @@ export function parseAuraScores(raw: unknown): AuraScores {
   return out;
 }
 
+const AURA_SCORE_FORMATTER = new Intl.NumberFormat("es-ES", {
+  useGrouping: false,
+  maximumFractionDigits: 0,
+});
+
 /** Sin separador de miles (en es-ES, 3380 sería «3.380» y se confunde con 338). */
 export function formatAuraScore(aura: number): string {
-  return new Intl.NumberFormat("es-ES", {
-    useGrouping: false,
-    maximumFractionDigits: 0,
-  }).format(aura);
+  return AURA_SCORE_FORMATTER.format(aura);
 }

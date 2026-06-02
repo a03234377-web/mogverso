@@ -123,6 +123,19 @@ export function AuraPage({
 
   const connectionError = firebaseInitError ?? firebaseError;
 
+  const heroQuotaBadge = useMemo(
+    () => (
+      <HeroBadge>
+        <IconLabel icon="sparkles" iconSize={12}>
+          {pageReady
+            ? `${votesRemaining}/${AURA_VOTES_PER_WEEK} votos esta semana`
+            : "Cargando cupo…"}
+        </IconLabel>
+      </HeroBadge>
+    ),
+    [pageReady, votesRemaining],
+  );
+
   return (
     <div id="page-aura" className="block animate-fade-up">
       <HeroSection
@@ -135,20 +148,12 @@ export function AuraPage({
           </>
         }
         subtitle={`Top ${AURA_RANKING_SIZE} del ranking · ${SPAIN_TIMEZONE_LABEL}`}
-        badges={
-          <HeroBadge>
-            <IconLabel icon="sparkles" iconSize={12}>
-              {pageReady
-                ? `${votesRemaining}/${AURA_VOTES_PER_WEEK} votos esta semana`
-                : "Cargando cupo…"}
-            </IconLabel>
-          </HeroBadge>
-        }
+        badges={heroQuotaBadge}
       />
 
       <div className="mx-auto mb-4 max-w-[1100px] px-5 max-md:px-4">
         <p className="text-center text-sm leading-relaxed text-lm-text2">
-          {AURA_VOTES_PER_WEEK} votos cada lunes (hora España), siempre desde cero — no
+          {AURA_VOTES_PER_WEEK} votos cada lunes (hora España), siempre desde cero; no
           se acumulan los de la semana anterior. Un voto por candidato (+230 / −100 al
           total del mes; puntos de aura se reinician el día 1).
         </p>
@@ -220,7 +225,7 @@ export function AuraPage({
         <div className="mb-4">
           <SectionTitle>
             <IconLabel icon="sparkles" iconSize={20}>
-              Top {AURA_RANKING_SIZE} — Votar aura
+              Top {AURA_RANKING_SIZE}: votar aura
             </IconLabel>
           </SectionTitle>
         </div>

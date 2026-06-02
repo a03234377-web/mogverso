@@ -42,7 +42,7 @@ export function computeAuraStanding(
     return { aura: auraForName(scores, name), auraRank: null, eligible: false };
   }
 
-  const sorted = [...rows].sort(
+  const sorted = rows.toSorted(
     (a, b) => b.aura - a.aura || a.officialRank - b.officialRank,
   );
   const auraRank = sorted.findIndex((r) => r.name === name) + 1;
@@ -63,12 +63,12 @@ export function computeAuraLeaders(
     aura: auraForName(scores, name),
   }));
 
-  const top = [...rows]
-    .sort((a, b) => b.aura - a.aura || a.rank - b.rank)
+  const top = rows
+    .toSorted((a, b) => b.aura - a.aura || a.rank - b.rank)
     .slice(0, count)
     .map((row, i) => ({ ...row, rank: i + 1 }));
-  const bottom = [...rows]
-    .sort((a, b) => a.aura - b.aura || a.rank - b.rank)
+  const bottom = rows
+    .toSorted((a, b) => a.aura - b.aura || a.rank - b.rank)
     .slice(0, count)
     .map((row, i) => ({ ...row, rank: i + 1 }));
 
@@ -80,7 +80,7 @@ export function sortEntriesByAura(
   entries: RankedEntry[],
   scores: Record<string, number>,
 ): RankedEntry[] {
-  const sorted = [...entries].sort((a, b) => {
+  const sorted = entries.toSorted((a, b) => {
     const diff = auraForName(scores, b.name) - auraForName(scores, a.name);
     if (diff !== 0) return diff;
     return a.rank - b.rank;

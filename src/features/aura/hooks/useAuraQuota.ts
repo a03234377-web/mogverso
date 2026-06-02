@@ -83,7 +83,7 @@ export function useAuraQuota() {
       ),
     );
     return true;
-  }, [weekId, applyServerBallot]);
+  }, [applyServerBallot]);
 
   const refreshQuota = useCallback(async () => {
     try {

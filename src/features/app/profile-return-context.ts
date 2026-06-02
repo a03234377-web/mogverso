@@ -3,7 +3,7 @@
 import { rankerProfileSlug } from "@/features/rankings/lib/profile-slug";
 import type { NavPageId } from "@/features/app/routes";
 
-export const PROFILE_RETURN_STORAGE_KEY = "mogverso:profile-return";
+const PROFILE_RETURN_STORAGE_KEY = "mogverso:profile-return";
 const PROFILE_RETURN_MAX_AGE_MS = 10 * 60 * 1000;
 
 export type ProfileReturnContext = {
@@ -13,9 +13,7 @@ export type ProfileReturnContext = {
   ts: number;
 };
 
-export function normalizeProfileTarget(
-  value: string | null | undefined,
-): string | null {
+function normalizeProfileTarget(value: string | null | undefined): string | null {
   if (!value) return null;
   return rankerProfileSlug(value);
 }

@@ -10,7 +10,7 @@ export function isAdminConfigured(): boolean {
   );
 }
 
-export function getAdminApp(): App {
+function getAdminApp(): App {
   if (adminApp) return adminApp;
 
   const existing = getApps()[0];
