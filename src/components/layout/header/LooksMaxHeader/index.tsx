@@ -12,9 +12,7 @@ import { useHeaderScroll } from "@/components/layout/header/useHeaderScroll";
 import type { LooksMaxHeaderProps } from "@/components/layout/header/types";
 
 export function LooksMaxHeader({ page, onOpenDiscord }: LooksMaxHeaderProps) {
-  const disableHeaderFade = page === "torneo";
-  const { headerOpacity, logoOpacity, isLogoInteractive } =
-    useHeaderScroll(disableHeaderFade);
+  const { headerOpacity, logoOpacity, isLogoInteractive } = useHeaderScroll();
 
   return (
     <header

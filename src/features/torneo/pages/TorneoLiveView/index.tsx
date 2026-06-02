@@ -1,9 +1,11 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { IconLabel } from "@/components/icons";
 import { ActivePage } from "@/components/ui/ActivePage";
 import { HeroSection } from "@/components/ui/HeroSection";
+import { PAGE_SCROLL_REVEAL } from "@/lib/scroll-reveal";
 import { TorneoPhaseCard } from "./TorneoPhaseCard";
 import { TorneoMatchesSection } from "./TorneoMatchesSection";
 import { TorneoBracket } from "./TorneoBracket";
@@ -22,12 +24,14 @@ export function TorneoLiveView() {
 
   return (
     <ActivePage id="page-torneo" active>
-      <HeroSection
-        variant="torneo"
-        eyebrow={TORNEO_HERO_EYEBROW}
-        title={TORNEO_HERO_TITLE}
-        subtitle={TORNEO_HERO_SUBTITLE}
-      />
+      <ScrollReveal className="w-full" {...PAGE_SCROLL_REVEAL}>
+        <HeroSection
+          variant="torneo"
+          eyebrow={TORNEO_HERO_EYEBROW}
+          title={TORNEO_HERO_TITLE}
+          subtitle={TORNEO_HERO_SUBTITLE}
+        />
+      </ScrollReveal>
 
       <TorneoPhaseCard state={state} loading={loading} onRestart={refresh} />
 

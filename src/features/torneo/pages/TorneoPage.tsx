@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import { TorneoComingSoon } from "@/features/torneo/pages/TorneoComingSoon";
 import { TorneoLiveView } from "@/features/torneo/pages/TorneoLiveView";
@@ -39,6 +41,18 @@ export function TorneoPage() {
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    const id = requestAnimationFrame(() => {
+      try {
+        ScrollTrigger.refresh();
+      } catch {
+        /* DOM en transición */
+      }
+    });
+    return () => cancelAnimationFrame(id);
+  }, [showComingSoon]);
 
   if (showComingSoon) {
     return <TorneoComingSoon />;

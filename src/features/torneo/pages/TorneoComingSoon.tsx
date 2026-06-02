@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { Icon } from "@/components/icons";
 import { ActivePage } from "@/components/ui/ActivePage";
+import { PAGE_SCROLL_REVEAL } from "@/lib/scroll-reveal";
 import { SpainTimezoneNote } from "@/components/ui/SpainTimezoneNote";
 import { HeroSection } from "@/components/ui/HeroSection";
 import {
@@ -42,12 +44,14 @@ export function TorneoComingSoon() {
 
   return (
     <ActivePage id="page-torneo" active>
-      <HeroSection
-        variant="torneo"
-        eyebrow={TORNEO_HERO_EYEBROW}
-        title={TORNEO_HERO_TITLE}
-        subtitle={TORNEO_HERO_SUBTITLE}
-      />
+      <ScrollReveal className="w-full" {...PAGE_SCROLL_REVEAL}>
+        <HeroSection
+          variant="torneo"
+          eyebrow={TORNEO_HERO_EYEBROW}
+          title={TORNEO_HERO_TITLE}
+          subtitle={TORNEO_HERO_SUBTITLE}
+        />
+      </ScrollReveal>
 
       <PhaseDisplay>
         <PhaseCard variant="waiting">
