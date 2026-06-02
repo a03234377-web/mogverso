@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { parseProfileTarget, type NavPageId } from "@/features/app/routes";
 import {
   clearProfileReturnContext,
@@ -16,17 +16,15 @@ function removeTargetFromUrl(pathname: string, searchParams: URLSearchParams): v
   window.history.replaceState(window.history.state, "", nextUrl);
 }
 
+/** Restores scroll/target after returning from profile (client-only; no useSearchParams). */
 export function useProfileReturnRestore(origin: NavPageId, ready = true) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const target = useMemo(
-    () => parseProfileTarget(searchParams.get("target")),
-    [searchParams],
-  );
 
   useEffect(() => {
     if (!ready) return;
 
+    const searchParams = new URLSearchParams(window.location.search);
+    const target = parseProfileTarget(searchParams.get("target"));
     const saved = readProfileReturnContext();
     const canUseSaved = saved?.from === origin ? saved : null;
     const hasTarget = Boolean(target);
@@ -46,7 +44,7 @@ export function useProfileReturnRestore(origin: NavPageId, ready = true) {
         if (row) {
           row.scrollIntoView({ block: "center", behavior: "auto" });
           clearProfileReturnContext();
-          removeTargetFromUrl(pathname, new URLSearchParams(searchParams.toString()));
+          removeTargetFromUrl(pathname, searchParams);
           return;
         }
       }
@@ -67,11 +65,11 @@ export function useProfileReturnRestore(origin: NavPageId, ready = true) {
         clearProfileReturnContext();
       }
       if (target) {
-        removeTargetFromUrl(pathname, new URLSearchParams(searchParams.toString()));
+        removeTargetFromUrl(pathname, searchParams);
       }
     };
 
     const raf = window.requestAnimationFrame(tryRestore);
     return () => window.cancelAnimationFrame(raf);
-  }, [origin, pathname, ready, searchParams, target]);
+  }, [origin, pathname, ready]);
 }
