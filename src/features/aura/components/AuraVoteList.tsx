@@ -4,6 +4,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useFlipListAnimation } from "@/components/animations/useFlipListAnimation";
 import { AuraVoteRow } from "@/features/aura/components/AuraVoteRow";
 import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
+import { profileTargetId } from "@/features/rankings/lib/profile-slug";
 import type { RankedEntry } from "@/features/rankings/lib/ranking";
 import type { AuraScores } from "@/types/aura";
 
@@ -18,6 +19,7 @@ type AuraVoteListProps = {
   votingName: string | null;
   voteSuccessName: string | null;
   lastVoteDelta: { name: string; delta: number } | null;
+  focusTarget?: string | null;
   onBoost: (name: string) => void;
   onPenalty: (name: string) => void;
   onOpenProfile: (name: string, rank: number) => void;
@@ -46,6 +48,7 @@ export function AuraVoteList({
   votingName,
   voteSuccessName,
   lastVoteDelta,
+  focusTarget = null,
   onBoost,
   onPenalty,
   onOpenProfile,
@@ -101,6 +104,9 @@ export function AuraVoteList({
                 : null
             }
             moveHint={moveHints[entry.name] ?? null}
+            isVoteFocus={
+              Boolean(focusTarget) && focusTarget === profileTargetId(entry.ranker.name)
+            }
             onBoost={onBoost}
             onPenalty={onPenalty}
             onOpenProfile={onOpenProfile}

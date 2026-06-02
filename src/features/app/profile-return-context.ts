@@ -1,6 +1,6 @@
 "use client";
 
-import { rankerProfileSlug } from "@/features/rankings/lib/profile-slug";
+import { parseProfileTarget } from "@/features/app/routes";
 import type { NavPageId } from "@/features/app/routes";
 
 const PROFILE_RETURN_STORAGE_KEY = "mogverso:profile-return";
@@ -14,8 +14,7 @@ export type ProfileReturnContext = {
 };
 
 function normalizeProfileTarget(value: string | null | undefined): string | null {
-  if (!value) return null;
-  return rankerProfileSlug(value);
+  return parseProfileTarget(value);
 }
 
 export function saveProfileReturnContext(

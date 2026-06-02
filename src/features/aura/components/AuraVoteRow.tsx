@@ -9,7 +9,7 @@ import { AURA_BOOST, AURA_PENALTY } from "@/lib/aura/constants";
 import { cn } from "@/lib/cn";
 import type { RankedEntry } from "@/features/rankings/lib/ranking";
 import type { AuraScores } from "@/types/aura";
-import { rankerProfileSlug } from "@/features/rankings/lib/profile-slug";
+import { profileTargetId } from "@/features/rankings/lib/profile-slug";
 
 type AuraVoteRowProps = {
   entry: RankedEntry;
@@ -21,6 +21,8 @@ type AuraVoteRowProps = {
   voteDelta: number | null;
   /** Breve indicador tras cambiar de puesto en el ranking de aura. */
   moveHint?: "up" | "down" | null;
+  /** Resalto al llegar desde perfil (`?target=`). */
+  isVoteFocus?: boolean;
   onBoost: (name: string) => void;
   onPenalty: (name: string) => void;
   onOpenProfile: (name: string, rank: number) => void;
@@ -35,12 +37,13 @@ export function AuraVoteRow({
   voteSuccessName,
   voteDelta,
   moveHint = null,
+  isVoteFocus = false,
   onBoost,
   onPenalty,
   onOpenProfile,
 }: AuraVoteRowProps) {
   const { ranker, rank } = entry;
-  const target = rankerProfileSlug(ranker.name);
+  const target = profileTargetId(ranker.name);
   const aura = auraForName(scores, ranker.name);
   const busy = votingName === ranker.name;
   const justVoted = voteSuccessName === ranker.name;
@@ -51,7 +54,9 @@ export function AuraVoteRow({
       className={cn(
         "relative flex flex-col gap-3 rounded-xl border border-lm-border bg-lm-card px-4 py-3",
         "max-md:gap-2.5 max-md:px-3.5",
-        "transition-[border-color,box-shadow] duration-300",
+        "scroll-mt-24 transition-[border-color,box-shadow] duration-300",
+        isVoteFocus &&
+          "z-[2] animate-profile-target-pulse border-lm-gold/80 bg-[rgba(232,184,75,0.1)] shadow-[0_0_28px_rgba(232,184,75,0.28)] ring-2 ring-lm-gold/60",
         justVoted && "border-lm-gold/50 shadow-[0_0_20px_rgba(232,184,75,0.15)]",
         alreadyVoted && !justVoted && "border-lm-gold/40 bg-[rgba(232,184,75,0.06)]",
         moveHint === "up" &&
@@ -77,6 +82,19 @@ export function AuraVoteRow({
             className="shrink-0"
           />
           {moveHint === "up" ? "Subió" : "Bajó"}
+        </span>
+      ) : null}
+      {isVoteFocus ? (
+        <span
+          className={cn(
+            "pointer-events-none absolute top-2.5 right-3 z-[3] flex items-center gap-1",
+            "animate-fade-up rounded-md border border-lm-gold/50 bg-lm-gold/20 px-2 py-0.5",
+            "text-xs font-bold text-lm-gold",
+          )}
+          aria-live="polite"
+        >
+          <Icon name="sparkles" size={12} className="shrink-0" />
+          Vota aquí
         </span>
       ) : null}
       <Pressable

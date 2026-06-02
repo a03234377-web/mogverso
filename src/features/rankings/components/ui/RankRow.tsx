@@ -9,7 +9,7 @@ import { auraForName } from "@/lib/aura/leaderboard";
 import { cn } from "@/lib/cn";
 import type { RankedEntry } from "@/features/rankings/lib/ranking";
 import type { AuraScores } from "@/types/aura";
-import { rankerProfileSlug } from "@/features/rankings/lib/profile-slug";
+import { profileTargetId } from "@/features/rankings/lib/profile-slug";
 
 type RankRowProps = {
   entry: RankedEntry;
@@ -29,7 +29,7 @@ const TOP_ROW_CLASS = ["rank-row--top1", "rank-row--top2", "rank-row--top3"] as 
 export function RankRow({ entry, index, auraScores, onOpenProfile }: RankRowProps) {
   const { ranker, rank, movement } = entry;
   const aura = auraScores ? auraForName(auraScores, ranker.name) : null;
-  const target = rankerProfileSlug(ranker.name);
+  const target = profileTargetId(ranker.name);
   const rankNumClass = RANK_NUM_CLASS[Math.min(index, 3)];
   const topRowClass = index < 3 ? TOP_ROW_CLASS[index] : undefined;
 

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { Icon } from "@/components/icons";
-import { LOOKSMAX_PATHS } from "@/features/app/routes";
+import { auraPathWithVoteTarget } from "@/features/app/routes";
+import { profileTargetId } from "@/features/rankings/lib/profile-slug";
 import { useRankingData } from "@/features/rankings/hooks/useRankingData";
 import { AuraScoreBadge } from "@/features/aura/components/AuraScoreBadge";
 import { AURA_RANKING_SIZE } from "@/lib/aura/constants";
@@ -35,15 +36,21 @@ export function ProfileAuraCard({ name }: ProfileAuraCardProps) {
         <div className="flex items-center gap-1.5 text-base font-bold text-lm-text">
           <Icon name="sparkles" size={16} className="text-lm-gold" /> Aura
         </div>
-        <Link
-          href={LOOKSMAX_PATHS.aura}
-          className={cn(
-            "text-sm font-bold text-lm-gold underline-offset-2 lm-focus-ring",
-            "rounded-sm hover:underline",
-          )}
-        >
-          Votar aura →
-        </Link>
+        {!ready ? (
+          <span className="text-sm font-bold text-lm-text2">Votar aura →</span>
+        ) : standing.eligible ? (
+          <Link
+            href={auraPathWithVoteTarget(name, profileTargetId(name))}
+            className={cn(
+              "text-sm font-bold text-lm-gold underline-offset-2 lm-focus-ring",
+              "rounded-sm hover:underline",
+            )}
+          >
+            Votar aura →
+          </Link>
+        ) : (
+          <span className="text-sm font-bold text-lm-text2">Fuera del top de aura</span>
+        )}
       </div>
 
       {!ready ? (

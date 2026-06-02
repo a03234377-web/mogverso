@@ -33,6 +33,7 @@
   --animate-blink: blink 1s step-end infinite;
   --animate-row-slide: rowSlide 0.5s ease both;
   --animate-fade-up: fadeUp 0.4s ease both;
+  --animate-profile-target-pulse: profileTargetPulse 2s ease-in-out 3;
   --animate-hero-entrance: heroEntrance 0.9s cubic-bezier(0.16, 1, 0.3, 1) both 0.1s;
   --animate-pulse-soft: pulse 2s infinite;
   --animate-vs-pulse: vsPulse 1.5s ease-in-out infinite;
@@ -460,6 +461,20 @@ textarea::-moz-selection {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes profileTargetPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(232, 184, 75, 0.35),
+      0 0 20px rgba(232, 184, 75, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px rgba(232, 184, 75, 0.25),
+      0 0 32px rgba(232, 184, 75, 0.35);
   }
 }
 

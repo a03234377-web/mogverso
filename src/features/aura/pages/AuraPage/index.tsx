@@ -12,6 +12,7 @@ import { useAuraVote } from "@/features/aura/hooks/useAuraVote";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import { useLooksMaxNavigate } from "@/features/app/shell/LooksMaxShell";
 import { useProfileReturnRestore } from "@/features/app/hooks/useProfileReturnRestore";
+import { useProfileTargetFocus } from "@/features/app/hooks/useProfileTargetFocus";
 import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import { AURA_RANKING_SIZE, AURA_VOTES_PER_WEEK } from "@/lib/aura/constants";
 import { computeAuraLeaders, sortEntriesByAura } from "@/lib/aura/leaderboard";
@@ -37,7 +38,10 @@ export function AuraPage({
 }: AuraPageProps) {
   const { fb, error: firebaseInitError } = useFirebase();
   const { openProfile } = useLooksMaxNavigate();
-  useProfileReturnRestore("aura", rankingReady && entries.length > 0);
+  const listReady = rankingReady;
+  const voteFocusTarget = useProfileTargetFocus(listReady);
+
+  useProfileReturnRestore("aura", listReady && entries.length > 0);
 
   const {
     votesRemaining,
@@ -101,7 +105,6 @@ export function AuraPage({
   );
 
   const pageReady = rankingReady && quotaReady;
-  const listReady = rankingReady;
   const leadersReady = rankingReady && scoresReady;
   const votesBackendReady = !serverQuotaUnavailable && !backendUnavailable;
   const canVote = Boolean(fb) && pageReady && votesBackendReady;
@@ -226,7 +229,10 @@ export function AuraPage({
         />
       </div>
 
-      <div className="mx-auto max-w-[1100px] px-5 pb-16 max-md:px-3 max-md:pb-20">
+      <div
+        id="aura-vote-list"
+        className="mx-auto max-w-[1100px] scroll-mt-24 px-5 pb-16 max-md:px-3 max-md:pb-20"
+      >
         <div className="mb-4">
           <SectionTitle>
             <IconLabel icon="sparkles" iconSize={20}>
@@ -239,6 +245,7 @@ export function AuraPage({
           entries={auraEntries}
           scores={scores}
           listReady={listReady}
+          focusTarget={voteFocusTarget}
           disabledFor={(name) => isRowDisabled(name)}
           hasVotedFor={hasVotedFor}
           votingName={votingName}
