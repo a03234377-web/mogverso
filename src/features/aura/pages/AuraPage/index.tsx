@@ -23,6 +23,7 @@ import { cn } from "@/lib/cn";
 type AuraPageProps = {
   entries: RankedEntry[];
   rankingReady: boolean;
+  scoresReady: boolean;
   scores: AuraScores;
   onPatchScore: (name: string, aura: number) => void;
 };
@@ -30,6 +31,7 @@ type AuraPageProps = {
 export function AuraPage({
   entries,
   rankingReady,
+  scoresReady,
   scores,
   onPatchScore,
 }: AuraPageProps) {
@@ -100,6 +102,7 @@ export function AuraPage({
 
   const pageReady = rankingReady && quotaReady;
   const listReady = rankingReady;
+  const leadersReady = rankingReady && scoresReady;
   const votesBackendReady = !serverQuotaUnavailable && !backendUnavailable;
   const canVote = Boolean(fb) && pageReady && votesBackendReady;
   const noVotesLeft = quotaReady && votesRemaining <= 0;
@@ -211,13 +214,15 @@ export function AuraPage({
           title="Más Aura"
           titleIcon="trending-up"
           variant="up"
-          leaders={pageReady ? top : []}
+          ready={leadersReady}
+          leaders={leadersReady ? top : []}
         />
         <AuraLeadersCard
           title="Menos Aura"
           titleIcon="trending-down"
           variant="down"
-          leaders={pageReady ? bottom : []}
+          ready={leadersReady}
+          leaders={leadersReady ? bottom : []}
         />
       </div>
 
