@@ -8,7 +8,7 @@ type ActivePageProps = {
   active: boolean;
   children?: ReactNode;
   className?: string;
-  /** Entrada con fade-up (desactivar en torneo live). */
+  /** Entrada con fade-up al montar la página. */
   entrance?: boolean;
 };
 

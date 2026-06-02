@@ -1,13 +1,18 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { IconLabel } from "@/components/icons";
 import { HeroBadge, HeroSection } from "@/components/ui/HeroSection";
 import { SectionTitle } from "@/components/ui/SectionTitle";
+import { AuraHowItWorksModal } from "@/features/aura/components/AuraHowItWorksModal";
 import { AuraLeadersCard } from "@/features/aura/components/AuraLeadersCard";
 import { AuraLeadersGrid } from "@/features/aura/components/AuraLeadersGrid";
 import { AuraQuotaNotice } from "@/features/aura/components/AuraQuotaNotice";
 import { AuraVoteList } from "@/features/aura/components/AuraVoteList";
+import { useAuraHowItWorksModal } from "@/features/aura/hooks/useAuraHowItWorksModal";
 import { useAuraQuota } from "@/features/aura/hooks/useAuraQuota";
 import { useAuraVote } from "@/features/aura/hooks/useAuraVote";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
@@ -17,6 +22,7 @@ import { useProfileTargetFocus } from "@/features/app/hooks/useProfileTargetFocu
 import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import { AURA_RANKING_SIZE, AURA_VOTES_PER_WEEK } from "@/lib/aura/constants";
 import { computeAuraLeaders, sortEntriesByAura } from "@/lib/aura/leaderboard";
+import { AURA_SCROLL_REVEAL } from "@/lib/aura/scroll-reveal";
 import { SPAIN_TIMEZONE_LABEL } from "@/lib/spain-time";
 import type { RankedEntry } from "@/features/rankings/lib/ranking";
 import type { AuraScores } from "@/types/aura";
@@ -38,6 +44,7 @@ export function AuraPage({
   onPatchScore,
 }: AuraPageProps) {
   const { fb, error: firebaseInitError } = useFirebase();
+  const { open: howItWorksOpen, close: closeHowItWorks } = useAuraHowItWorksModal();
   const { openProfile } = useLooksMaxNavigate();
   const listReady = rankingReady;
   const voteFocusTarget = useProfileTargetFocus(listReady);
@@ -130,6 +137,18 @@ export function AuraPage({
 
   const connectionError = firebaseInitError ?? firebaseError;
 
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    const id = requestAnimationFrame(() => {
+      try {
+        ScrollTrigger.refresh();
+      } catch {
+        /* DOM en transición o iframes cross-origin */
+      }
+    });
+    return () => cancelAnimationFrame(id);
+  }, [leadersReady, listReady, entries.length]);
+
   const heroQuotaBadge = useMemo(
     () => (
       <HeroBadge>
@@ -145,6 +164,7 @@ export function AuraPage({
 
   return (
     <div id="page-aura" className="block animate-fade-up">
+      <AuraHowItWorksModal open={howItWorksOpen} onClose={closeHowItWorks} />
       <HeroSection
         eyebrow="Votación comunitaria"
         title={
@@ -209,26 +229,46 @@ export function AuraPage({
       </div>
 
       <AuraLeadersGrid
-        ready={leadersReady}
         className={cn(
           "mx-auto mb-6 grid max-w-[1100px] grid-cols-2 gap-3 px-5",
           "max-md:grid-cols-1 max-md:gap-2.5 max-md:px-4",
         )}
       >
-        <AuraLeadersCard
-          title="Más Aura"
-          titleIcon="trending-up"
-          variant="up"
-          ready={leadersReady}
-          leaders={leadersReady ? top : []}
-        />
-        <AuraLeadersCard
-          title="Menos Aura"
-          titleIcon="trending-down"
-          variant="down"
-          ready={leadersReady}
-          leaders={leadersReady ? bottom : []}
-        />
+        <ScrollReveal
+          className="w-full"
+          y={AURA_SCROLL_REVEAL.y}
+          enterSpan={AURA_SCROLL_REVEAL.enterSpan}
+          holdSpan={AURA_SCROLL_REVEAL.holdSpan}
+          exitSpan={AURA_SCROLL_REVEAL.exitSpan}
+          start={AURA_SCROLL_REVEAL.start}
+          end={AURA_SCROLL_REVEAL.end}
+        >
+          <AuraLeadersCard
+            title="Más Aura"
+            titleIcon="trending-up"
+            variant="up"
+            ready={leadersReady}
+            leaders={leadersReady ? top : []}
+          />
+        </ScrollReveal>
+        <ScrollReveal
+          className="w-full"
+          y={AURA_SCROLL_REVEAL.y}
+          enterSpan={AURA_SCROLL_REVEAL.enterSpan}
+          holdSpan={AURA_SCROLL_REVEAL.holdSpan}
+          exitSpan={AURA_SCROLL_REVEAL.exitSpan}
+          start={AURA_SCROLL_REVEAL.start}
+          end={AURA_SCROLL_REVEAL.end}
+          delay={0.04}
+        >
+          <AuraLeadersCard
+            title="Menos Aura"
+            titleIcon="trending-down"
+            variant="down"
+            ready={leadersReady}
+            leaders={leadersReady ? bottom : []}
+          />
+        </ScrollReveal>
       </AuraLeadersGrid>
 
       <div

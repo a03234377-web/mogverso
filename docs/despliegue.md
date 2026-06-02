@@ -42,7 +42,7 @@ Si tienes **Vercel Pro** y quieres heal programado sin visitantes, añade en `ve
 | `/api/cron/entry-vote`       | Cada 10 min |
 | `/api/cron/torneo-advance`   | Cada 5 min  |
 
-Y define **`CRON_SECRET`** en Vercel. El scheduler envía `Authorization: Bearer <CRON_SECRET>`; el middleware rechaza peticiones sin ese valor.
+Y define **`CRON_SECRET`** en Vercel. El scheduler envía `Authorization: Bearer <CRON_SECRET>`; el proxy (`src/proxy.ts`) rechaza peticiones sin ese valor.
 
 ## Dominio personalizado
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 const SCROLL_RANGE_PX = 100;
 
@@ -21,14 +21,11 @@ function readScrollState(disableFade: boolean) {
 }
 
 export function useHeaderScroll(disableFade = false) {
-  const [headerOpacity, setHeaderOpacity] = useState(
-    () => readScrollState(disableFade).headerOpacity,
-  );
-  const [logoOpacity, setLogoOpacity] = useState(
-    () => readScrollState(disableFade).logoOpacity,
-  );
+  /** Mismo valor en servidor y en hidratación (0); sync en layout tras montar. */
+  const [headerOpacity, setHeaderOpacity] = useState(0);
+  const [logoOpacity, setLogoOpacity] = useState(0);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const sync = () => {
       const next = readScrollState(disableFade);
       setHeaderOpacity(next.headerOpacity);

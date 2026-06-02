@@ -1,12 +1,12 @@
 "use client";
 
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import gsap from "gsap";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { useFlipListAnimation } from "@/components/animations/useFlipListAnimation";
-import { AURA_GSAP_EASE, prefersReducedMotion } from "@/lib/aura/gsap-motion";
 import { AuraVoteRow } from "@/features/aura/components/AuraVoteRow";
 import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import { profileTargetId } from "@/features/rankings/lib/profile-slug";
+import { AURA_SCROLL_REVEAL } from "@/lib/aura/scroll-reveal";
 import type { RankedEntry } from "@/features/rankings/lib/ranking";
 import type { AuraScores } from "@/types/aura";
 
@@ -56,7 +56,6 @@ export function AuraVoteList({
   onOpenProfile,
 }: AuraVoteListProps) {
   const listRef = useRef<HTMLDivElement>(null);
-  const listEntranceRef = useRef(false);
   const prevRanksRef = useRef<Record<string, number>>({});
   const [moveHints, setMoveHints] = useState<Record<string, "up" | "down">>({});
 
@@ -69,26 +68,6 @@ export function AuraVoteList({
     enabled: listReady,
     itemSelector: "[data-aura-flip-id]",
   });
-
-  useLayoutEffect(() => {
-    if (!listReady || listEntranceRef.current) return;
-    const list = listRef.current;
-    if (!list) return;
-    listEntranceRef.current = true;
-    if (!prefersReducedMotion()) {
-      gsap.fromTo(
-        list,
-        { opacity: 0, y: 14 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.42,
-          ease: AURA_GSAP_EASE,
-          clearProps: "transform",
-        },
-      );
-    }
-  }, [listReady]);
 
   useLayoutEffect(() => {
     if (!listReady) return;
@@ -113,28 +92,40 @@ export function AuraVoteList({
   return (
     <div ref={listRef} className="flex flex-col gap-2">
       {entries.map((entry) => (
-        <div key={entry.name} data-aura-flip-id={entry.name} data-flip-id={entry.name}>
-          <AuraVoteRow
-            entry={entry}
-            scores={scores}
-            disabled={disabledFor(entry.ranker.name)}
-            alreadyVoted={hasVotedFor(entry.ranker.name)}
-            votingName={votingName}
-            voteSuccessName={voteSuccessName}
-            voteDelta={
-              lastVoteDelta?.name === resolveCanonicalRankerName(entry.ranker.name)
-                ? lastVoteDelta.delta
-                : null
-            }
-            moveHint={moveHints[entry.name] ?? null}
-            isVoteFocus={
-              Boolean(focusTarget) && focusTarget === profileTargetId(entry.ranker.name)
-            }
-            onBoost={onBoost}
-            onPenalty={onPenalty}
-            onOpenProfile={onOpenProfile}
-          />
-        </div>
+        <ScrollReveal
+          key={entry.name}
+          className="w-full"
+          y={AURA_SCROLL_REVEAL.y}
+          enterSpan={AURA_SCROLL_REVEAL.enterSpan}
+          holdSpan={AURA_SCROLL_REVEAL.holdSpan}
+          exitSpan={AURA_SCROLL_REVEAL.exitSpan}
+          start={AURA_SCROLL_REVEAL.start}
+          end={AURA_SCROLL_REVEAL.end}
+        >
+          <div data-aura-flip-id={entry.name} data-flip-id={entry.name}>
+            <AuraVoteRow
+              entry={entry}
+              scores={scores}
+              disabled={disabledFor(entry.ranker.name)}
+              alreadyVoted={hasVotedFor(entry.ranker.name)}
+              votingName={votingName}
+              voteSuccessName={voteSuccessName}
+              voteDelta={
+                lastVoteDelta?.name === resolveCanonicalRankerName(entry.ranker.name)
+                  ? lastVoteDelta.delta
+                  : null
+              }
+              moveHint={moveHints[entry.name] ?? null}
+              isVoteFocus={
+                Boolean(focusTarget) &&
+                focusTarget === profileTargetId(entry.ranker.name)
+              }
+              onBoost={onBoost}
+              onPenalty={onPenalty}
+              onOpenProfile={onOpenProfile}
+            />
+          </div>
+        </ScrollReveal>
       ))}
     </div>
   );

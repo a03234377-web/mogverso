@@ -8,6 +8,13 @@ import type { AuraScores } from "@/types/aura";
 
 const AURA_SCORES_POLL_MS = 20_000;
 
+function isRtdbPermissionDenied(err: unknown): boolean {
+  if (!err || typeof err !== "object") return false;
+  const code = "code" in err ? String((err as { code: string }).code) : "";
+  const message = "message" in err ? String((err as { message: string }).message) : "";
+  return /permission_denied/i.test(code) || /permission_denied/i.test(message);
+}
+
 async function fetchAuraScoresFromApi(): Promise<AuraScores | null> {
   try {
     const res = await fetch("/api/aura/scores", { cache: "no-store" });
@@ -75,19 +82,31 @@ export function useAuraScores() {
     if (!fb) return;
     const { db, ref, onValue } = fb;
 
-    const unsub = onValue(
+    let unsub = () => {};
+
+    unsub = onValue(
       ref(db, "aura/scores"),
       (snap) => {
         const parsed = snap.exists() ? parseAuraScores(snap.val()) : {};
         applyRemote(parsed);
       },
       (err) => {
+        if (isRtdbPermissionDenied(err)) {
+          unsub();
+          if (process.env.NODE_ENV === "development") {
+            console.warn(
+              "[Aura] RTDB aura/scores: lectura denegada por reglas Firebase; usando /api/aura/scores.",
+            );
+          }
+          void refreshFromApi();
+          return;
+        }
         console.error("[Aura] RTDB aura/scores:", err);
       },
     );
 
     return () => unsub();
-  }, [fb, applyRemote]);
+  }, [fb, applyRemote, refreshFromApi]);
 
   useEffect(() => {
     if (!ready) return;

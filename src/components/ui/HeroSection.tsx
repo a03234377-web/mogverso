@@ -53,8 +53,10 @@ export function HeroSection({
               "hero-title--default animate-hero-entrance font-display tracking-[4px]",
               "text-[clamp(2.4rem,8vw,9rem)]",
             ),
-          variant === "torneo" && cn("hero-title--torneo", FEATURE_HERO_TITLE),
-          variant === "rankvote" && cn("hero-title--rankvote", FEATURE_HERO_TITLE),
+          variant === "torneo" &&
+            cn("hero-title--torneo animate-hero-entrance", FEATURE_HERO_TITLE),
+          variant === "rankvote" &&
+            cn("hero-title--rankvote animate-hero-entrance", FEATURE_HERO_TITLE),
         )}
       >
         {title}
