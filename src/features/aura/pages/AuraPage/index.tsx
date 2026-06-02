@@ -4,10 +4,12 @@ import { useCallback, useMemo, useState } from "react";
 import { IconLabel } from "@/components/icons";
 import { HeroBadge, HeroSection } from "@/components/ui/HeroSection";
 import { SectionTitle } from "@/components/ui/SectionTitle";
+import { AuraHowItWorksModal } from "@/features/aura/components/AuraHowItWorksModal";
 import { AuraLeadersCard } from "@/features/aura/components/AuraLeadersCard";
 import { AuraLeadersGrid } from "@/features/aura/components/AuraLeadersGrid";
 import { AuraQuotaNotice } from "@/features/aura/components/AuraQuotaNotice";
 import { AuraVoteList } from "@/features/aura/components/AuraVoteList";
+import { useAuraHowItWorksModal } from "@/features/aura/hooks/useAuraHowItWorksModal";
 import { useAuraQuota } from "@/features/aura/hooks/useAuraQuota";
 import { useAuraVote } from "@/features/aura/hooks/useAuraVote";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
@@ -38,6 +40,7 @@ export function AuraPage({
   onPatchScore,
 }: AuraPageProps) {
   const { fb, error: firebaseInitError } = useFirebase();
+  const { open: howItWorksOpen, close: closeHowItWorks } = useAuraHowItWorksModal();
   const { openProfile } = useLooksMaxNavigate();
   const listReady = rankingReady;
   const voteFocusTarget = useProfileTargetFocus(listReady);
@@ -145,6 +148,7 @@ export function AuraPage({
 
   return (
     <div id="page-aura" className="block animate-fade-up">
+      <AuraHowItWorksModal open={howItWorksOpen} onClose={closeHowItWorks} />
       <HeroSection
         eyebrow="Votación comunitaria"
         title={
