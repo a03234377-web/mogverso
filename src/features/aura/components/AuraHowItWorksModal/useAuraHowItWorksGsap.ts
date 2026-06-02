@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import gsap from "gsap";
 import {
   AURA_GSAP_EASE,
-  clearGsapTargets,
   prefersReducedMotion,
   runAfterPaint,
 } from "@/lib/aura/gsap-motion";
@@ -22,6 +21,7 @@ export function useAuraHowItWorksGsap(
   targets: AuraHowItWorksGsapTargets,
 ) {
   const { panelRef, iconRef, titleRef, listRef, ctaRef } = targets;
+  const tlRef = useRef<gsap.core.Timeline | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -29,54 +29,64 @@ export function useAuraHowItWorksGsap(
     const panel = panelRef.current;
     if (!panel || prefersReducedMotion()) return;
 
-    const icon = iconRef.current;
-    const title = titleRef.current;
-    const list = listRef.current;
-    const cta = ctaRef.current;
-    const items = list
-      ? Array.from(list.querySelectorAll<HTMLElement>("[data-aura-how-item]"))
-      : [];
-    const animated: HTMLElement[] = [panel, icon, title, cta, ...items].filter(
-      (el): el is HTMLElement => Boolean(el),
-    );
-
-    let tl: gsap.core.Timeline | null = null;
+    let cancelled = false;
 
     const cancelPaint = runAfterPaint(() => {
-      gsap.set(panel, { opacity: 0, scale: 0.92, y: 24 });
-      if (icon) gsap.set(icon, { opacity: 0, scale: 0.6, rotate: -12 });
-      if (title) gsap.set(title, { opacity: 0, y: 12 });
-      if (items.length) gsap.set(items, { opacity: 0, x: -14 });
-      if (cta) gsap.set(cta, { opacity: 0, y: 10 });
+      if (cancelled) return;
 
-      tl = gsap.timeline({ defaults: { ease: AURA_GSAP_EASE } });
-      tl.to(panel, { opacity: 1, scale: 1, y: 0, duration: 0.5 }, 0);
+      const icon = iconRef.current;
+      const title = titleRef.current;
+      const list = listRef.current;
+      const cta = ctaRef.current;
+      const items = list
+        ? Array.from(list.querySelectorAll<HTMLElement>("[data-aura-how-item]"))
+        : [];
+
+      tlRef.current?.kill();
+      gsap.set(panel, { opacity: 0, scale: 0.94, y: 20 });
+      if (icon) gsap.set(icon, { opacity: 0, scale: 0.75 });
+      if (title) gsap.set(title, { opacity: 0, y: 10 });
+      if (items.length) gsap.set(items, { opacity: 0, y: 8 });
+      if (cta) gsap.set(cta, { opacity: 0, y: 8 });
+
+      const tl = gsap.timeline({
+        defaults: { ease: AURA_GSAP_EASE },
+        onComplete: () => {
+          gsap.set([panel, icon, title, cta, ...items].filter(Boolean), {
+            clearProps: "opacity,transform,scale",
+          });
+        },
+      });
+      tlRef.current = tl;
+
+      tl.to(panel, { opacity: 1, scale: 1, y: 0, duration: 0.42 }, 0);
 
       if (icon) {
         tl.to(
           icon,
-          { opacity: 1, scale: 1, rotate: 0, duration: 0.55, ease: "back.out(1.6)" },
-          0.08,
+          { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.5)" },
+          0.06,
         );
       }
 
       if (title) {
-        tl.to(title, { opacity: 1, y: 0, duration: 0.4 }, 0.14);
+        tl.to(title, { opacity: 1, y: 0, duration: 0.32 }, 0.1);
       }
 
       if (items.length) {
-        tl.to(items, { opacity: 1, x: 0, duration: 0.38, stagger: 0.09 }, 0.22);
+        tl.to(items, { opacity: 1, y: 0, duration: 0.3, stagger: 0.07 }, 0.16);
       }
 
       if (cta) {
-        tl.to(cta, { opacity: 1, y: 0, duration: 0.35 }, 0.42);
+        tl.to(cta, { opacity: 1, y: 0, duration: 0.28 }, 0.28);
       }
     });
 
     return () => {
+      cancelled = true;
       cancelPaint();
-      tl?.kill();
-      clearGsapTargets(animated);
+      tlRef.current?.kill();
+      tlRef.current = null;
     };
   }, [open, panelRef, iconRef, titleRef, listRef, ctaRef]);
 }

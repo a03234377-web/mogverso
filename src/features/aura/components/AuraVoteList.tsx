@@ -1,14 +1,8 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import gsap from "gsap";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useFlipListAnimation } from "@/components/animations/useFlipListAnimation";
-import {
-  AURA_GSAP_EASE,
-  clearGsapTargets,
-  prefersReducedMotion,
-  runAfterPaint,
-} from "@/lib/aura/gsap-motion";
+import { useGsapStaggerEntrance } from "@/features/aura/hooks/useGsapStaggerEntrance";
 import { AuraVoteRow } from "@/features/aura/components/AuraVoteRow";
 import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import { profileTargetId } from "@/features/rankings/lib/profile-slug";
@@ -61,7 +55,6 @@ export function AuraVoteList({
   onOpenProfile,
 }: AuraVoteListProps) {
   const listRef = useRef<HTMLDivElement>(null);
-  const listEntranceRef = useRef(false);
   const prevRanksRef = useRef<Record<string, number>>({});
   const [moveHints, setMoveHints] = useState<Record<string, "up" | "down">>({});
 
@@ -75,42 +68,12 @@ export function AuraVoteList({
     itemSelector: "[data-aura-flip-id]",
   });
 
-  useEffect(() => {
-    if (!listReady || listEntranceRef.current) return;
-
-    let rows: HTMLElement[] = [];
-    let cancelled = false;
-
-    const cancelPaint = runAfterPaint(() => {
-      if (cancelled || listEntranceRef.current) return;
-
-      const list = listRef.current;
-      if (!list) return;
-
-      rows = Array.from(list.querySelectorAll<HTMLElement>("[data-aura-flip-id]"));
-      if (rows.length === 0) return;
-
-      listEntranceRef.current = true;
-
-      if (prefersReducedMotion()) return;
-
-      gsap.set(rows, { opacity: 0, y: 16 });
-      gsap.to(rows, {
-        opacity: 1,
-        y: 0,
-        duration: 0.4,
-        stagger: 0.035,
-        ease: AURA_GSAP_EASE,
-        clearProps: "transform,opacity",
-      });
-    });
-
-    return () => {
-      cancelled = true;
-      cancelPaint();
-      if (rows.length > 0) clearGsapTargets(rows);
-    };
-  }, [listReady]);
+  useGsapStaggerEntrance(listRef, listReady && entries.length > 0, {
+    itemSelector: "[data-aura-flip-id]",
+    y: 12,
+    duration: 0.34,
+    staggerAmount: 0.55,
+  });
 
   useLayoutEffect(() => {
     if (!listReady) return;
