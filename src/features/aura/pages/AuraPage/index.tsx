@@ -6,7 +6,7 @@ import { HeroBadge, HeroSection } from "@/components/ui/HeroSection";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { AuraLeadersCard } from "@/features/aura/components/AuraLeadersCard";
 import { AuraQuotaNotice } from "@/features/aura/components/AuraQuotaNotice";
-import { AuraVoteRow } from "@/features/aura/components/AuraVoteRow";
+import { AuraVoteList } from "@/features/aura/components/AuraVoteList";
 import { useAuraQuota } from "@/features/aura/hooks/useAuraQuota";
 import { useAuraVote } from "@/features/aura/hooks/useAuraVote";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
@@ -225,31 +225,19 @@ export function AuraPage({
           </SectionTitle>
         </div>
 
-        {!listReady ? (
-          <div className="py-8 text-center text-lm-text2">Cargando aura…</div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {auraEntries.map((entry) => (
-              <AuraVoteRow
-                key={entry.name}
-                entry={entry}
-                scores={scores}
-                disabled={isRowDisabled(entry.ranker.name)}
-                alreadyVoted={hasVotedFor(entry.ranker.name)}
-                votingName={votingName}
-                voteSuccessName={voteSuccess}
-                voteDelta={
-                  lastVoteDelta?.name === resolveCanonicalRankerName(entry.ranker.name)
-                    ? lastVoteDelta.delta
-                    : null
-                }
-                onBoost={handleBoost}
-                onPenalty={handlePenalty}
-                onOpenProfile={(name, rank) => openProfile(name, rank, "aura")}
-              />
-            ))}
-          </div>
-        )}
+        <AuraVoteList
+          entries={auraEntries}
+          scores={scores}
+          listReady={listReady}
+          disabledFor={(name) => isRowDisabled(name)}
+          hasVotedFor={hasVotedFor}
+          votingName={votingName}
+          voteSuccessName={voteSuccess}
+          lastVoteDelta={lastVoteDelta}
+          onBoost={handleBoost}
+          onPenalty={handlePenalty}
+          onOpenProfile={(name, rank) => openProfile(name, rank, "aura")}
+        />
       </div>
     </div>
   );

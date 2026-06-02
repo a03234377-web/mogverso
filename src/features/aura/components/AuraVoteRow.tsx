@@ -19,6 +19,8 @@ type AuraVoteRowProps = {
   votingName: string | null;
   voteSuccessName: string | null;
   voteDelta: number | null;
+  /** Breve indicador tras cambiar de puesto en el ranking de aura. */
+  moveHint?: "up" | "down" | null;
   onBoost: (name: string) => void;
   onPenalty: (name: string) => void;
   onOpenProfile: (name: string, rank: number) => void;
@@ -32,6 +34,7 @@ export function AuraVoteRow({
   votingName,
   voteSuccessName,
   voteDelta,
+  moveHint = null,
   onBoost,
   onPenalty,
   onOpenProfile,
@@ -48,10 +51,34 @@ export function AuraVoteRow({
       className={cn(
         "relative flex flex-col gap-3 rounded-xl border border-lm-border bg-lm-card px-4 py-3",
         "max-md:gap-2.5 max-md:px-3.5",
+        "transition-[border-color,box-shadow] duration-300",
         justVoted && "border-lm-gold/50 shadow-[0_0_20px_rgba(232,184,75,0.15)]",
         alreadyVoted && !justVoted && "border-lm-gold/40 bg-[rgba(232,184,75,0.06)]",
+        moveHint === "up" &&
+          "border-lm-green2/55 shadow-[0_0_16px_rgba(46,204,113,0.18)]",
+        moveHint === "down" &&
+          "border-lm-red2/55 shadow-[0_0_16px_rgba(255,71,87,0.15)]",
       )}
     >
+      {moveHint ? (
+        <span
+          className={cn(
+            "pointer-events-none absolute top-2.5 right-3 z-[2] flex items-center gap-1",
+            "animate-fade-up rounded-md px-2 py-0.5 text-xs font-bold",
+            moveHint === "up"
+              ? "bg-[rgba(46,204,113,0.18)] text-lm-green2"
+              : "bg-[rgba(255,71,87,0.18)] text-lm-red2",
+          )}
+          aria-live="polite"
+        >
+          <Icon
+            name={moveHint === "up" ? "trending-up" : "trending-down"}
+            size={12}
+            className="shrink-0"
+          />
+          {moveHint === "up" ? "Subió" : "Bajó"}
+        </span>
+      ) : null}
       <Pressable
         id={`profile-target-${target}`}
         data-profile-target={target}
