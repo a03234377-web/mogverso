@@ -39,7 +39,7 @@ export function RankVotePage() {
             Ranking
           </>
         }
-        subtitle="Vota cada 3 horas · El ganador sube 1 puesto · El perdedor baja 1 puesto"
+        subtitle="Vota cada 1 hora y 30 minutos · El ganador sube 1 puesto · El perdedor baja 1 puesto"
       />
       <div className="mx-auto max-w-[1000px] px-5 pb-16 max-md:px-3 max-md:pb-[5.5rem]">
         <WormBorder

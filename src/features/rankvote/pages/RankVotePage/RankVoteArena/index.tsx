@@ -85,7 +85,7 @@ export function RankVoteArena({
       </div>
 
       <div className="mb-5 text-base font-semibold text-lm-text2">
-        Vota cada 3 horas · El ganador sube 1 puesto · El perdedor baja 1 puesto
+        Vota cada 1 hora y 30 minutos · El ganador sube 1 puesto · El perdedor baja 1 puesto
       </div>
 
       <CountdownDigits h={cd.h} m={cd.m} s={cd.s} variant="green" className="mb-6" />
@@ -176,7 +176,7 @@ export function RankVoteArena({
       <div className="mt-2.5 text-center text-base leading-snug font-semibold text-lm-text2">
         <Icon name="vote" size={14} className="mr-1 inline shrink-0 align-middle" />1
         voto por dispositivo e IP · Ranking actualizado automáticamente · Nueva ronda
-        cada 3 horas
+        cada 1 hora y 30 minutos
       </div>
     </>
   );
