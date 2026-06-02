@@ -6,7 +6,7 @@ import { SkipLink } from "@/components/a11y/SkipLink";
 import { DiscordModal } from "@/features/app/components/DiscordModal";
 import { FirebaseLoader } from "@/features/app/components/FirebaseLoader";
 import { GlobalAnnouncements } from "@/features/app/components/GlobalAnnouncements";
-import { LooksMaxFooter, LooksMaxHeader } from "@/components/layout";
+import { LooksMaxFooter, LooksMaxHeader, SiteCreditFooter } from "@/components/layout";
 import { Particles } from "@/features/app/components/Particles";
 import { Ticker } from "@/features/app/components/Ticker";
 import { BackgroundEffects } from "@/features/app/components/BackgroundEffects";
@@ -64,10 +64,11 @@ export function LooksMaxShell({ children }: { children: ReactNode }) {
         id="main-content"
         ref={mainRef}
         tabIndex={-1}
-        className="relative z-[2] overflow-x-clip outline-none"
+        className="relative z-[2] flex min-h-[calc(100vh-var(--lm-nav-height))] flex-col overflow-x-clip outline-none"
         aria-label="Contenido principal"
       >
         {children}
+        <SiteCreditFooter />
       </main>
 
       <DiscordModal open={discordOpen} onClose={() => setDiscordOpen(false)} />
