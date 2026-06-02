@@ -9,9 +9,11 @@ import { RankVoteArena } from "./RankVoteArena";
 import { HistoryRow } from "./HistoryRow";
 import { useRankVote } from "@/features/rankvote/hooks/useRankVote";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
+import { useProfileReturnRestore } from "@/features/app/hooks/useProfileReturnRestore";
 import { cn } from "@/lib/cn";
 
 export function RankVotePage() {
+  useProfileReturnRestore("rankvote");
   const { fb } = useFirebase();
   const {
     rv,

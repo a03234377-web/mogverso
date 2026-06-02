@@ -21,16 +21,37 @@ export function parseProfileFrom(value: string | null | undefined): NavPageId | 
   return null;
 }
 
-export function profilePath(name: string, from?: NavPageId | null): string {
-  const base = `/perfil/${rankerProfileSlug(name)}`;
-  const origin = from ? parseProfileFrom(from) : null;
-  if (!origin) return base;
-  return `${base}?from=${origin}`;
+export function parseProfileTarget(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const clean = value.trim().toLowerCase();
+  if (!clean) return null;
+  return /^[a-z0-9-]+$/.test(clean) ? clean : null;
 }
 
-export function backPathFromProfile(from: NavPageId | null | undefined): string {
+export function profilePath(
+  name: string,
+  from?: NavPageId | null,
+  target?: string | null,
+): string {
+  const base = `/perfil/${rankerProfileSlug(name)}`;
   const origin = from ? parseProfileFrom(from) : null;
-  return origin ? LOOKSMAX_PATHS[origin] : DEFAULT_LOOKSMAX_PATH;
+  const returnTarget = parseProfileTarget(target);
+  if (!origin && !returnTarget) return base;
+  const params = new URLSearchParams();
+  if (origin) params.set("from", origin);
+  if (returnTarget) params.set("target", returnTarget);
+  return `${base}?${params.toString()}`;
+}
+
+export function backPathFromProfile(
+  from: NavPageId | null | undefined,
+  target?: string | null,
+): string {
+  const origin = from ? parseProfileFrom(from) : null;
+  const base = origin ? LOOKSMAX_PATHS[origin] : DEFAULT_LOOKSMAX_PATH;
+  const returnTarget = parseProfileTarget(target);
+  if (!returnTarget) return base;
+  return `${base}?target=${returnTarget}`;
 }
 
 export function pathForPage(page: PageId, profileName?: string | null): string {

@@ -5,8 +5,10 @@ import { SpainTimezoneNote } from "@/components/ui/SpainTimezoneNote";
 import { ActivePage } from "@/components/ui/ActivePage";
 import { BreakingNewsCard } from "./BreakingNewsCard";
 import { NoticiasFeed } from "./NoticiasFeed";
+import { useProfileReturnRestore } from "@/features/app/hooks/useProfileReturnRestore";
 
 export function NoticiasPage() {
+  useProfileReturnRestore("noticias");
   return (
     <ActivePage id="page-noticias" active>
       <PageHeader

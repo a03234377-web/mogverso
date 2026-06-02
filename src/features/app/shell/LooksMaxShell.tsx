@@ -14,6 +14,7 @@ import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import {
   backPathFromProfile,
   isNavPage,
+  parseProfileTarget,
   pageIdFromPathname,
   pathForPage,
   profilePath,
@@ -22,6 +23,8 @@ import {
 import type { PageId } from "@/features/app/types";
 import { useSecurityGuard } from "@/features/app/hooks/useSecurityGuard";
 import { isEscape } from "@/lib/a11y/keyboard";
+import { saveProfileReturnContext } from "@/features/app/profile-return-context";
+import { rankerProfileSlug } from "@/features/rankings/lib/profile-slug";
 
 export function LooksMaxShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -88,8 +91,12 @@ export function useLooksMaxNavigate() {
 
   const openProfile = useCallback(
     (name: string, rankPos: number, from?: NavPageId) => {
+      const target = parseProfileTarget(rankerProfileSlug(name));
+      if (from) {
+        saveProfileReturnContext(from, target);
+      }
       void rankPos;
-      const href = profilePath(name, from);
+      const href = profilePath(name, from, target);
       const current =
         typeof window !== "undefined"
           ? window.location.pathname + window.location.search
@@ -101,10 +108,12 @@ export function useLooksMaxNavigate() {
   );
 
   const backFromProfile = useCallback(
-    (from?: NavPageId | null) => {
-      const target = backPathFromProfile(from);
-      if (pathname !== target) router.push(target);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+    (from?: NavPageId | null, target?: string | null) => {
+      const backPath = backPathFromProfile(from, target);
+      if (pathname !== backPath) router.push(backPath);
+      if (!target) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     },
     [pathname, router],
   );
