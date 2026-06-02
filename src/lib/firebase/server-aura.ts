@@ -168,12 +168,12 @@ export async function castAuraVoteServer(
 
   const canonical = resolveCanonicalRankerName(trimmed);
 
-  const meta = await ensureAuraPeriods();
-  const weekId = meta.weekId || getMadridWeekId();
-
   if (!(await isEligibleAuraName(canonical))) {
     return { ok: false, reason: "invalid_candidate" };
   }
+
+  const meta = await ensureAuraPeriods();
+  const weekId = meta.weekId || getMadridWeekId();
 
   const db = getAdminDatabase();
   const ipHash = hashIpForVote(ip);

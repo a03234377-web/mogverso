@@ -112,7 +112,7 @@ export function addDaysMadrid(year: number, month: number, day: number, add: num
   return { year: p.year, month: p.month, day: p.day };
 }
 
-export function isSameCalendarDayInSpain(a: number, b: number): boolean {
+function isSameCalendarDayInSpain(a: number, b: number): boolean {
   const pa = getMadridParts(a);
   const pb = getMadridParts(b);
   return pa.year === pb.year && pa.month === pb.month && pa.day === pb.day;
@@ -124,7 +124,7 @@ export function formatSpainTime(ts: number): string {
 }
 
 /** Fecha corta en España (p. ej. «31 may»). */
-export function formatSpainDateShort(ts: number): string {
+function formatSpainDateShort(ts: number): string {
   return SPAIN_DATE_SHORT_FORMATTER.format(new Date(ts)).replace(".", "");
 }
 

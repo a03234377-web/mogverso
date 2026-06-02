@@ -1,6 +1,6 @@
 import { isValidRankVotePair } from "@/features/rankings/lib/ranker-name";
 
-export const ENTRY_VOTE_CANDIDATES = ["franbv", "nilojeda"] as const;
+const ENTRY_VOTE_CANDIDATES = ["franbv", "nilojeda"] as const;
 export type EntryVoteCandidate = (typeof ENTRY_VOTE_CANDIDATES)[number];
 
 export function isValidEntryVoteCandidate(id: string): id is EntryVoteCandidate {

@@ -47,7 +47,7 @@ function twitterImagesFromOg(
 }
 
 /** Campos de metadatos por ruta (sin imagen OG: la define el App Router en `app/`). */
-export function resolvePageMetadata(input: PageMetaInput, parent: Metadata): Metadata {
+function resolvePageMetadata(input: PageMetaInput, parent: Metadata): Metadata {
   const description = input.description ?? DEFAULT_DESCRIPTION;
   const canonical = pageCanonical(input.path);
   const fullTitle = pageFullTitle(input.title);

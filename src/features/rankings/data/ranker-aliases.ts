@@ -1,5 +1,5 @@
 /** Nombres alternativos (URL, torneo, votación, Firebase) → nombre canónico en RANKERS. */
-export const RANKER_NAME_ALIASES: Record<string, string> = {
+const RANKER_NAME_ALIASES: Record<string, string> = {
   Sergi: "SergiCabrer",
   Franbv: "Franbeuve",
   NilOjeda: "Nil Ojeda",

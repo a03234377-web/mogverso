@@ -1,12 +1,14 @@
 "use server";
 
-import { getServerClientIp } from "@/lib/api/server-ip";
-import { sanitizeDeviceId } from "@/lib/api/route-helpers";
 import {
   performHealTorneo,
   performTorneoVote,
   type ActionResult,
 } from "@/lib/firebase/perform";
+import {
+  assertHealServerAction,
+  assertVoteServerAction,
+} from "@/lib/security/server-action-auth";
 
 export async function submitTorneoVote(
   matchId: string,
@@ -14,19 +16,13 @@ export async function submitTorneoVote(
   deviceId: string,
   recaptchaToken?: string,
 ): Promise<ActionResult> {
-  const ip = await getServerClientIp();
-  return performTorneoVote(
-    matchId,
-    candidateName,
-    sanitizeDeviceId(deviceId),
-    ip,
-    recaptchaToken,
-  );
+  const { deviceId: sanitized, ip } = await assertVoteServerAction(deviceId);
+  return performTorneoVote(matchId, candidateName, sanitized, ip, recaptchaToken);
 }
 
 export async function healTorneoAction(options?: {
   restartIfEnded?: boolean;
 }): Promise<ActionResult> {
-  const ip = await getServerClientIp();
+  const ip = await assertHealServerAction();
   return performHealTorneo(ip, options);
 }

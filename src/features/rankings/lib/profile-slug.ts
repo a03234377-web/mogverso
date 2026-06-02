@@ -7,6 +7,14 @@ export function rankerProfileSlug(name: string): string {
   return encodeURIComponent(name.trim());
 }
 
+/** Id estable para `?target=` y `data-profile-target` (kebab, minúsculas). */
+export function profileTargetId(name: string): string {
+  const canonical = resolveCanonicalRankerName(name);
+  return rankerPhotoFile(canonical)
+    .replace(/\.webp$/i, "")
+    .toLowerCase();
+}
+
 /** Valor del param `[slug]` en rutas estáticas (sin codificar; Next codifica la URL). */
 export function rankerProfileParam(name: string): string {
   return name.trim();

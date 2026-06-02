@@ -173,9 +173,7 @@ export function useRankingData() {
       });
     });
     const unsubAura = onValue(ref(db, "aura/scores"), (snap) => {
-      if (!snap.exists()) return;
-      const parsed = parseAuraScores(snap.val());
-      if (Object.keys(parsed).length === 0) return;
+      const parsed = snap.exists() ? parseAuraScores(snap.val()) : {};
       dispatch({ type: "auraScores", payload: parsed });
     });
     const unsubRv = onValue(ref(db, "rankvote/current"), (snap) => {

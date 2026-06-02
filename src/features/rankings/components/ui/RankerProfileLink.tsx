@@ -4,7 +4,7 @@ import {
   isKnownRankerName,
   safeRankerLabel,
 } from "@/features/rankings/lib/ranker-name";
-import { rankerProfileSlug } from "@/features/rankings/lib/profile-slug";
+import { profileTargetId } from "@/features/rankings/lib/profile-slug";
 import { cn } from "@/lib/cn";
 import { saveProfileReturnContext } from "@/features/app/profile-return-context";
 
@@ -23,7 +23,7 @@ export function RankerProfileLink({
   fallback = "—",
 }: RankerProfileLinkProps) {
   const label = safeRankerLabel(name, fallback);
-  const target = rankerProfileSlug(name);
+  const target = profileTargetId(name);
 
   if (!isKnownRankerName(name)) {
     return <span className={className}>{label}</span>;

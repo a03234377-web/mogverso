@@ -14,7 +14,6 @@ import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import {
   backPathFromProfile,
   isNavPage,
-  parseProfileTarget,
   pageIdFromPathname,
   pathForPage,
   profilePath,
@@ -24,7 +23,7 @@ import type { PageId } from "@/features/app/types";
 import { useSecurityGuard } from "@/features/app/hooks/useSecurityGuard";
 import { isEscape } from "@/lib/a11y/keyboard";
 import { saveProfileReturnContext } from "@/features/app/profile-return-context";
-import { rankerProfileSlug } from "@/features/rankings/lib/profile-slug";
+import { profileTargetId } from "@/features/rankings/lib/profile-slug";
 
 export function LooksMaxShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -92,7 +91,7 @@ export function useLooksMaxNavigate() {
 
   const openProfile = useCallback(
     (name: string, rankPos: number, from?: NavPageId) => {
-      const target = parseProfileTarget(rankerProfileSlug(name));
+      const target = profileTargetId(name);
       if (from) {
         saveProfileReturnContext(from, target);
       }

@@ -33,8 +33,10 @@ export function useNoticiasFeed() {
   const { fb, ready: firebaseReady } = useFirebase();
   const { upMovers, downMovers, ready: rankingReady } = useRankingData();
   const { state: torneoState, loading: torneoLoading } = useTorneo(true);
-  const [rankVoteHistory, setRankVoteHistory] = useState<RankVoteHistoryRow[]>([]);
-  const [historySynced, setHistorySynced] = useState(false);
+  const [rankVoteHistoryState, setRankVoteHistoryState] = useState<{
+    rows: RankVoteHistoryRow[];
+    synced: boolean;
+  }>({ rows: [], synced: false });
 
   useEffect(() => {
     if (!fb) return;
@@ -42,23 +44,22 @@ export function useNoticiasFeed() {
     const { db, ref, onValue } = fb;
     const unsub = onValue(ref(db, "rankvoteHistory"), (snap) => {
       if (!snap.exists()) {
-        setRankVoteHistory([]);
-        setHistorySynced(true);
+        setRankVoteHistoryState({ rows: [], synced: true });
         return;
       }
       const raw = snap.val() as Record<string, RankVoteHistoryRow>;
       const hist = dedupeHistory(
         Object.values(raw).filter((h) => h.ts && typeof h.ts === "number"),
       )
-        .sort((a, b) => b.ts - a.ts)
+        .toSorted((a, b) => b.ts - a.ts)
         .slice(0, 20);
-      setRankVoteHistory(hist);
-      setHistorySynced(true);
+      setRankVoteHistoryState({ rows: hist, synced: true });
     });
 
     return () => unsub();
   }, [fb]);
 
+  const { rows: rankVoteHistory, synced: historySynced } = rankVoteHistoryState;
   const historyReady = !fb || historySynced;
   const ready = firebaseReady && rankingReady && historyReady && !torneoLoading;
 

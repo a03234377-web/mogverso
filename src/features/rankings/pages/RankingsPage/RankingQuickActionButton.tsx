@@ -79,10 +79,7 @@ type RankingQuickActionButtonProps = {
   onClick: () => void;
 };
 
-export function RankingQuickActionButton({
-  variant,
-  onClick,
-}: RankingQuickActionButtonProps) {
+function RankingQuickActionButton({ variant, onClick }: RankingQuickActionButtonProps) {
   const { label, icon, modifier } = VARIANT_CONFIG[variant];
 
   return (
@@ -137,7 +134,7 @@ export function RankingQuickActionButton({
   );
 }
 
-export function QuickActionCaption({ children }: { children: ReactNode }) {
+function QuickActionCaption({ children }: { children: ReactNode }) {
   return (
     <p
       className={cn(

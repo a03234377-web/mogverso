@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { Pressable } from "@/components/a11y/Pressable";
 import { Icon } from "@/components/icons";
 import { Avatar } from "@/components/Avatar";
@@ -9,7 +10,8 @@ import { AURA_BOOST, AURA_PENALTY } from "@/lib/aura/constants";
 import { cn } from "@/lib/cn";
 import type { RankedEntry } from "@/features/rankings/lib/ranking";
 import type { AuraScores } from "@/types/aura";
-import { rankerProfileSlug } from "@/features/rankings/lib/profile-slug";
+import { useAuraVoteFocusGsap } from "@/features/aura/hooks/useAuraVoteFocusGsap";
+import { profileTargetId } from "@/features/rankings/lib/profile-slug";
 
 type AuraVoteRowProps = {
   entry: RankedEntry;
@@ -19,6 +21,10 @@ type AuraVoteRowProps = {
   votingName: string | null;
   voteSuccessName: string | null;
   voteDelta: number | null;
+  /** Breve indicador tras cambiar de puesto en el ranking de aura. */
+  moveHint?: "up" | "down" | null;
+  /** Resalto al llegar desde perfil (`?target=`). */
+  isVoteFocus?: boolean;
   onBoost: (name: string) => void;
   onPenalty: (name: string) => void;
   onOpenProfile: (name: string, rank: number) => void;
@@ -32,26 +38,70 @@ export function AuraVoteRow({
   votingName,
   voteSuccessName,
   voteDelta,
+  moveHint = null,
+  isVoteFocus = false,
   onBoost,
   onPenalty,
   onOpenProfile,
 }: AuraVoteRowProps) {
   const { ranker, rank } = entry;
-  const target = rankerProfileSlug(ranker.name);
+  const target = profileTargetId(ranker.name);
   const aura = auraForName(scores, ranker.name);
   const busy = votingName === ranker.name;
   const justVoted = voteSuccessName === ranker.name;
   const buttonsDisabled = disabled || busy || alreadyVoted;
+  const cardRef = useRef<HTMLDivElement>(null);
+  useAuraVoteFocusGsap(cardRef, isVoteFocus);
 
   return (
     <div
+      ref={cardRef}
       className={cn(
         "relative flex flex-col gap-3 rounded-xl border border-lm-border bg-lm-card px-4 py-3",
         "max-md:gap-2.5 max-md:px-3.5",
+        "scroll-mt-24 transition-[border-color,box-shadow] duration-300",
+        isVoteFocus &&
+          "z-[2] border-lm-gold/80 bg-[rgba(232,184,75,0.1)] ring-2 ring-lm-gold/60",
         justVoted && "border-lm-gold/50 shadow-[0_0_20px_rgba(232,184,75,0.15)]",
         alreadyVoted && !justVoted && "border-lm-gold/40 bg-[rgba(232,184,75,0.06)]",
+        moveHint === "up" &&
+          "border-lm-green2/55 shadow-[0_0_16px_rgba(46,204,113,0.18)]",
+        moveHint === "down" &&
+          "border-lm-red2/55 shadow-[0_0_16px_rgba(255,71,87,0.15)]",
       )}
     >
+      {moveHint ? (
+        <span
+          className={cn(
+            "pointer-events-none absolute top-2.5 right-3 z-[2] flex items-center gap-1",
+            "animate-fade-up rounded-md px-2 py-0.5 text-xs font-bold",
+            moveHint === "up"
+              ? "bg-[rgba(46,204,113,0.18)] text-lm-green2"
+              : "bg-[rgba(255,71,87,0.18)] text-lm-red2",
+          )}
+          aria-live="polite"
+        >
+          <Icon
+            name={moveHint === "up" ? "trending-up" : "trending-down"}
+            size={12}
+            className="shrink-0"
+          />
+          {moveHint === "up" ? "Subió" : "Bajó"}
+        </span>
+      ) : null}
+      {isVoteFocus ? (
+        <span
+          className={cn(
+            "pointer-events-none absolute top-2.5 right-3 z-[3] flex items-center gap-1",
+            "animate-fade-up rounded-md border border-lm-gold/50 bg-lm-gold/20 px-2 py-0.5",
+            "text-xs font-bold text-lm-gold",
+          )}
+          aria-live="polite"
+        >
+          <Icon name="sparkles" size={12} className="shrink-0" />
+          Vota aquí
+        </span>
+      ) : null}
       <Pressable
         id={`profile-target-${target}`}
         data-profile-target={target}
@@ -62,7 +112,7 @@ export function AuraVoteRow({
         )}
         onClick={() => onOpenProfile(ranker.name, rank - 1)}
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] bg-lm-bg3 lm-type-score text-[1.05rem] text-lm-text2">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-[9px] bg-lm-bg3 lm-type-score text-[1.05rem] text-lm-text2">
           {rank}
         </div>
         <div className="relative size-10 shrink-0 overflow-hidden rounded-full border-2 border-lm-border bg-lm-bg3">
@@ -96,7 +146,7 @@ export function AuraVoteRow({
             aria-disabled="true"
           >
             <Icon name="lock" size={14} className="shrink-0 text-lm-text2" />
-            Voto registrado — no puedes votar otra vez
+            Voto registrado: no puedes votar otra vez
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-2">

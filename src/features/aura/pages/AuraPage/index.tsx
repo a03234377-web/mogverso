@@ -5,16 +5,18 @@ import { IconLabel } from "@/components/icons";
 import { HeroBadge, HeroSection } from "@/components/ui/HeroSection";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { AuraLeadersCard } from "@/features/aura/components/AuraLeadersCard";
+import { AuraLeadersGrid } from "@/features/aura/components/AuraLeadersGrid";
 import { AuraQuotaNotice } from "@/features/aura/components/AuraQuotaNotice";
-import { AuraVoteRow } from "@/features/aura/components/AuraVoteRow";
+import { AuraVoteList } from "@/features/aura/components/AuraVoteList";
 import { useAuraQuota } from "@/features/aura/hooks/useAuraQuota";
 import { useAuraVote } from "@/features/aura/hooks/useAuraVote";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import { useLooksMaxNavigate } from "@/features/app/shell/LooksMaxShell";
 import { useProfileReturnRestore } from "@/features/app/hooks/useProfileReturnRestore";
+import { useProfileTargetFocus } from "@/features/app/hooks/useProfileTargetFocus";
 import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import { AURA_RANKING_SIZE, AURA_VOTES_PER_WEEK } from "@/lib/aura/constants";
-import { computeAuraLeaders } from "@/lib/aura/leaderboard";
+import { computeAuraLeaders, sortEntriesByAura } from "@/lib/aura/leaderboard";
 import { SPAIN_TIMEZONE_LABEL } from "@/lib/spain-time";
 import type { RankedEntry } from "@/features/rankings/lib/ranking";
 import type { AuraScores } from "@/types/aura";
@@ -23,6 +25,7 @@ import { cn } from "@/lib/cn";
 type AuraPageProps = {
   entries: RankedEntry[];
   rankingReady: boolean;
+  scoresReady: boolean;
   scores: AuraScores;
   onPatchScore: (name: string, aura: number) => void;
 };
@@ -30,12 +33,16 @@ type AuraPageProps = {
 export function AuraPage({
   entries,
   rankingReady,
+  scoresReady,
   scores,
   onPatchScore,
 }: AuraPageProps) {
   const { fb, error: firebaseInitError } = useFirebase();
   const { openProfile } = useLooksMaxNavigate();
-  useProfileReturnRestore("aura", rankingReady && entries.length > 0);
+  const listReady = rankingReady;
+  const voteFocusTarget = useProfileTargetFocus(listReady);
+
+  useProfileReturnRestore("aura", listReady && entries.length > 0);
 
   const {
     votesRemaining,
@@ -84,9 +91,14 @@ export function AuraPage({
     clearError,
   } = useAuraVote(onVoteSuccess);
 
-  const auraEntries = useMemo(() => entries.slice(0, AURA_RANKING_SIZE), [entries]);
+  const auraPool = useMemo(() => entries.slice(0, AURA_RANKING_SIZE), [entries]);
 
-  const rankedNames = useMemo(() => auraEntries.map((e) => e.name), [auraEntries]);
+  const auraEntries = useMemo(
+    () => sortEntriesByAura(auraPool, scores),
+    [auraPool, scores],
+  );
+
+  const rankedNames = useMemo(() => auraPool.map((e) => e.name), [auraPool]);
 
   const { top, bottom } = useMemo(
     () => computeAuraLeaders(rankedNames, scores),
@@ -94,7 +106,7 @@ export function AuraPage({
   );
 
   const pageReady = rankingReady && quotaReady;
-  const listReady = rankingReady;
+  const leadersReady = rankingReady && scoresReady;
   const votesBackendReady = !serverQuotaUnavailable && !backendUnavailable;
   const canVote = Boolean(fb) && pageReady && votesBackendReady;
   const noVotesLeft = quotaReady && votesRemaining <= 0;
@@ -118,6 +130,19 @@ export function AuraPage({
 
   const connectionError = firebaseInitError ?? firebaseError;
 
+  const heroQuotaBadge = useMemo(
+    () => (
+      <HeroBadge>
+        <IconLabel icon="sparkles" iconSize={12}>
+          {pageReady
+            ? `${votesRemaining}/${AURA_VOTES_PER_WEEK} votos esta semana`
+            : "Cargando cupo…"}
+        </IconLabel>
+      </HeroBadge>
+    ),
+    [pageReady, votesRemaining],
+  );
+
   return (
     <div id="page-aura" className="block animate-fade-up">
       <HeroSection
@@ -130,20 +155,12 @@ export function AuraPage({
           </>
         }
         subtitle={`Top ${AURA_RANKING_SIZE} del ranking · ${SPAIN_TIMEZONE_LABEL}`}
-        badges={
-          <HeroBadge>
-            <IconLabel icon="sparkles" iconSize={12}>
-              {pageReady
-                ? `${votesRemaining}/${AURA_VOTES_PER_WEEK} votos esta semana`
-                : "Cargando cupo…"}
-            </IconLabel>
-          </HeroBadge>
-        }
+        badges={heroQuotaBadge}
       />
 
       <div className="mx-auto mb-4 max-w-[1100px] px-5 max-md:px-4">
         <p className="text-center text-sm leading-relaxed text-lm-text2">
-          {AURA_VOTES_PER_WEEK} votos cada lunes (hora España), siempre desde cero — no
+          {AURA_VOTES_PER_WEEK} votos cada lunes (hora España), siempre desde cero; no
           se acumulan los de la semana anterior. Un voto por candidato (+230 / −100 al
           total del mes; puntos de aura se reinician el día 1).
         </p>
@@ -191,7 +208,8 @@ export function AuraPage({
         ) : null}
       </div>
 
-      <div
+      <AuraLeadersGrid
+        ready={leadersReady}
         className={cn(
           "mx-auto mb-6 grid max-w-[1100px] grid-cols-2 gap-3 px-5",
           "max-md:grid-cols-1 max-md:gap-2.5 max-md:px-4",
@@ -201,50 +219,44 @@ export function AuraPage({
           title="Más Aura"
           titleIcon="trending-up"
           variant="up"
-          leaders={pageReady ? top : []}
+          ready={leadersReady}
+          leaders={leadersReady ? top : []}
         />
         <AuraLeadersCard
           title="Menos Aura"
           titleIcon="trending-down"
           variant="down"
-          leaders={pageReady ? bottom : []}
+          ready={leadersReady}
+          leaders={leadersReady ? bottom : []}
         />
-      </div>
+      </AuraLeadersGrid>
 
-      <div className="mx-auto max-w-[1100px] px-5 pb-16 max-md:px-3 max-md:pb-20">
+      <div
+        id="aura-vote-list"
+        className="mx-auto max-w-[1100px] scroll-mt-24 px-5 pb-16 max-md:px-3 max-md:pb-20"
+      >
         <div className="mb-4">
           <SectionTitle>
             <IconLabel icon="sparkles" iconSize={20}>
-              Top {AURA_RANKING_SIZE} — Votar aura
+              Top {AURA_RANKING_SIZE}: votar aura
             </IconLabel>
           </SectionTitle>
         </div>
 
-        {!listReady ? (
-          <div className="py-8 text-center text-lm-text2">Cargando aura…</div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {auraEntries.map((entry) => (
-              <AuraVoteRow
-                key={entry.name}
-                entry={entry}
-                scores={scores}
-                disabled={isRowDisabled(entry.ranker.name)}
-                alreadyVoted={hasVotedFor(entry.ranker.name)}
-                votingName={votingName}
-                voteSuccessName={voteSuccess}
-                voteDelta={
-                  lastVoteDelta?.name === resolveCanonicalRankerName(entry.ranker.name)
-                    ? lastVoteDelta.delta
-                    : null
-                }
-                onBoost={handleBoost}
-                onPenalty={handlePenalty}
-                onOpenProfile={(name, rank) => openProfile(name, rank, "aura")}
-              />
-            ))}
-          </div>
-        )}
+        <AuraVoteList
+          entries={auraEntries}
+          scores={scores}
+          listReady={listReady}
+          focusTarget={voteFocusTarget}
+          disabledFor={(name) => isRowDisabled(name)}
+          hasVotedFor={hasVotedFor}
+          votingName={votingName}
+          voteSuccessName={voteSuccess}
+          lastVoteDelta={lastVoteDelta}
+          onBoost={handleBoost}
+          onPenalty={handlePenalty}
+          onOpenProfile={(name, rank) => openProfile(name, rank, "aura")}
+        />
       </div>
     </div>
   );

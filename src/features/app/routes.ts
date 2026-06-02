@@ -54,6 +54,13 @@ export function backPathFromProfile(
   return `${base}?target=${returnTarget}`;
 }
 
+/** /aura con scroll y foco en la fila de votación del ranker. */
+export function auraPathWithVoteTarget(name: string, targetId: string): string {
+  const id = parseProfileTarget(targetId);
+  if (!id) return LOOKSMAX_PATHS.aura;
+  return `${LOOKSMAX_PATHS.aura}?target=${id}`;
+}
+
 export function pathForPage(page: PageId, profileName?: string | null): string {
   if (page === "profile" && profileName) {
     return profilePath(profileName);

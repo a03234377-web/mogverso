@@ -1,23 +1,25 @@
 "use server";
 
-import { getServerClientIp } from "@/lib/api/server-ip";
-import { sanitizeDeviceId } from "@/lib/api/route-helpers";
 import {
   performEntryVote,
   performHealEntryVote,
   type ActionResult,
 } from "@/lib/firebase/perform";
+import {
+  assertHealServerAction,
+  assertVoteServerAction,
+} from "@/lib/security/server-action-auth";
 
 export async function submitEntryVote(
   candidateId: string,
   deviceId: string,
   recaptchaToken?: string,
 ): Promise<ActionResult> {
-  const ip = await getServerClientIp();
-  return performEntryVote(candidateId, sanitizeDeviceId(deviceId), ip, recaptchaToken);
+  const { deviceId: sanitized, ip } = await assertVoteServerAction(deviceId);
+  return performEntryVote(candidateId, sanitized, ip, recaptchaToken);
 }
 
 export async function healEntryVoteAction(): Promise<ActionResult> {
-  const ip = await getServerClientIp();
+  const ip = await assertHealServerAction();
   return performHealEntryVote(ip);
 }

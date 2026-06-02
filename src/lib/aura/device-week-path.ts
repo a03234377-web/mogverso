@@ -1,7 +1,7 @@
 import { sanitizeDeviceId } from "@/lib/api/sanitize-device-id";
 
 /** Segmento estable en RTDB: `dev_<id>` sin duplicar prefijo. */
-export function auraDeviceIdSegment(deviceId: string): string {
+function auraDeviceIdSegment(deviceId: string): string {
   const id = sanitizeDeviceId(deviceId).replace(/\//g, "_");
   return id.startsWith("dev_") ? id : `dev_${id}`;
 }

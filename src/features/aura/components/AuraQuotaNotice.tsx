@@ -16,15 +16,14 @@ export function AuraQuotaNotice({
   const exhausted = votesRemaining <= 0;
 
   return (
-    <div
+    <output
       className={cn(
-        "mx-auto mb-5 max-w-[1100px] rounded-xl border px-4 py-3.5",
+        "mx-auto mb-5 block max-w-[1100px] rounded-xl border px-4 py-3.5",
         "max-md:mx-4",
         exhausted
           ? "border-lm-red2/40 bg-[rgba(255,71,87,0.08)]"
           : "border-lm-gold/35 bg-[rgba(232,184,75,0.08)]",
       )}
-      role="status"
     >
       <div
         className={cn(
@@ -76,6 +75,6 @@ export function AuraQuotaNotice({
           Con voto registrado: {votedNames.join(", ")}
         </p>
       ) : null}
-    </div>
+    </output>
   );
 }

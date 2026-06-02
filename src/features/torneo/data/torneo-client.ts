@@ -3,7 +3,7 @@ import type { FirebaseBridge } from "@/lib/firebase/client";
 import type { TorneoState } from "@/types/looksmax";
 import { PHASES } from "./torneo-players";
 
-export async function readTorneoState(fb: FirebaseBridge): Promise<TorneoState | null> {
+async function readTorneoState(fb: FirebaseBridge): Promise<TorneoState | null> {
   const snap = await fb.get(fb.ref(fb.db, "torneo/state"));
   return snap.exists() ? (snap.val() as TorneoState) : null;
 }
