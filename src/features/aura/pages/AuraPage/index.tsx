@@ -14,7 +14,7 @@ import { useLooksMaxNavigate } from "@/features/app/shell/LooksMaxShell";
 import { useProfileReturnRestore } from "@/features/app/hooks/useProfileReturnRestore";
 import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import { AURA_RANKING_SIZE, AURA_VOTES_PER_WEEK } from "@/lib/aura/constants";
-import { computeAuraLeaders } from "@/lib/aura/leaderboard";
+import { computeAuraLeaders, sortEntriesByAura } from "@/lib/aura/leaderboard";
 import { SPAIN_TIMEZONE_LABEL } from "@/lib/spain-time";
 import type { RankedEntry } from "@/features/rankings/lib/ranking";
 import type { AuraScores } from "@/types/aura";
@@ -84,9 +84,14 @@ export function AuraPage({
     clearError,
   } = useAuraVote(onVoteSuccess);
 
-  const auraEntries = useMemo(() => entries.slice(0, AURA_RANKING_SIZE), [entries]);
+  const auraPool = useMemo(() => entries.slice(0, AURA_RANKING_SIZE), [entries]);
 
-  const rankedNames = useMemo(() => auraEntries.map((e) => e.name), [auraEntries]);
+  const auraEntries = useMemo(
+    () => sortEntriesByAura(auraPool, scores),
+    [auraPool, scores],
+  );
+
+  const rankedNames = useMemo(() => auraPool.map((e) => e.name), [auraPool]);
 
   const { top, bottom } = useMemo(
     () => computeAuraLeaders(rankedNames, scores),

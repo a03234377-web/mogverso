@@ -1,4 +1,5 @@
 import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
+import type { RankedEntry } from "@/features/rankings/lib/ranking";
 import { AURA_LEADERS_COUNT, AURA_RANKING_SIZE } from "@/lib/aura/constants";
 import { coerceAuraScore } from "@/lib/aura/coerce-score";
 
@@ -72,4 +73,17 @@ export function computeAuraLeaders(
     .map((row, i) => ({ ...row, rank: i + 1 }));
 
   return { top, bottom };
+}
+
+/** Top oficial ordenado por puntuación de aura (1 = más aura; empate → rank oficial). */
+export function sortEntriesByAura(
+  entries: RankedEntry[],
+  scores: Record<string, number>,
+): RankedEntry[] {
+  const sorted = [...entries].sort((a, b) => {
+    const diff = auraForName(scores, b.name) - auraForName(scores, a.name);
+    if (diff !== 0) return diff;
+    return a.rank - b.rank;
+  });
+  return sorted.map((entry, i) => ({ ...entry, rank: i + 1 }));
 }
