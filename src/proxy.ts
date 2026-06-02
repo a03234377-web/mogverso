@@ -42,7 +42,7 @@ function isValidCronSecret(request: NextRequest): boolean {
   return headerSecret === expected;
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith("/api/admin")) {
