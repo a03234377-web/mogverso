@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Icon, IconLabel } from "@/components/icons";
 import { Modal } from "@/components/ui/Modal";
 import { AURA_VOTES_PER_WEEK } from "@/lib/aura/constants";
@@ -9,7 +9,7 @@ import { useAuraHowItWorksGsap } from "./useAuraHowItWorksGsap";
 
 type AuraHowItWorksModalProps = {
   open: boolean;
-  onClose: () => void;
+  onClose: (dontShowAgain: boolean) => void;
 };
 
 const ruleCardClass = cn(
@@ -38,13 +38,19 @@ export function AuraHowItWorksModal({ open, onClose }: AuraHowItWorksModalProps)
   const titleRef = useRef<HTMLHeadingElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
 
   useAuraHowItWorksGsap(open, { panelRef, iconRef, titleRef, listRef, ctaRef });
+
+  const handleClose = useCallback(() => {
+    onClose(dontShowAgain);
+    setDontShowAgain(false);
+  }, [dontShowAgain, onClose]);
 
   return (
     <Modal
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       id="modal-aura-how-it-works"
       labelledBy="aura-how-it-works-title"
       describedBy="aura-how-it-works-desc"
@@ -100,7 +106,39 @@ export function AuraHowItWorksModal({ open, onClose }: AuraHowItWorksModalProps)
           ))}
         </ul>
 
-        <div ref={ctaRef} className="flex flex-col gap-2">
+        <div ref={ctaRef} className="flex flex-col gap-3">
+          <label
+            className={cn(
+              "flex cursor-pointer items-center gap-3 rounded-xl border px-3.5 py-3",
+              "lm-focus-ring transition-colors duration-200",
+              dontShowAgain
+                ? "border-[rgba(232,184,75,0.45)] bg-[rgba(232,184,75,0.12)]"
+                : "border-[rgba(232,184,75,0.14)] bg-[rgba(232,184,75,0.04)] hover:bg-[rgba(232,184,75,0.08)]",
+            )}
+          >
+            <input
+              type="checkbox"
+              checked={dontShowAgain}
+              onChange={(e) => setDontShowAgain(e.target.checked)}
+              className="sr-only"
+            />
+            <span
+              className={cn(
+                "flex size-[22px] shrink-0 items-center justify-center rounded-md border-2",
+                "transition-all duration-200",
+                dontShowAgain
+                  ? "border-lm-gold bg-[linear-gradient(135deg,var(--color-lm-gold2),var(--color-lm-gold))] text-lm-bg"
+                  : "border-[rgba(232,184,75,0.35)] bg-transparent",
+              )}
+              aria-hidden
+            >
+              {dontShowAgain ? <Icon name="check" size={14} strokeWidth={3} /> : null}
+            </span>
+            <span className="text-left text-sm leading-snug font-semibold text-lm-text2">
+              No volver a mostrar la próxima vez
+            </span>
+          </label>
+
           <button
             type="button"
             className={cn(
@@ -111,7 +149,7 @@ export function AuraHowItWorksModal({ open, onClose }: AuraHowItWorksModalProps)
               "hover:scale-[1.02] hover:shadow-[0_0_24px_rgba(232,184,75,0.35)]",
               "max-md:min-h-[3.25rem]",
             )}
-            onClick={onClose}
+            onClick={handleClose}
           >
             <IconLabel icon="check" iconSize={18} className="justify-center text-lm-bg">
               Entendido, cerrar

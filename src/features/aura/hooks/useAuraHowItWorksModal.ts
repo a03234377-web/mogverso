@@ -21,8 +21,10 @@ export function useAuraHowItWorksModal() {
 
   const open = !seenBefore && !dismissed;
 
-  const close = useCallback(() => {
-    markAuraHowItWorksSeen();
+  const close = useCallback((dontShowAgain: boolean) => {
+    if (dontShowAgain) {
+      markAuraHowItWorksSeen();
+    }
     setDismissed(true);
   }, []);
 
