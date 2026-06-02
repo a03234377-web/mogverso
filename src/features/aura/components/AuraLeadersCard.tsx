@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { Icon } from "@/components/icons";
-import { AuraScoreBadge } from "@/features/aura/components/AuraScoreBadge";
+import { LeaderAuraScore } from "@/features/aura/components/LeaderAuraScore";
 import { useAuraLeaderListMotion } from "@/features/aura/hooks/useAuraLeaderListMotion";
 import { RankerProfileLink } from "@/features/rankings/components/ui/RankerProfileLink";
 import type { AuraLeader } from "@/lib/aura/leaderboard";
@@ -35,7 +35,10 @@ export function AuraLeadersCard({
   const showEmpty = ready && displayLeaders.length === 0;
 
   return (
-    <div className="rounded-[14px] border border-lm-border bg-lm-card px-5 py-4">
+    <div
+      data-aura-leader-card
+      className="rounded-[14px] border border-lm-border bg-lm-card px-5 py-4"
+    >
       <div
         className={cn(
           "mb-3 flex items-center gap-1.5 lm-type-label text-base",
@@ -116,7 +119,7 @@ export function AuraLeadersCard({
                     className="truncate text-lm-text"
                   />
                 </div>
-                <AuraScoreBadge total={leader.aura} />
+                <LeaderAuraScore aura={leader.aura} />
               </div>
             );
           })

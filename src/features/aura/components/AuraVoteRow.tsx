@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { Pressable } from "@/components/a11y/Pressable";
 import { Icon } from "@/components/icons";
 import { Avatar } from "@/components/Avatar";
@@ -9,6 +10,7 @@ import { AURA_BOOST, AURA_PENALTY } from "@/lib/aura/constants";
 import { cn } from "@/lib/cn";
 import type { RankedEntry } from "@/features/rankings/lib/ranking";
 import type { AuraScores } from "@/types/aura";
+import { useAuraVoteFocusGsap } from "@/features/aura/hooks/useAuraVoteFocusGsap";
 import { profileTargetId } from "@/features/rankings/lib/profile-slug";
 
 type AuraVoteRowProps = {
@@ -48,15 +50,18 @@ export function AuraVoteRow({
   const busy = votingName === ranker.name;
   const justVoted = voteSuccessName === ranker.name;
   const buttonsDisabled = disabled || busy || alreadyVoted;
+  const cardRef = useRef<HTMLDivElement>(null);
+  useAuraVoteFocusGsap(cardRef, isVoteFocus);
 
   return (
     <div
+      ref={cardRef}
       className={cn(
         "relative flex flex-col gap-3 rounded-xl border border-lm-border bg-lm-card px-4 py-3",
         "max-md:gap-2.5 max-md:px-3.5",
         "scroll-mt-24 transition-[border-color,box-shadow] duration-300",
         isVoteFocus &&
-          "z-[2] animate-profile-target-pulse border-lm-gold/80 bg-[rgba(232,184,75,0.1)] shadow-[0_0_28px_rgba(232,184,75,0.28)] ring-2 ring-lm-gold/60",
+          "z-[2] border-lm-gold/80 bg-[rgba(232,184,75,0.1)] ring-2 ring-lm-gold/60",
         justVoted && "border-lm-gold/50 shadow-[0_0_20px_rgba(232,184,75,0.15)]",
         alreadyVoted && !justVoted && "border-lm-gold/40 bg-[rgba(232,184,75,0.06)]",
         moveHint === "up" &&

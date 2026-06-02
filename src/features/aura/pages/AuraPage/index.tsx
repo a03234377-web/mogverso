@@ -5,6 +5,7 @@ import { IconLabel } from "@/components/icons";
 import { HeroBadge, HeroSection } from "@/components/ui/HeroSection";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { AuraLeadersCard } from "@/features/aura/components/AuraLeadersCard";
+import { AuraLeadersGrid } from "@/features/aura/components/AuraLeadersGrid";
 import { AuraQuotaNotice } from "@/features/aura/components/AuraQuotaNotice";
 import { AuraVoteList } from "@/features/aura/components/AuraVoteList";
 import { useAuraQuota } from "@/features/aura/hooks/useAuraQuota";
@@ -207,7 +208,8 @@ export function AuraPage({
         ) : null}
       </div>
 
-      <div
+      <AuraLeadersGrid
+        ready={leadersReady}
         className={cn(
           "mx-auto mb-6 grid max-w-[1100px] grid-cols-2 gap-3 px-5",
           "max-md:grid-cols-1 max-md:gap-2.5 max-md:px-4",
@@ -227,7 +229,7 @@ export function AuraPage({
           ready={leadersReady}
           leaders={leadersReady ? bottom : []}
         />
-      </div>
+      </AuraLeadersGrid>
 
       <div
         id="aura-vote-list"

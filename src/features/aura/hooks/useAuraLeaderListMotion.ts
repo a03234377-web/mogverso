@@ -4,16 +4,16 @@ import gsap from "gsap";
 import { useLayoutEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { useFlipListAnimation } from "@/components/animations/useFlipListAnimation";
 import type { AuraLeader } from "@/lib/aura/leaderboard";
+import {
+  AURA_GSAP_EASE,
+  AURA_GSAP_EASE_IN,
+  prefersReducedMotion,
+} from "@/lib/aura/gsap-motion";
 
 const MOVE_HINT_MS = 1800;
 const EXIT_DURATION = 0.34;
 const ENTER_DURATION = 0.42;
 const ITEM_SELECTOR = "[data-aura-leader-flip-id]";
-
-function prefersReducedMotion(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 
 function leaderOrderKey(leaders: AuraLeader[]): string {
   return leaders.map((l) => `${l.name}:${l.rank}:${l.aura}`).join("|");
@@ -112,7 +112,7 @@ export function useAuraLeaderListMotion(
         gsap.fromTo(
           el,
           { opacity: 0, y: yFrom },
-          { opacity: 1, y: 0, duration: ENTER_DURATION, ease: "power2.out" },
+          { opacity: 1, y: 0, duration: ENTER_DURATION, ease: AURA_GSAP_EASE },
         );
       }
     };
@@ -166,7 +166,7 @@ export function useAuraLeaderListMotion(
             marginBottom: 0,
             overflow: "hidden",
             duration: EXIT_DURATION,
-            ease: "power2.in",
+            ease: AURA_GSAP_EASE_IN,
             onComplete: finishExit,
           });
         }
