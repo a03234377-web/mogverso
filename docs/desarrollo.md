@@ -60,6 +60,7 @@ Checklist operativo (doc privado o consola):
 | `entryVote/current`                                | Pública                        | **Denegada**                                  |
 | `torneo/state`                                     | Pública                        | **Denegada**                                  |
 | `announcements`                                    | Pública                        | **Denegada**                                  |
+| `aura/scores`                                      | Pública                        | **Denegada** (escritura solo Admin; lectura en vivo) |
 
 Tras desplegar la capa `/api/*`, bloquea **toda** escritura desde el cliente SDK; solo Admin SDK escribe.
 
