@@ -1,8 +1,13 @@
 "use client";
 
-import { useLayoutEffect, type RefObject } from "react";
+import { useEffect, type RefObject } from "react";
 import gsap from "gsap";
-import { AURA_GSAP_EASE, prefersReducedMotion } from "@/lib/aura/gsap-motion";
+import {
+  AURA_GSAP_EASE,
+  clearGsapTargets,
+  prefersReducedMotion,
+  runAfterPaint,
+} from "@/lib/aura/gsap-motion";
 
 type AuraHowItWorksGsapTargets = {
   panelRef: RefObject<HTMLElement | null>;
@@ -18,31 +23,33 @@ export function useAuraHowItWorksGsap(
 ) {
   const { panelRef, iconRef, titleRef, listRef, ctaRef } = targets;
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!open) return;
 
     const panel = panelRef.current;
+    if (!panel || prefersReducedMotion()) return;
+
     const icon = iconRef.current;
     const title = titleRef.current;
     const list = listRef.current;
     const cta = ctaRef.current;
-    if (!panel) return;
-
-    if (prefersReducedMotion()) return;
-
     const items = list
       ? Array.from(list.querySelectorAll<HTMLElement>("[data-aura-how-item]"))
       : [];
+    const animated: HTMLElement[] = [panel, icon, title, cta, ...items].filter(
+      (el): el is HTMLElement => Boolean(el),
+    );
 
-    const ctx = gsap.context(() => {
+    let tl: gsap.core.Timeline | null = null;
+
+    const cancelPaint = runAfterPaint(() => {
       gsap.set(panel, { opacity: 0, scale: 0.92, y: 24 });
       if (icon) gsap.set(icon, { opacity: 0, scale: 0.6, rotate: -12 });
       if (title) gsap.set(title, { opacity: 0, y: 12 });
       if (items.length) gsap.set(items, { opacity: 0, x: -14 });
       if (cta) gsap.set(cta, { opacity: 0, y: 10 });
 
-      const tl = gsap.timeline({ defaults: { ease: AURA_GSAP_EASE } });
-
+      tl = gsap.timeline({ defaults: { ease: AURA_GSAP_EASE } });
       tl.to(panel, { opacity: 1, scale: 1, y: 0, duration: 0.5 }, 0);
 
       if (icon) {
@@ -64,8 +71,12 @@ export function useAuraHowItWorksGsap(
       if (cta) {
         tl.to(cta, { opacity: 1, y: 0, duration: 0.35 }, 0.42);
       }
-    }, panel);
+    });
 
-    return () => ctx.revert();
+    return () => {
+      cancelPaint();
+      tl?.kill();
+      clearGsapTargets(animated);
+    };
   }, [open, panelRef, iconRef, titleRef, listRef, ctaRef]);
 }

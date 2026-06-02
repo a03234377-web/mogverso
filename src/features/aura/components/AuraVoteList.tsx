@@ -1,9 +1,14 @@
 "use client";
 
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { useFlipListAnimation } from "@/components/animations/useFlipListAnimation";
-import { AURA_GSAP_EASE, prefersReducedMotion } from "@/lib/aura/gsap-motion";
+import {
+  AURA_GSAP_EASE,
+  clearGsapTargets,
+  prefersReducedMotion,
+  runAfterPaint,
+} from "@/lib/aura/gsap-motion";
 import { AuraVoteRow } from "@/features/aura/components/AuraVoteRow";
 import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import { profileTargetId } from "@/features/rankings/lib/profile-slug";
@@ -70,24 +75,41 @@ export function AuraVoteList({
     itemSelector: "[data-aura-flip-id]",
   });
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!listReady || listEntranceRef.current) return;
-    const list = listRef.current;
-    if (!list) return;
-    listEntranceRef.current = true;
-    if (!prefersReducedMotion()) {
-      gsap.fromTo(
-        list,
-        { opacity: 0, y: 14 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.42,
-          ease: AURA_GSAP_EASE,
-          clearProps: "transform",
-        },
-      );
-    }
+
+    let rows: HTMLElement[] = [];
+    let cancelled = false;
+
+    const cancelPaint = runAfterPaint(() => {
+      if (cancelled || listEntranceRef.current) return;
+
+      const list = listRef.current;
+      if (!list) return;
+
+      rows = Array.from(list.querySelectorAll<HTMLElement>("[data-aura-flip-id]"));
+      if (rows.length === 0) return;
+
+      listEntranceRef.current = true;
+
+      if (prefersReducedMotion()) return;
+
+      gsap.set(rows, { opacity: 0, y: 16 });
+      gsap.to(rows, {
+        opacity: 1,
+        y: 0,
+        duration: 0.4,
+        stagger: 0.035,
+        ease: AURA_GSAP_EASE,
+        clearProps: "transform,opacity",
+      });
+    });
+
+    return () => {
+      cancelled = true;
+      cancelPaint();
+      if (rows.length > 0) clearGsapTargets(rows);
+    };
   }, [listReady]);
 
   useLayoutEffect(() => {

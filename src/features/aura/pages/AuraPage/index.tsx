@@ -1,6 +1,9 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { IconLabel } from "@/components/icons";
 import { HeroBadge, HeroSection } from "@/components/ui/HeroSection";
 import { SectionTitle } from "@/components/ui/SectionTitle";
@@ -133,6 +136,18 @@ export function AuraPage({
 
   const connectionError = firebaseInitError ?? firebaseError;
 
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    const id = requestAnimationFrame(() => {
+      try {
+        ScrollTrigger.refresh();
+      } catch {
+        /* DOM en transición o iframes cross-origin */
+      }
+    });
+    return () => cancelAnimationFrame(id);
+  }, [leadersReady, listReady]);
+
   const heroQuotaBadge = useMemo(
     () => (
       <HeroBadge>
@@ -212,31 +227,30 @@ export function AuraPage({
         ) : null}
       </div>
 
-      <AuraLeadersGrid
-        ready={leadersReady}
-        className={cn(
-          "mx-auto mb-6 grid max-w-[1100px] grid-cols-2 gap-3 px-5",
-          "max-md:grid-cols-1 max-md:gap-2.5 max-md:px-4",
-        )}
-      >
-        <AuraLeadersCard
-          title="Más Aura"
-          titleIcon="trending-up"
-          variant="up"
+      <ScrollReveal y={36} className="mx-auto mb-6 max-w-[1100px] px-5 max-md:px-4">
+        <AuraLeadersGrid
           ready={leadersReady}
-          leaders={leadersReady ? top : []}
-        />
-        <AuraLeadersCard
-          title="Menos Aura"
-          titleIcon="trending-down"
-          variant="down"
-          ready={leadersReady}
-          leaders={leadersReady ? bottom : []}
-        />
-      </AuraLeadersGrid>
+          className={cn("grid grid-cols-2 gap-3", "max-md:grid-cols-1 max-md:gap-2.5")}
+        >
+          <AuraLeadersCard
+            title="Más Aura"
+            titleIcon="trending-up"
+            variant="up"
+            ready={leadersReady}
+            leaders={leadersReady ? top : []}
+          />
+          <AuraLeadersCard
+            title="Menos Aura"
+            titleIcon="trending-down"
+            variant="down"
+            ready={leadersReady}
+            leaders={leadersReady ? bottom : []}
+          />
+        </AuraLeadersGrid>
+      </ScrollReveal>
 
-      <div
-        id="aura-vote-list"
+      <ScrollReveal
+        y={28}
         className="mx-auto max-w-[1100px] scroll-mt-24 px-5 pb-16 max-md:px-3 max-md:pb-20"
       >
         <div className="mb-4">
@@ -247,21 +261,23 @@ export function AuraPage({
           </SectionTitle>
         </div>
 
-        <AuraVoteList
-          entries={auraEntries}
-          scores={scores}
-          listReady={listReady}
-          focusTarget={voteFocusTarget}
-          disabledFor={(name) => isRowDisabled(name)}
-          hasVotedFor={hasVotedFor}
-          votingName={votingName}
-          voteSuccessName={voteSuccess}
-          lastVoteDelta={lastVoteDelta}
-          onBoost={handleBoost}
-          onPenalty={handlePenalty}
-          onOpenProfile={(name, rank) => openProfile(name, rank, "aura")}
-        />
-      </div>
+        <div id="aura-vote-list">
+          <AuraVoteList
+            entries={auraEntries}
+            scores={scores}
+            listReady={listReady}
+            focusTarget={voteFocusTarget}
+            disabledFor={(name) => isRowDisabled(name)}
+            hasVotedFor={hasVotedFor}
+            votingName={votingName}
+            voteSuccessName={voteSuccess}
+            lastVoteDelta={lastVoteDelta}
+            onBoost={handleBoost}
+            onPenalty={handlePenalty}
+            onOpenProfile={(name, rank) => openProfile(name, rank, "aura")}
+          />
+        </div>
+      </ScrollReveal>
     </div>
   );
 }
