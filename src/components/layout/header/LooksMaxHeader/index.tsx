@@ -6,6 +6,7 @@ import { Icon } from "@/components/icons";
 import { LOOKSMAX_PATHS } from "@/features/app/routes";
 import { BrandLink, NavBadge } from "./HeaderParts";
 import { JoinCommunityButton } from "./JoinCommunityButton";
+import { TikTokHeaderLink } from "./TikTokHeaderLink";
 import { cn } from "@/lib/cn";
 import { DESKTOP_TABS, sectionTitle } from "@/components/layout/header/nav-config";
 import { useHeaderScroll } from "@/components/layout/header/useHeaderScroll";
@@ -117,6 +118,7 @@ export function LooksMaxHeader({ page, onOpenDiscord }: LooksMaxHeaderProps) {
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
+          <TikTokHeaderLink />
           <JoinCommunityButton onClick={onOpenDiscord} />
         </div>
       </nav>
