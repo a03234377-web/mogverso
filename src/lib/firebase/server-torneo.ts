@@ -69,16 +69,6 @@ function preserveEditionMeta(state: TorneoState, patch: TorneoState): TorneoStat
   };
 }
 
-export async function startTorneoOctavosFromSeed(
-  now = Date.now(),
-): Promise<TorneoState> {
-  const seedNames = await fetchTorneoSeedNames();
-  const editionStartMs = getEditionStartMsForWeekContaining(now);
-  const fresh = buildOctavosTorneoState(now, seedNames, editionStartMs);
-  await resetTorneoState(fresh as Record<string, unknown>);
-  return fresh;
-}
-
 /**
  * Tras la hora de inicio, pasar de `waiting_octavos` a octavos (RTDB).
  * Transición atómica: no borra votos ni reinicia si otro request ya avanzó la fase.
@@ -249,29 +239,6 @@ async function doAdvanceTorneoPhase(
   return state;
 }
 
-export async function advanceTorneoPhaseNow(): Promise<TorneoState | null> {
-  const state = await getTorneoState();
-  if (!state) return null;
-  return doAdvanceTorneoPhase(state, Date.now());
-}
-
-export async function fastForwardTorneoPhase(): Promise<TorneoState | null> {
-  const db = getAdminDatabase();
-  const state = await getTorneoState();
-  if (!state) return null;
-  if (state.phase === PHASES.WAITING_OCTAVOS || state.phase === PHASES.TORNEO_ENDED) {
-    return healTorneo().then(() => getTorneoState());
-  }
-  await db.ref("torneo/state/phaseEnd").set(Date.now() - 1000);
-  await healTorneo();
-  return getTorneoState();
-}
-
-export async function clearTorneoVotes(): Promise<void> {
-  const db = getAdminDatabase();
-  await db.ref("torneoVotes").set(null);
-}
-
 async function advanceTorneoPhaseIfNeeded(
   state: TorneoState | null,
   now = Date.now(),
@@ -366,19 +333,3 @@ export async function healTorneo(options?: {
   await advanceTorneoPhaseIfNeeded(existing, now);
   return { healed: true };
 }
-
-export async function adminInitTorneo(state: Record<string, unknown>) {
-  await resetTorneoState(state);
-}
-
-export async function adminResetTorneo() {
-  const waiting = createWaitingTorneoState(Date.now());
-  await resetTorneoState(waiting as Record<string, unknown>);
-  return waiting;
-}
-
-export {
-  getTorneoState,
-  resetTorneoState as initTorneoState,
-  startTorneoOctavosFromSeed as getInitialTorneoState,
-};

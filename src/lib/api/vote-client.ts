@@ -15,34 +15,70 @@ import { getDeviceId } from "./device-id";
 export type HealResponse = ActionResult;
 export type VoteApiResponse = ActionResult;
 
+const HEAL_TORNEO_COOLDOWN_MS = 12_000;
+const HEAL_TORNEO_RATE_LIMIT_BACKOFF_MS = 45_000;
+
+let healTorneoInFlight: Promise<HealResponse> | null = null;
+let healTorneoNextAllowedAt = 0;
+
+export async function healTorneoApi(options?: {
+  restartIfEnded?: boolean;
+  force?: boolean;
+}): Promise<HealResponse> {
+  const now = Date.now();
+  const force = options?.force === true;
+
+  if (healTorneoInFlight) {
+    return healTorneoInFlight;
+  }
+
+  if (!force && now < healTorneoNextAllowedAt) {
+    return { ok: true, healed: false };
+  }
+
+  healTorneoInFlight = (async () => {
+    if (!force) {
+      healTorneoNextAllowedAt = Date.now() + HEAL_TORNEO_COOLDOWN_MS;
+    }
+
+    try {
+      const res = await fetch("/api/heal/torneo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          restartIfEnded: options?.restartIfEnded === true,
+        }),
+      });
+      const data = (await res.json()) as HealResponse & { healed?: boolean };
+      if (res.ok && data.ok) return data;
+      if (res.status === 429) {
+        healTorneoNextAllowedAt = Date.now() + HEAL_TORNEO_RATE_LIMIT_BACKOFF_MS;
+        return { ok: false, reason: "rate_limit", error: "rate_limit" };
+      }
+    } catch (err) {
+      console.warn("[healTorneoApi] fetch failed, trying server action:", err);
+    }
+
+    const actionResult = await healTorneoAction(options);
+    if (!actionResult.ok && actionResult.reason === "rate_limit") {
+      healTorneoNextAllowedAt = Date.now() + HEAL_TORNEO_RATE_LIMIT_BACKOFF_MS;
+    }
+    return actionResult;
+  })();
+
+  try {
+    return await healTorneoInFlight;
+  } finally {
+    healTorneoInFlight = null;
+  }
+}
+
 export async function healRankvoteApi(): Promise<HealResponse> {
   return healRankvoteAction();
 }
 
 export async function healEntryVoteApi(): Promise<HealResponse> {
   return healEntryVoteAction();
-}
-
-export async function healTorneoApi(options?: {
-  restartIfEnded?: boolean;
-}): Promise<HealResponse> {
-  try {
-    const res = await fetch("/api/heal/torneo", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        restartIfEnded: options?.restartIfEnded === true,
-      }),
-    });
-    const data = (await res.json()) as HealResponse & { healed?: boolean };
-    if (res.ok && data.ok) return data;
-    if (res.status === 429) {
-      return { ok: false, reason: "rate_limit", error: "rate_limit" };
-    }
-  } catch (err) {
-    console.warn("[healTorneoApi] fetch failed, trying server action:", err);
-  }
-  return healTorneoAction(options);
 }
 
 export async function voteRankvoteApi(

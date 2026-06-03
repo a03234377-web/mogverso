@@ -63,7 +63,7 @@ Checklist operativo con prioridades y ventajas de cada paso: **`docs/pasos-pendi
 - **No** subas `.env.local` al repositorio.
 - Configura **reglas RTDB** en Firebase Console (lectura pública en datos de juego; **escritura cliente denegada**). Votos, heal y admin usan Route Handlers + Firebase Admin SDK.
 - Restringe la API key de Firebase por HTTP referrer (dominio producción + localhost dev).
-- Define `ADMIN_SECRET` fuerte; init/reset torneo solo vía `POST /api/admin/torneo/*` con ese header.
+- Define `ADMIN_SECRET` fuerte para `/api/admin/aura/*` (reset de votos de aura).
 - Crons en `vercel.json` solo con plan **Pro**; en Hobby déjalos fuera (ver arriba).
 - Los hooks usan **Server Actions**; las rutas `/api/vote/*` y `/api/heal/*` siguen disponibles como alternativa HTTP.
 - Opcional: Upstash Redis para rate limiting distribuido en votos y heal on-demand.

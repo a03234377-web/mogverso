@@ -7,10 +7,9 @@ import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import { TorneoComingSoon } from "@/features/torneo/pages/TorneoComingSoon";
 import { TorneoLiveView } from "@/features/torneo/pages/TorneoLiveView";
 import type { TorneoPhase } from "@/types/looksmax";
-import { isTorneoEditionLive, shouldShowTorneoComingSoon } from "@/lib/torneo-schedule";
+import { shouldShowTorneoComingSoon } from "@/lib/torneo-schedule";
 import { TorneoPromoModal } from "@/features/torneo/components/TorneoPromoModal";
 import { useTorneoPromoModal } from "@/features/torneo/hooks/useTorneoPromoModal";
-import { healTorneoApi } from "@/lib/api/vote-client";
 import { useIsClient } from "@/hooks/useIsClient";
 
 function useTorneoPhase() {
@@ -35,24 +34,6 @@ export function TorneoPage() {
   const phase = useTorneoPhase();
   const showComingSoon = shouldShowTorneoComingSoon(now, phase);
   const { open: promoOpen, close: closePromo } = useTorneoPromoModal();
-
-  useEffect(() => {
-    void healTorneoApi().catch(() => {
-      /* fetch/API puede fallar sin admin; el hook useTorneo reintenta heal si hace falta */
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!isTorneoEditionLive(now) || showComingSoon) return;
-    const kick = () => {
-      void healTorneoApi().catch(() => {
-        /* silencioso: heal periódico es best-effort */
-      });
-    };
-    kick();
-    const id = setInterval(kick, 20_000);
-    return () => clearInterval(id);
-  }, [now, showComingSoon]);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
