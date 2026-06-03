@@ -1,64 +1,34 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { SectionTitle } from "@/components/ui/SectionTitle";
-import { OCTAVOS_IDS } from "@/lib/torneo-bracket";
-import type { TorneoMatch, TorneoState } from "@/types/looksmax";
-import type { PHASES } from "@/features/torneo/data/torneo-players";
+import { PHASES } from "@/features/torneo/data/torneo-players";
+import { useTorneoBracketPreview } from "@/features/torneo/hooks/useTorneoBracketPreview";
+import { getTorneoMatchesView } from "@/features/torneo/lib/torneo-matches-view";
+import type { TorneoState } from "@/types/looksmax";
 import { MatchCard } from "./MatchCard";
 
 export function TorneoMatchesSection({
   state,
   getLocalVote,
   onVote,
-  phases,
 }: {
   state: TorneoState | null;
-  getLocalVote: (id: string) => string | null;
+  getLocalVote: (matchId: string) => string | null;
   onVote: (matchId: string, name: string) => Promise<void>;
-  phases: typeof PHASES;
 }) {
-  if (!state) return null;
+  const [now, setNow] = useState(() => Date.now());
+  const needsPreview = state?.phase === PHASES.WAITING_OCTAVOS && !state.matches?.oct_0;
+  const previewMatches = useTorneoBracketPreview(needsPreview);
+  const view = getTorneoMatchesView(state, previewMatches, now);
 
-  let matches: Record<string, TorneoMatch> | undefined;
-  let ids: string[] = [];
-  let round = "";
-  let title = "";
-  let show = false;
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
-  if (state.phase === phases.OCTAVOS_VOTING && state.matches) {
-    matches = state.matches;
-    ids = [...OCTAVOS_IDS];
-    round = "octavos";
-    title = "Octavos de Final — ¡Vota en todos los duelos!";
-    show = true;
-  } else if (state.phase === phases.CUARTOS_VOTING && state.cuartosMatches) {
-    matches = state.cuartosMatches;
-    ids = ["cua_0", "cua_1", "cua_2", "cua_3"];
-    round = "cuartos";
-    title = "Cuartos de Final — ¡Vota Ahora!";
-    show = true;
-  } else if (state.phase === phases.SEMIFINALS_VOTING && state.semisMatches) {
-    matches = state.semisMatches;
-    ids = ["semi_0", "semi_1"];
-    round = "semis";
-    title = "Semifinales — ¡Vota Ahora!";
-    show = true;
-  } else if (state.phase === phases.FINAL_VOTING && state.finalMatch) {
-    matches = { final_0: state.finalMatch };
-    ids = ["final_0"];
-    round = "final";
-    title = "Gran Final — ¡Vota al Campeón!";
-    show = true;
-  } else if (state.phase === phases.TORNEO_ENDED && state.finalMatch) {
-    matches = { final_0: state.finalMatch };
-    ids = ["final_0"];
-    round = "final";
-    title = "Gran Final — Resultado Final";
-    show = true;
-  }
-
-  if (!show || !matches) return null;
+  if (!view) return null;
 
   return (
     <div
@@ -66,11 +36,16 @@ export function TorneoMatchesSection({
       id="torneoMatchesSection"
     >
       <SectionTitle center className="mb-4" id="torneoMatchesTitle">
-        {title}
+        {view.title}
       </SectionTitle>
+      {view.pendingStart ? (
+        <p className="mb-4 text-center text-sm font-semibold text-lm-orange">
+          Abriendo votación en octavos… Los botones se activan en unos segundos.
+        </p>
+      ) : null}
       <div className="flex flex-col gap-3" id="torneoMatchesGrid">
-        {ids.map((id, idx) => {
-          const m = matches![id];
+        {view.ids.map((id, idx) => {
+          const m = view.matches[id];
           if (!m) return null;
           return (
             <ScrollReveal
@@ -83,9 +58,11 @@ export function TorneoMatchesSection({
               <MatchCard
                 match={m}
                 idx={idx}
-                round={round}
-                state={state}
+                round={view.round}
+                state={state!}
                 myVote={getLocalVote(id)}
+                canVote={view.canVote}
+                previewLive={view.pendingStart}
                 onVote={(name) => onVote(id, name)}
               />
             </ScrollReveal>

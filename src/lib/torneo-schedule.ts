@@ -94,10 +94,8 @@ export function getTorneoWaitingTargetMs(
   state: { phaseEnd: number; editionStartMs?: number | null },
   now = Date.now(),
 ): number {
-  const editionStart =
-    state.editionStartMs ?? getEditionStartMsForWeekContaining(now);
-  const canonical =
-    now < editionStart ? getUpcomingTorneoStartMs(now) : editionStart;
+  const editionStart = state.editionStartMs ?? getEditionStartMsForWeekContaining(now);
+  const canonical = now < editionStart ? getUpcomingTorneoStartMs(now) : editionStart;
   if (Math.abs(state.phaseEnd - canonical) > 60_000) return canonical;
   return state.phaseEnd;
 }

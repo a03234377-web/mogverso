@@ -19,7 +19,7 @@ export function TorneoBracket({ state }: { state: TorneoState | null }) {
   const previewMatches = useTorneoBracketPreview(needsPreview);
   const octavosSource = state?.matches?.oct_0
     ? state.matches
-    : previewMatches ?? state?.matches;
+    : (previewMatches ?? state?.matches);
 
   if (!state && !previewMatches) {
     return <TorneoBracketShell empty />;

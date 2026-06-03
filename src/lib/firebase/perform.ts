@@ -172,7 +172,7 @@ export async function performHealTorneo(
 ): Promise<ActionResult> {
   if (!isAdminConfigured()) return notConfigured();
 
-  const rl = await checkRateLimit("heal-torneo", ip, 6, 60);
+  const rl = await checkRateLimit("heal-torneo", ip, 30, 60);
   if (!rl.allowed) return { ok: false, error: "rate_limit", reason: "rate_limit" };
 
   const result = await healTorneo(options);

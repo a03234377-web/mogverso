@@ -7,10 +7,7 @@ import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import { TorneoComingSoon } from "@/features/torneo/pages/TorneoComingSoon";
 import { TorneoLiveView } from "@/features/torneo/pages/TorneoLiveView";
 import type { TorneoPhase } from "@/types/looksmax";
-import {
-  isTorneoEditionLive,
-  shouldShowTorneoComingSoon,
-} from "@/lib/torneo-schedule";
+import { isTorneoEditionLive, shouldShowTorneoComingSoon } from "@/lib/torneo-schedule";
 import { TorneoPromoModal } from "@/features/torneo/components/TorneoPromoModal";
 import { useTorneoPromoModal } from "@/features/torneo/hooks/useTorneoPromoModal";
 import { healTorneoApi } from "@/lib/api/vote-client";
