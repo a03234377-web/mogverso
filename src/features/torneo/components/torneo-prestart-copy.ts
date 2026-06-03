@@ -11,7 +11,7 @@ export const TORNEO_PRESTART_BRACKET =
   "Octavos → Cuartos → Semifinales → Gran Final · 24 h por fase";
 
 export const TORNEO_PRESTART_FOOTER =
-  "El torneo arrancará automáticamente el jueves a las";
+  "El torneo arrancará automáticamente el miércoles a las";
 
 export const TORNEO_VOTING_SUB =
   "24 horas de votación · Vota en todos los duelos de esta ronda (1 voto por combate)";
