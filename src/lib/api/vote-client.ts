@@ -22,6 +22,22 @@ export async function healEntryVoteApi(): Promise<HealResponse> {
 export async function healTorneoApi(options?: {
   restartIfEnded?: boolean;
 }): Promise<HealResponse> {
+  try {
+    const res = await fetch("/api/heal/torneo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        restartIfEnded: options?.restartIfEnded === true,
+      }),
+    });
+    const data = (await res.json()) as HealResponse & { healed?: boolean };
+    if (res.ok && data.ok) return data;
+    if (res.status === 429) {
+      return { ok: false, reason: "rate_limit", error: "rate_limit" };
+    }
+  } catch (err) {
+    console.warn("[healTorneoApi] fetch failed, trying server action:", err);
+  }
   return healTorneoAction(options);
 }
 

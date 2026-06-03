@@ -14,7 +14,10 @@ import { TORNEO_VOTING_SUB } from "@/features/torneo/components/torneo-prestart-
 import { PHASES } from "@/features/torneo/data/torneo-players";
 import { healTorneoApi } from "@/lib/api/vote-client";
 import { useCountdown } from "@/hooks/useCountdown";
-import { getUpcomingTorneoStartMs } from "@/lib/torneo-schedule";
+import {
+  getTorneoWaitingTargetMs,
+  getUpcomingTorneoStartMs,
+} from "@/lib/torneo-schedule";
 import type { TorneoState } from "@/types/looksmax";
 import { TorneoPhaseEnded, TorneoPhaseWaitingOctavos } from "./TorneoPhaseViews";
 
@@ -27,10 +30,26 @@ export function TorneoPhaseCard({
   loading: boolean;
   onRestart: () => void;
 }) {
-  const cd = useCountdown(state?.phaseEnd);
+  const waitingTargetMs =
+    state?.phase === PHASES.WAITING_OCTAVOS
+      ? getTorneoWaitingTargetMs(state)
+      : null;
+  const cd = useCountdown(
+    state?.phase === PHASES.WAITING_OCTAVOS
+      ? waitingTargetMs
+      : state?.phaseEnd,
+  );
   const restartEnd =
     state?.phase === PHASES.TORNEO_ENDED ? getUpcomingTorneoStartMs() : null;
   const restartCd = useCountdown(restartEnd);
+
+  useEffect(() => {
+    if (state?.phase !== PHASES.WAITING_OCTAVOS || !cd.expired) return;
+    void (async () => {
+      await healTorneoApi();
+      onRestart();
+    })();
+  }, [state?.phase, cd.expired, onRestart]);
 
   useEffect(() => {
     if (state?.phase !== PHASES.TORNEO_ENDED || !restartCd.expired) return;
@@ -60,7 +79,13 @@ export function TorneoPhaseCard({
   }
 
   if (state.phase === PHASES.WAITING_OCTAVOS) {
-    return <TorneoPhaseWaitingOctavos state={state} cd={cd} />;
+    return (
+      <TorneoPhaseWaitingOctavos
+        state={state}
+        cd={cd}
+        targetMs={waitingTargetMs ?? state.phaseEnd}
+      />
+    );
   }
 
   if (state.phase === PHASES.OCTAVOS_VOTING) {

@@ -1,5 +1,9 @@
 import { healTorneoApi } from "@/lib/api/vote-client";
 import type { FirebaseBridge } from "@/lib/firebase/client";
+import {
+  getEditionStartMsForWeekContaining,
+  getUpcomingTorneoStartMs,
+} from "@/lib/torneo-schedule";
 import type { TorneoState } from "@/types/looksmax";
 import { PHASES } from "./torneo-players";
 
@@ -15,25 +19,29 @@ export async function ensureTorneoState(
 ): Promise<TorneoState> {
   await healTorneoApi();
 
-  const existing = await readTorneoState(fb);
-  if (existing) {
-    if (existing.phase === PHASES.WAITING_OCTAVOS && existing.phaseEnd > now) {
-      return existing;
-    }
-    if (existing.phaseEnd <= now - 2000) {
-      await healTorneoApi();
-      const advanced = await readTorneoState(fb);
-      return advanced ?? existing;
+  let existing = await readTorneoState(fb);
+  if (!existing) {
+    await healTorneoApi();
+    existing = await readTorneoState(fb);
+    if (!existing) {
+      throw new Error("Torneo state unavailable after heal");
     }
     return existing;
   }
 
-  await healTorneoApi();
-  const created = await readTorneoState(fb);
-  if (!created) {
-    throw new Error("Torneo state unavailable after heal");
+  const editionStart = getEditionStartMsForWeekContaining(now);
+  const waitingNeedsHeal =
+    existing.phase === PHASES.WAITING_OCTAVOS &&
+    (now >= editionStart ||
+      Math.abs(existing.phaseEnd - getUpcomingTorneoStartMs(now)) > 60_000);
+
+  if (waitingNeedsHeal || existing.phaseEnd <= now - 2000) {
+    await healTorneoApi();
+    const refreshed = await readTorneoState(fb);
+    return refreshed ?? existing;
   }
-  return created;
+
+  return existing;
 }
 
 export async function advanceTorneoPhaseIfNeeded(

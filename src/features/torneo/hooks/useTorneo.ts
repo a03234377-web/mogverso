@@ -8,6 +8,10 @@ import {
 } from "@/features/torneo/data/torneo-client";
 import { PHASES } from "@/features/torneo/data/torneo-players";
 import { healTorneoApi, voteTorneoApi } from "@/lib/api/vote-client";
+import {
+  getEditionStartMsForWeekContaining,
+  getTorneoWaitingTargetMs,
+} from "@/lib/torneo-schedule";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import type { TorneoState } from "@/types/looksmax";
 
@@ -54,9 +58,31 @@ export function useTorneo(active: boolean) {
     async (incoming: TorneoState) => {
       if (!fb) return;
       const now = Date.now();
-      if (incoming.phaseEnd <= now - 2000) {
-        const advanced = await advanceTorneoPhaseIfNeeded(fb, incoming, now);
-        dispatch({ type: "sync", payload: advanced ?? incoming });
+      const editionStart = getEditionStartMsForWeekContaining(now);
+      const waitingPastStart =
+        incoming.phase === PHASES.WAITING_OCTAVOS && now >= editionStart;
+      const waitingStaleTarget =
+        incoming.phase === PHASES.WAITING_OCTAVOS &&
+        Math.abs(incoming.phaseEnd - getTorneoWaitingTargetMs(incoming, now)) >
+          60_000;
+
+      if (
+        waitingPastStart ||
+        waitingStaleTarget ||
+        incoming.phaseEnd <= now - 2000
+      ) {
+        if (waitingPastStart || waitingStaleTarget) {
+          await healTorneoApi();
+        } else {
+          await advanceTorneoPhaseIfNeeded(fb, incoming, now);
+        }
+        const advanced = await fb.get(fb.ref(fb.db, "torneo/state"));
+        dispatch({
+          type: "sync",
+          payload: advanced.exists()
+            ? (advanced.val() as TorneoState)
+            : incoming,
+        });
       } else {
         dispatch({ type: "sync", payload: incoming });
       }

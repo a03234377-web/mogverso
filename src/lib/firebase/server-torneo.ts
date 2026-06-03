@@ -263,7 +263,7 @@ export async function healTorneo(options?: {
   restartIfEnded?: boolean;
 }): Promise<{ healed: boolean }> {
   const now = Date.now();
-  const existing = await getTorneoState();
+  let existing = await getTorneoState();
 
   if (!existing) {
     const waiting = createWaitingTorneoState(now);
@@ -314,6 +314,14 @@ export async function healTorneo(options?: {
       }
       return { healed: false };
     }
+
+    if (Math.abs(existing.phaseEnd - editionStart) > 60_000) {
+      const waiting = createWaitingTorneoState(now);
+      await initTorneoState(waiting as Record<string, unknown>);
+      existing = (await getTorneoState()) ?? existing;
+    }
+    await advanceTorneoPhaseIfNeeded(existing, now);
+    return { healed: true };
   }
 
   await advanceTorneoPhaseIfNeeded(existing, now);
