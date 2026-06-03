@@ -447,7 +447,9 @@ function BracketMatchGroup({
       tabIndex={clickable ? 0 : undefined}
       aria-label={
         clickable && player1 && player2
-          ? `Ir a votar: ${player1} contra ${player2}`
+          ? myVote
+            ? `Ir al duelo: ${player1} contra ${player2}`
+            : `Ir a votar: ${player1} contra ${player2}`
           : undefined
       }
       onClick={handleClick}
@@ -457,7 +459,11 @@ function BracketMatchGroup({
         <span className="text-[10px] font-bold tracking-wide text-lm-text2 uppercase">
           Duelo {matchNum}
         </span>
-        {votingActive ? (
+        {votingActive && myVote ? (
+          <span className="flex shrink-0 items-center gap-0.5 rounded-full border border-lm-border bg-white/8 px-1.5 py-px text-[9px] font-black tracking-wide text-lm-text2 uppercase">
+            Ir
+          </span>
+        ) : votingActive ? (
           <span className="flex shrink-0 items-center gap-0.5 rounded-full border border-[rgba(46,204,113,0.45)] bg-[rgba(46,204,113,0.12)] px-1.5 py-px text-[9px] font-black tracking-wide text-lm-green2 uppercase">
             <Icon name="radio" size={8} className="text-lm-red2" />
             Votar
