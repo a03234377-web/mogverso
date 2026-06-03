@@ -17,6 +17,9 @@ export function patchTorneoVoteCount(
   const match = findMatch(next, matchId);
   if (!match) return state;
 
-  match.votes = { ...match.votes, [candidateName]: (match.votes[candidateName] ?? 0) + 1 };
+  match.votes = {
+    ...match.votes,
+    [candidateName]: (match.votes[candidateName] ?? 0) + 1,
+  };
   return next;
 }

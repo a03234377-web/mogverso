@@ -5,11 +5,7 @@ import { CreatorImage } from "@/components/CreatorImage";
 import { CreatorIcon, Icon } from "@/components/icons";
 import { getPlayerByName, PHASES } from "@/features/torneo/data/torneo-players";
 import { useTorneoBracketPreview } from "@/features/torneo/hooks/useTorneoBracketPreview";
-import {
-  CUARTOS_IDS,
-  OCTAVOS_IDS,
-  SEMIS_IDS,
-} from "@/lib/torneo-bracket";
+import { CUARTOS_IDS, OCTAVOS_IDS, SEMIS_IDS } from "@/lib/torneo-bracket";
 import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 import { cn } from "@/lib/cn";
 
@@ -319,11 +315,11 @@ function BracketMatchGroup({
       onKeyDown={handleKeyDown}
     >
       <div className="mb-1 flex items-center justify-between gap-1 px-0.5">
-        <span className="truncate text-[10px] font-bold uppercase tracking-wide text-lm-text2">
+        <span className="truncate text-[10px] font-bold tracking-wide text-lm-text2 uppercase">
           Duelo {matchNum}
         </span>
         {votingActive ? (
-          <span className="flex shrink-0 items-center gap-0.5 rounded-full border border-[rgba(46,204,113,0.45)] bg-[rgba(46,204,113,0.12)] px-1.5 py-px text-[9px] font-black uppercase tracking-wide text-lm-green2">
+          <span className="flex shrink-0 items-center gap-0.5 rounded-full border border-[rgba(46,204,113,0.45)] bg-[rgba(46,204,113,0.12)] px-1.5 py-px text-[9px] font-black tracking-wide text-lm-green2 uppercase">
             <Icon name="radio" size={8} className="text-lm-red2" />
             Votar
           </span>
@@ -454,7 +450,9 @@ function BracketSlot({
           alt={p.name}
           className="rounded-full object-cover"
           sizes={compact ? "24px" : "28px"}
-          fallback={<CreatorIcon name={p.name} icon={p.icon} size={compact ? 12 : 14} />}
+          fallback={
+            <CreatorIcon name={p.name} icon={p.icon} size={compact ? 12 : 14} />
+          }
         />
       </div>
       <div

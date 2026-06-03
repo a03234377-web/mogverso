@@ -1,9 +1,6 @@
 import { PHASES } from "@/features/torneo/data/torneo-players";
 import { getEditionStartMsForWeekContaining } from "@/lib/torneo-schedule";
-import {
-  torneoVoteDeviceKey,
-  torneoVoteIpKey,
-} from "@/lib/torneo-vote-keys";
+import { torneoVoteDeviceKey, torneoVoteIpKey } from "@/lib/torneo-vote-keys";
 import { coerceVoteCount } from "@/lib/coerce-vote-count";
 import { hashIpForVote } from "@/lib/security/client-ip";
 import { getAdminDatabase } from "./admin";
