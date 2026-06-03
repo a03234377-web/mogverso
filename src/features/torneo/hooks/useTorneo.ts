@@ -128,9 +128,13 @@ export function useTorneo(active: boolean) {
     }
 
     let cancelled = false;
-    void fetchTorneoMyVotesApi(editionStartMs).then((votes) => {
-      if (!cancelled) setServerVotes(votes);
-    });
+    void fetchTorneoMyVotesApi(editionStartMs)
+      .then((votes) => {
+        if (!cancelled) setServerVotes(votes);
+      })
+      .catch(() => {
+        /* best-effort: localStorage cubre el voto del usuario */
+      });
 
     return () => {
       cancelled = true;

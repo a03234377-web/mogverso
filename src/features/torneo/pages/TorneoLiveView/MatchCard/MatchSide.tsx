@@ -106,12 +106,11 @@ export function MatchSide({
       ) : canVote ? (
         <div
           className={cn(
-            "mt-1 flex items-center justify-center gap-1.5 rounded-lg border border-transparent px-2 py-1",
-            "text-base font-bold text-lm-green2 transition-all duration-250",
-            "group-hover:scale-105 group-hover:border-[rgba(46,204,113,0.5)] group-hover:bg-[rgba(46,204,113,0.2)] group-hover:text-white group-hover:shadow-[0_0_12px_rgba(46,204,113,0.35)]",
+            "mt-1 flex items-center justify-center gap-1.5 rounded-lg px-2 py-1",
+            "text-base font-bold text-lm-green2",
           )}
         >
-          <Icon name="pointer" size={14} className="transition-transform duration-250 group-hover:scale-110" />
+          <Icon name="pointer" size={14} />
           Votar
         </div>
       ) : null}
