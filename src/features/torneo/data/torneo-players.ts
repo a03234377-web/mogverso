@@ -1,42 +1,11 @@
 import { creatorImage } from "@/assets/creators";
 import { getRankerFallback, getRankerPhoto } from "@/features/rankings/data/avatars";
-import { getUpcomingTorneoStartMs } from "@/lib/torneo-schedule";
-import type {
-  TorneoMatch,
-  TorneoPhase,
-  TorneoPlayer,
-  TorneoState,
-} from "@/types/looksmax";
-import type { IconName } from "@/types/icons";
-
-function torneoPlayer(name: string, icon: IconName): TorneoPlayer {
-  return {
-    name,
-    photo: getRankerPhoto(name) ?? creatorImage("kappah.webp"),
-    icon,
-  };
-}
-
-const TORNEO_PLAYERS: TorneoPlayer[] = [
-  torneoPlayer("Aaronjaureguii", "star"),
-  torneoPlayer("Peereira7", "goal"),
-  torneoPlayer("TitoChape", "cookie"),
-  torneoPlayer("RubenMaxxing", "microscope"),
-  torneoPlayer("Kappah", "crown"),
-  torneoPlayer("Sergi", "waves"),
-  torneoPlayer("JoseNogales", "leaf"),
-  torneoPlayer("Franbv", "drama"),
-  torneoPlayer("Elcalvo", "brain"),
-  torneoPlayer("Febron", "dumbbell"),
-  torneoPlayer("Didac", "target"),
-  torneoPlayer("Giva", "flame"),
-  torneoPlayer("Javichu", "zap"),
-  torneoPlayer("Ismael", "sparkles"),
-  torneoPlayer("AlvaroSapo", "turtle"),
-  torneoPlayer("Hectrollprox", "ghost"),
-];
-
-const VOTING_DURATION = 30 * 60 * 1000;
+import { buildOctavosMatchesFromSeed } from "@/lib/torneo-bracket";
+import {
+  getUpcomingTorneoStartMs,
+  TORNEO_PHASE_DURATION_MS,
+} from "@/lib/torneo-schedule";
+import type { TorneoPhase, TorneoPlayer, TorneoState } from "@/types/looksmax";
 
 export const PHASES = {
   WAITING_OCTAVOS: "waiting_octavos",
@@ -50,10 +19,9 @@ export const PHASES = {
   TORNEO_ENDED: "torneo_ended",
 } as const satisfies Record<string, TorneoPhase>;
 
-export function getPlayerByName(name: string): TorneoPlayer {
-  const found = TORNEO_PLAYERS.find((p) => p.name === name);
-  if (found) return found;
+export { TORNEO_PHASE_DURATION_MS };
 
+export function getPlayerByName(name: string): TorneoPlayer {
   const photo = getRankerPhoto(name);
   return {
     name,
@@ -62,42 +30,35 @@ export function getPlayerByName(name: string): TorneoPlayer {
   };
 }
 
-/** Estado inicial cuando termina la cuenta atrás (cuartos directo, sin octavos en UI). */
-export function getInitialTorneoState(now: number): TorneoState {
-  const cuartosMatches: Record<string, TorneoMatch> = {};
-  for (let i = 0; i < 4; i++) {
-    const id = `cua_${i}`;
-    const p1 = TORNEO_PLAYERS[i * 2];
-    const p2 = TORNEO_PLAYERS[i * 2 + 1];
-    cuartosMatches[id] = {
-      id,
-      round: "cuartos",
-      p1: p1.name,
-      p2: p2.name,
-      votes: { _placeholder_: 0 },
-      winner: null,
-      resolved: false,
-    };
-  }
+/** Octavos con top 16 congelado (1v2, 3v4, …). */
+export function buildOctavosTorneoState(
+  now: number,
+  seedNames: string[],
+  editionStartMs?: number,
+): TorneoState {
+  const edition = editionStartMs ?? getUpcomingTorneoStartMs(now);
   return {
-    phase: PHASES.CUARTOS_VOTING,
+    phase: PHASES.OCTAVOS_VOTING,
     phaseStart: now,
-    phaseEnd: now + VOTING_DURATION,
-    cuartosMatches,
+    phaseEnd: now + TORNEO_PHASE_DURATION_MS,
+    editionStartMs: edition,
+    seedNames,
+    matches: buildOctavosMatchesFromSeed(seedNames),
     octavosWinners: null,
     cuartosWinners: null,
     createdAt: now,
   };
 }
 
-/** Cuenta atrás hasta el próximo viernes 23:00 (inicio del torneo desde cero). */
+/** Cuenta atrás hasta el próximo jueves 22:30 (inicio del torneo). */
 export function createWaitingTorneoState(now = Date.now()): TorneoState {
   const phaseEnd = getUpcomingTorneoStartMs(now);
   return {
     phase: PHASES.WAITING_OCTAVOS,
     phaseEnd,
     phaseStart: now,
-    nextPhaseLabel: "Cuartos de Final",
+    editionStartMs: phaseEnd,
+    nextPhaseLabel: "Octavos de Final",
     createdAt: now,
   };
 }

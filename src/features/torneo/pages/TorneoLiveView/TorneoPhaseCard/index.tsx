@@ -10,12 +10,13 @@ import {
   PhaseTimer,
   PhaseTitle,
 } from "@/features/torneo/components/PhaseCard";
+import { TORNEO_VOTING_SUB } from "@/features/torneo/components/torneo-prestart-copy";
 import { PHASES } from "@/features/torneo/data/torneo-players";
 import { healTorneoApi } from "@/lib/api/vote-client";
 import { useCountdown } from "@/hooks/useCountdown";
+import { getUpcomingTorneoStartMs } from "@/lib/torneo-schedule";
 import type { TorneoState } from "@/types/looksmax";
 import { TorneoPhaseEnded, TorneoPhaseWaitingOctavos } from "./TorneoPhaseViews";
-import { getNext23Ms } from "./getNext23Ms";
 
 export function TorneoPhaseCard({
   state,
@@ -27,7 +28,8 @@ export function TorneoPhaseCard({
   onRestart: () => void;
 }) {
   const cd = useCountdown(state?.phaseEnd);
-  const restartEnd = state?.phase === PHASES.TORNEO_ENDED ? getNext23Ms() : null;
+  const restartEnd =
+    state?.phase === PHASES.TORNEO_ENDED ? getUpcomingTorneoStartMs() : null;
   const restartCd = useCountdown(restartEnd);
 
   useEffect(() => {
@@ -61,6 +63,26 @@ export function TorneoPhaseCard({
     return <TorneoPhaseWaitingOctavos state={state} cd={cd} />;
   }
 
+  if (state.phase === PHASES.OCTAVOS_VOTING) {
+    return (
+      <PhaseDisplay>
+        <PhaseCard variant="voting">
+          <PhaseLabel color="green">OCTAVOS EN VIVO · VOTA AHORA</PhaseLabel>
+          <PhaseTitle color="green">
+            <Icon
+              name="gamepad-2"
+              size={18}
+              className="mr-1.5 inline shrink-0 align-middle"
+            />
+            OCTAVOS DE FINAL
+          </PhaseTitle>
+          <PhaseSub>{TORNEO_VOTING_SUB}</PhaseSub>
+          <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="green" />
+        </PhaseCard>
+      </PhaseDisplay>
+    );
+  }
+
   if (state.phase === PHASES.CUARTOS_VOTING) {
     return (
       <PhaseDisplay>
@@ -74,9 +96,7 @@ export function TorneoPhaseCard({
             />
             CUARTOS DE FINAL
           </PhaseTitle>
-          <PhaseSub>
-            30 minutos de votación · El que más votos tenga pasa a Semifinales
-          </PhaseSub>
+          <PhaseSub>{TORNEO_VOTING_SUB}</PhaseSub>
           <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="green" />
         </PhaseCard>
       </PhaseDisplay>
@@ -105,9 +125,7 @@ export function TorneoPhaseCard({
             />
             SEMIFINALES
           </PhaseTitle>
-          <PhaseSub>
-            30 minutos de votación · Los ganadores van a la Gran Final
-          </PhaseSub>
+          <PhaseSub>{TORNEO_VOTING_SUB}</PhaseSub>
           <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="gold" />
         </PhaseCard>
       </PhaseDisplay>
@@ -151,7 +169,7 @@ export function TorneoPhaseCard({
             </span>
           </PhaseLabel>
           <PhaseTitle color="gold">GRAN FINAL</PhaseTitle>
-          <PhaseSub>El último enfrentamiento · Solo uno puede ser el Campeón</PhaseSub>
+          <PhaseSub>{TORNEO_VOTING_SUB}</PhaseSub>
           <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="gold" />
         </PhaseCard>
       </PhaseDisplay>

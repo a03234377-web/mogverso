@@ -8,6 +8,8 @@ import { TorneoComingSoon } from "@/features/torneo/pages/TorneoComingSoon";
 import { TorneoLiveView } from "@/features/torneo/pages/TorneoLiveView";
 import type { TorneoPhase } from "@/types/looksmax";
 import { shouldShowTorneoComingSoon } from "@/lib/torneo-schedule";
+import { TorneoPromoModal } from "@/features/torneo/components/TorneoPromoModal";
+import { useTorneoPromoModal } from "@/features/torneo/hooks/useTorneoPromoModal";
 import { healTorneoApi } from "@/lib/api/vote-client";
 
 function useTorneoPhase() {
@@ -30,6 +32,7 @@ export function TorneoPage() {
   const [now, setNow] = useState(() => Date.now());
   const phase = useTorneoPhase();
   const showComingSoon = shouldShowTorneoComingSoon(now, phase);
+  const { open: promoOpen, close: closePromo } = useTorneoPromoModal();
 
   useEffect(() => {
     void healTorneoApi().catch((err) => {
@@ -54,9 +57,10 @@ export function TorneoPage() {
     return () => cancelAnimationFrame(id);
   }, [showComingSoon]);
 
-  if (showComingSoon) {
-    return <TorneoComingSoon />;
-  }
-
-  return <TorneoLiveView />;
+  return (
+    <>
+      {showComingSoon ? <TorneoComingSoon /> : <TorneoLiveView />}
+      <TorneoPromoModal open={promoOpen} onClose={closePromo} />
+    </>
+  );
 }

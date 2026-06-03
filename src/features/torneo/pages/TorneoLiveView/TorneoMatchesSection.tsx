@@ -1,11 +1,11 @@
 "use client";
 
+import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { SectionTitle } from "@/components/ui/SectionTitle";
-import { MatchCard } from "./MatchCard";
-import { useCountdown } from "@/hooks/useCountdown";
-import { formatDuration } from "@/lib/time";
+import { OCTAVOS_IDS } from "@/lib/torneo-bracket";
 import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 import type { PHASES } from "@/features/torneo/data/torneo-players";
+import { MatchCard } from "./MatchCard";
 
 export function TorneoMatchesSection({
   state,
@@ -18,10 +18,6 @@ export function TorneoMatchesSection({
   onVote: (matchId: string, name: string) => Promise<void>;
   phases: typeof PHASES;
 }) {
-  const breakRemaining = useCountdown(
-    state?.phase === phases.BREAK_FINAL ? state.phaseEnd : null,
-  );
-
   if (!state) return null;
 
   let matches: Record<string, TorneoMatch> | undefined;
@@ -30,7 +26,13 @@ export function TorneoMatchesSection({
   let title = "";
   let show = false;
 
-  if (state.phase === phases.CUARTOS_VOTING && state.cuartosMatches) {
+  if (state.phase === phases.OCTAVOS_VOTING && state.matches) {
+    matches = state.matches;
+    ids = [...OCTAVOS_IDS];
+    round = "octavos";
+    title = "Octavos de Final — ¡Vota en todos los duelos!";
+    show = true;
+  } else if (state.phase === phases.CUARTOS_VOTING && state.cuartosMatches) {
     matches = state.cuartosMatches;
     ids = ["cua_0", "cua_1", "cua_2", "cua_3"];
     round = "cuartos";
@@ -54,12 +56,6 @@ export function TorneoMatchesSection({
     round = "final";
     title = "Gran Final — Resultado Final";
     show = true;
-  } else if (state.phase === phases.BREAK_FINAL && state.semisMatches) {
-    matches = state.semisMatches;
-    ids = ["semi_0", "semi_1"];
-    round = "semis";
-    title = `Resultados Semifinales — Final en ${formatDuration(breakRemaining.remainingMs)}`;
-    show = true;
   }
 
   if (!show || !matches) return null;
@@ -77,15 +73,22 @@ export function TorneoMatchesSection({
           const m = matches![id];
           if (!m) return null;
           return (
-            <MatchCard
+            <ScrollReveal
               key={id}
-              match={m}
-              idx={idx}
-              round={round}
-              state={state}
-              myVote={getLocalVote(id)}
-              onVote={(name) => onVote(id, name)}
-            />
+              y={28}
+              scrollRange="block"
+              start="top bottom+=8%"
+              className="w-full"
+            >
+              <MatchCard
+                match={m}
+                idx={idx}
+                round={round}
+                state={state}
+                myVote={getLocalVote(id)}
+                onVote={(name) => onVote(id, name)}
+              />
+            </ScrollReveal>
           );
         })}
       </div>

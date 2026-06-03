@@ -97,6 +97,14 @@ En **Vercel/producción** sí debes tener las dos claves del mismo sitio reCAPTC
 - Si faltan fotos, las rutas en `/img/` devolverán 404; la UI muestra emojis de respaldo.
 - Si reCAPTCHA falla **solo en producción**, revisa dominio en Google, par site key + secret y variables en Vercel.
 
+## Torneo (jueves 22:30 → domingo, 24 h por fase)
+
+- **Calendario:** octavos (top 16 del ranking, 1v2, 3v4…) → cuartos → semis → final. Votación simultánea en todos los duelos de la fase activa (1 voto por combate).
+- **Producción:** `heal` al visitar `/torneo` y al votar; opcional cron `GET /api/cron/torneo-advance` en Vercel Pro.
+- **QA local:** `pnpm run dev` → [http://localhost:3000/admin/torneo](http://localhost:3000/admin/torneo). Pega `ADMIN_SECRET`, usa **Preview top 16**, **Iniciar octavos ahora**, **Fast-forward fase** y abre `/torneo`.
+- En staging sin dev: `NEXT_PUBLIC_ENABLE_TORNEO_DEV_TOOLS=true` en `.env.local`.
+- Reset edición: `POST /api/admin/torneo/reset` con `Authorization: Bearer ADMIN_SECRET`.
+
 ## Editar estilos
 
 - Estilos de la app: `src/app/looksmax.css` (extraídos del diseño original).

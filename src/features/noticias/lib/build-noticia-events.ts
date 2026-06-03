@@ -62,6 +62,8 @@ function rankVoteEvent(row: RankVoteHistoryRow): NoticiaEvent {
 
 function torneoPhaseLabel(phase: TorneoState["phase"]): string | null {
   switch (phase) {
+    case PHASES.OCTAVOS_VOTING:
+      return "octavos de final";
     case PHASES.CUARTOS_VOTING:
       return "cuartos de final";
     case PHASES.SEMIFINALS_VOTING:
@@ -100,6 +102,7 @@ function torneoEvent(state: TorneoState): NoticiaEvent | null {
   if (!phaseLabel) return null;
 
   const livePhases = new Set<string>([
+    PHASES.OCTAVOS_VOTING,
     PHASES.CUARTOS_VOTING,
     PHASES.SEMIFINALS_VOTING,
     PHASES.FINAL_VOTING,

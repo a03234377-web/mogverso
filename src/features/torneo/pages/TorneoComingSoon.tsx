@@ -29,6 +29,7 @@ import {
   TORNEO_HERO_SUBTITLE,
   TORNEO_HERO_TITLE,
 } from "@/features/torneo/components/torneo-hero-content";
+import { TorneoEditionCalendar } from "@/features/torneo/components/TorneoEditionCalendar";
 import { cn } from "@/lib/cn";
 
 export function TorneoComingSoon() {
@@ -93,6 +94,10 @@ export function TorneoComingSoon() {
           <SpainTimezoneNote className="mt-4 text-center" />
         </PhaseCard>
       </PhaseDisplay>
+
+      <div className="mx-auto mb-10 flex justify-center px-5 max-md:px-3">
+        <TorneoEditionCalendar editionStartMs={startMs} now={now} />
+      </div>
     </ActivePage>
   );
 }

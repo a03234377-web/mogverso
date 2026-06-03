@@ -12,6 +12,8 @@ type ModalProps = {
   id?: string;
   labelledBy?: string;
   describedBy?: string;
+  /** Bloquea backdrop, Escape y botón X (p. ej. countdown promo torneo). */
+  preventClose?: boolean;
 };
 
 export function Modal({
@@ -21,6 +23,7 @@ export function Modal({
   id,
   labelledBy,
   describedBy,
+  preventClose = false,
 }: ModalProps) {
   useScrollLock(open);
 
@@ -32,6 +35,11 @@ export function Modal({
     },
     [open],
   );
+
+  const handleDialogClose = useCallback(() => {
+    if (preventClose) return;
+    onClose();
+  }, [preventClose, onClose]);
 
   return (
     <dialog
@@ -46,14 +54,21 @@ export function Modal({
         "touch-none overscroll-contain",
         "p-2 max-md:open:items-end",
       )}
-      onClose={onClose}
+      onClose={handleDialogClose}
+      onCancel={(e) => {
+        if (preventClose) e.preventDefault();
+      }}
     >
-      <button
-        type="button"
-        aria-label="Cerrar diálogo"
-        className="fixed inset-0 m-0 h-full w-full cursor-default border-0 bg-transparent p-0"
-        onClick={onClose}
-      />
+      {!preventClose ? (
+        <button
+          type="button"
+          aria-label="Cerrar diálogo"
+          className="fixed inset-0 m-0 h-full w-full cursor-default border-0 bg-transparent p-0"
+          onClick={onClose}
+        />
+      ) : (
+        <div className="fixed inset-0 m-0 h-full w-full" aria-hidden />
+      )}
       <div
         className={cn(
           "relative z-[1] w-full max-w-[700px] rounded-[22px] border px-8 py-9",
@@ -72,16 +87,24 @@ export function Modal({
   );
 }
 
-export function ModalCloseButton({ onClose }: { onClose: () => void }) {
+export function ModalCloseButton({
+  onClose,
+  disabled,
+}: {
+  onClose: () => void;
+  disabled?: boolean;
+}) {
   return (
     <button
       type="button"
       aria-label="Cerrar"
+      disabled={disabled}
       className={cn(
         "absolute top-3.5 right-4 flex size-[30px] cursor-pointer items-center",
         "justify-center rounded-full border border-lm-border bg-white/6",
         "text-lm-text2 lm-focus-ring transition-all duration-200",
         "hover:bg-white/12 hover:text-lm-text",
+        disabled && "pointer-events-none cursor-not-allowed opacity-40",
       )}
       onClick={onClose}
     >
