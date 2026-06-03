@@ -1,4 +1,51 @@
+import { PHASES } from "@/features/torneo/data/torneo-players";
 import { isValidRankVotePair } from "@/features/rankings/lib/ranker-name";
+import type { TorneoPhase } from "@/types/looksmax";
+
+const OCTAVOS_PREFIX = "oct_";
+const CUARTOS_PREFIX = "cua_";
+const SEMIS_PREFIX = "semi_";
+
+function expectedPhaseForMatchId(matchId: string): TorneoPhase | null {
+  if (matchId.startsWith(OCTAVOS_PREFIX)) return PHASES.OCTAVOS_VOTING;
+  if (matchId.startsWith(CUARTOS_PREFIX)) return PHASES.CUARTOS_VOTING;
+  if (matchId.startsWith(SEMIS_PREFIX)) return PHASES.SEMIFINALS_VOTING;
+  if (matchId === "final_0") return PHASES.FINAL_VOTING;
+  return null;
+}
+
+export function validateTorneoVoteContext(
+  state: Record<string, unknown>,
+  matchId: string,
+  now = Date.now(),
+): { ok: true } | { ok: false; reason: string } {
+  const phase = state.phase as TorneoPhase | undefined;
+  const phaseEnd = typeof state.phaseEnd === "number" ? state.phaseEnd : 0;
+  const expected = expectedPhaseForMatchId(matchId);
+
+  if (!expected) return { ok: false, reason: "invalid_match_id" };
+  if (phase !== expected) return { ok: false, reason: "wrong_phase" };
+  if (now >= phaseEnd - 2000) return { ok: false, reason: "phase_ended" };
+
+  const matches = state.matches as Record<string, { resolved?: boolean }> | undefined;
+  const cuartos = state.cuartosMatches as
+    | Record<string, { resolved?: boolean }>
+    | undefined;
+  const semis = state.semisMatches as
+    | Record<string, { resolved?: boolean }>
+    | undefined;
+  const finalMatch = state.finalMatch as { resolved?: boolean } | undefined;
+
+  let resolved = false;
+  if (matches?.[matchId]) resolved = Boolean(matches[matchId].resolved);
+  else if (cuartos?.[matchId]) resolved = Boolean(cuartos[matchId].resolved);
+  else if (semis?.[matchId]) resolved = Boolean(semis[matchId].resolved);
+  else if (matchId === "final_0" && finalMatch) resolved = Boolean(finalMatch.resolved);
+
+  if (resolved) return { ok: false, reason: "match_resolved" };
+
+  return { ok: true };
+}
 
 const ENTRY_VOTE_CANDIDATES = ["franbv", "nilojeda"] as const;
 export type EntryVoteCandidate = (typeof ENTRY_VOTE_CANDIDATES)[number];
@@ -13,7 +60,7 @@ export function resolveTorneoVotePath(
   candidateName: string,
 ): { ok: true; votePath: string } | { ok: false; reason: string } {
   const matches = state.matches as
-    | Record<string, { p1?: string; p2?: string }>
+    | Record<string, { p1?: string; p2?: string; resolved?: boolean }>
     | undefined;
   const cuartosMatches = state.cuartosMatches as
     | Record<string, { p1?: string; p2?: string }>

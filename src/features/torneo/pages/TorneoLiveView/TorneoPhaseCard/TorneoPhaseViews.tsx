@@ -133,7 +133,7 @@ export function TorneoPhaseEnded({
             )}
           >
             <Icon name="refresh-cw" size={18} />
-            NUEVO TORNEO EMPIEZA A LAS 23:00
+            PRÓXIMO TORNEO · JUEVES 22:30
           </div>
           <PhaseTimer h={restartCd.h} m={restartCd.m} s={restartCd.s} color="orange" />
           <SpainTimezoneNote className="mt-3 text-center" />

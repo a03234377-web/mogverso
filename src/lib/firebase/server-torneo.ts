@@ -1,97 +1,27 @@
 import {
+  buildOctavosTorneoState,
   createWaitingTorneoState,
-  getInitialTorneoState,
   PHASES,
 } from "@/features/torneo/data/torneo-players";
 import {
   getUpcomingTorneoStartMs,
   shouldForceTorneoWaitingBeforeStart,
+  TORNEO_PHASE_DURATION_MS,
 } from "@/lib/torneo-schedule";
+import {
+  buildCuartosFromOctavosWinners,
+  buildFinalMatch,
+  buildSemisMatches,
+  CUARTOS_IDS,
+  OCTAVOS_IDS,
+  resolveRoundMatches,
+  SEMIS_IDS,
+} from "@/lib/torneo-bracket";
+import { fetchTorneoSeedNames } from "@/lib/firebase/torneo-seed";
 import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 import { getAdminDatabase } from "./admin";
 
-const CUARTOS_IDS = ["cua_0", "cua_1", "cua_2", "cua_3"] as const;
-const SEMIS_IDS = ["semi_0", "semi_1"] as const;
-
 let torneoAdvancing = false;
-
-function cloneMatches<T>(obj: T): T {
-  return structuredClone(obj);
-}
-
-function resolveCuartosMatches(cuartosObj: Record<string, TorneoMatch>) {
-  const updatedMatches = cloneMatches(cuartosObj);
-  const winners: (string | null)[] = [];
-  CUARTOS_IDS.forEach((id) => {
-    const m = updatedMatches[id];
-    if (!m) {
-      winners.push(null);
-      return;
-    }
-    const v1 = m.votes?.[m.p1] || 0;
-    const v2 = m.votes?.[m.p2] || 0;
-    const winner = v1 >= v2 ? m.p1 : m.p2;
-    m.winner = winner;
-    m.resolved = true;
-    winners.push(winner);
-  });
-  return { winners, updatedMatches };
-}
-
-function buildSemisMatches(winners: (string | null)[]): Record<string, TorneoMatch> {
-  const semis: Record<string, TorneoMatch> = {};
-  for (let i = 0; i < 2; i++) {
-    const id = `semi_${i}`;
-    const p1name = winners[i * 2] || "TBD";
-    const p2name = winners[i * 2 + 1] || "TBD";
-    semis[id] = {
-      id,
-      round: "semis",
-      p1: p1name,
-      p2: p2name,
-      votes: { _placeholder_: 0 },
-      winner: null,
-      resolved: false,
-    };
-  }
-  return semis;
-}
-
-function resolveSemisMatches(semisObj: Record<string, TorneoMatch>) {
-  const updatedMatches = cloneMatches(semisObj);
-  const winners: (string | null)[] = [];
-  SEMIS_IDS.forEach((id) => {
-    const m = updatedMatches[id];
-    if (!m) {
-      winners.push(null);
-      return;
-    }
-    const v1 = m.votes?.[m.p1] || 0;
-    const v2 = m.votes?.[m.p2] || 0;
-    const winner = v1 >= v2 ? m.p1 : m.p2;
-    m.winner = winner;
-    m.resolved = true;
-    winners.push(winner);
-  });
-  return { winners, updatedMatches };
-}
-
-function buildFinalMatch(winners: (string | null)[]): TorneoMatch {
-  const p1name = winners[0] || "TBD";
-  const p2name = winners[1] || "TBD";
-  return {
-    id: "final_0",
-    round: "final",
-    p1: p1name,
-    p2: p2name,
-    votes: { _placeholder_: 0 },
-    winner: null,
-    resolved: false,
-  };
-}
-
-const VOTING_DURATION = 30 * 60 * 1000;
-const BREAK_BETWEEN_ROUNDS = 5 * 60 * 1000;
 
 async function getTorneoState(): Promise<TorneoState | null> {
   const db = getAdminDatabase();
@@ -127,78 +57,102 @@ async function atomicAdvanceTorneoPhase(
   return true;
 }
 
+function preserveEditionMeta(state: TorneoState, patch: TorneoState): TorneoState {
+  return {
+    ...state,
+    ...patch,
+    editionStartMs: patch.editionStartMs ?? state.editionStartMs,
+    seedNames: patch.seedNames ?? state.seedNames,
+    createdAt: patch.createdAt ?? state.createdAt,
+  };
+}
+
+export async function startTorneoOctavosFromSeed(
+  now = Date.now(),
+): Promise<TorneoState> {
+  const seedNames = await fetchTorneoSeedNames();
+  const editionStartMs = getUpcomingTorneoStartMs(now);
+  const fresh = buildOctavosTorneoState(now, seedNames, editionStartMs);
+  await initTorneoState(fresh as Record<string, unknown>);
+  return fresh;
+}
+
 async function doAdvanceTorneoPhase(
   state: TorneoState,
   now: number,
 ): Promise<TorneoState> {
   if (state.phase === PHASES.WAITING_OCTAVOS) {
-    const fresh = getInitialTorneoState(now);
-    await initTorneoState(fresh as Record<string, unknown>);
+    const fresh = await startTorneoOctavosFromSeed(now);
     return fresh;
+  }
+
+  if (state.phase === PHASES.OCTAVOS_VOTING) {
+    const octavosObj = state.matches || {};
+    const resolved = resolveRoundMatches(OCTAVOS_IDS, octavosObj);
+    const cuartosMatches = buildCuartosFromOctavosWinners(resolved.winners);
+    const newState: TorneoState = {
+      phase: PHASES.CUARTOS_VOTING,
+      phaseStart: now,
+      phaseEnd: now + TORNEO_PHASE_DURATION_MS,
+      octavosWinners: resolved.winners.filter((w): w is string => w !== null),
+      matches: resolved.updatedMatches,
+      cuartosMatches,
+    };
+    const ok = await atomicAdvanceTorneoPhase(
+      PHASES.OCTAVOS_VOTING,
+      preserveEditionMeta(state, newState) as Record<string, unknown>,
+    );
+    if (!ok) {
+      const fresh = await getTorneoState();
+      return fresh ?? state;
+    }
+    return preserveEditionMeta(state, newState);
   }
 
   if (state.phase === PHASES.CUARTOS_VOTING) {
     const cuartosObj = state.cuartosMatches || {};
-    const resolved = resolveCuartosMatches(cuartosObj);
+    const resolved = resolveRoundMatches(CUARTOS_IDS, cuartosObj);
     const semisMatches = buildSemisMatches(resolved.winners);
     const newState: TorneoState = {
       phase: PHASES.SEMIFINALS_VOTING,
       phaseStart: now,
-      phaseEnd: now + VOTING_DURATION,
+      phaseEnd: now + TORNEO_PHASE_DURATION_MS,
       cuartosWinners: resolved.winners.filter((w): w is string => w !== null),
       cuartosMatches: resolved.updatedMatches,
       semisMatches,
     };
     const ok = await atomicAdvanceTorneoPhase(
       PHASES.CUARTOS_VOTING,
-      newState as Record<string, unknown>,
+      preserveEditionMeta(state, newState) as Record<string, unknown>,
     );
     if (!ok) {
       const fresh = await getTorneoState();
       return fresh ?? state;
     }
-    return { ...state, ...newState };
-  }
-
-  if (state.phase === PHASES.SEMIFINALS_PROMO) {
-    const semisWinners = state.cuartosWinners || [];
-    const semisMatches = buildSemisMatches(semisWinners);
-    const newState: TorneoState = {
-      phase: PHASES.SEMIFINALS_VOTING,
-      phaseStart: now,
-      phaseEnd: now + VOTING_DURATION,
-      semisMatches,
-    };
-    const ok = await atomicAdvanceTorneoPhase(
-      PHASES.SEMIFINALS_PROMO,
-      newState as Record<string, unknown>,
-    );
-    if (!ok) {
-      const fresh = await getTorneoState();
-      return fresh ?? state;
-    }
-    return { ...state, ...newState };
+    return preserveEditionMeta(state, newState);
   }
 
   if (state.phase === PHASES.SEMIFINALS_VOTING) {
     const semisObj = state.semisMatches || {};
-    const resolved = resolveSemisMatches(semisObj);
+    const resolved = resolveRoundMatches(SEMIS_IDS, semisObj);
+    const finalMatch = buildFinalMatch(resolved.winners);
     const newState: TorneoState = {
-      phase: PHASES.BREAK_FINAL,
+      phase: PHASES.FINAL_VOTING,
       phaseStart: now,
-      phaseEnd: now + BREAK_BETWEEN_ROUNDS,
+      phaseEnd: now + TORNEO_PHASE_DURATION_MS,
       semisWinners: resolved.winners.filter((w): w is string => w !== null),
       semisMatches: resolved.updatedMatches,
+      finalMatch,
     };
     const ok = await atomicAdvanceTorneoPhase(
       PHASES.SEMIFINALS_VOTING,
-      newState as Record<string, unknown>,
+      preserveEditionMeta(state, newState) as Record<string, unknown>,
     );
     if (!ok) {
       const fresh = await getTorneoState();
       return fresh ?? state;
     }
-    return { ...state, ...newState };
+    return preserveEditionMeta(state, newState);
   }
 
   if (state.phase === PHASES.BREAK_FINAL) {
@@ -207,18 +161,18 @@ async function doAdvanceTorneoPhase(
     const newState: TorneoState = {
       phase: PHASES.FINAL_VOTING,
       phaseStart: now,
-      phaseEnd: now + VOTING_DURATION,
+      phaseEnd: now + TORNEO_PHASE_DURATION_MS,
       finalMatch,
     };
     const ok = await atomicAdvanceTorneoPhase(
       PHASES.BREAK_FINAL,
-      newState as Record<string, unknown>,
+      preserveEditionMeta(state, newState) as Record<string, unknown>,
     );
     if (!ok) {
       const fresh = await getTorneoState();
       return fresh ?? state;
     }
-    return { ...state, ...newState };
+    return preserveEditionMeta(state, newState);
   }
 
   if (state.phase === PHASES.FINAL_VOTING) {
@@ -230,22 +184,45 @@ async function doAdvanceTorneoPhase(
     const newState: TorneoState = {
       phase: PHASES.TORNEO_ENDED,
       phaseStart: now,
-      phaseEnd: now + 999 * 24 * 60 * 60 * 1000,
+      phaseEnd: getUpcomingTorneoStartMs(now + 60_000),
       champion,
       finalMatch: updatedFinal,
     };
     const ok = await atomicAdvanceTorneoPhase(
       PHASES.FINAL_VOTING,
-      newState as Record<string, unknown>,
+      preserveEditionMeta(state, newState) as Record<string, unknown>,
     );
     if (!ok) {
       const fresh = await getTorneoState();
       return fresh ?? state;
     }
-    return { ...state, ...newState };
+    return preserveEditionMeta(state, newState);
   }
 
   return state;
+}
+
+export async function advanceTorneoPhaseNow(): Promise<TorneoState | null> {
+  const state = await getTorneoState();
+  if (!state) return null;
+  return doAdvanceTorneoPhase(state, Date.now());
+}
+
+export async function fastForwardTorneoPhase(): Promise<TorneoState | null> {
+  const db = getAdminDatabase();
+  const state = await getTorneoState();
+  if (!state) return null;
+  if (state.phase === PHASES.WAITING_OCTAVOS || state.phase === PHASES.TORNEO_ENDED) {
+    return healTorneo().then(() => getTorneoState());
+  }
+  await db.ref("torneo/state/phaseEnd").set(Date.now() - 1000);
+  await healTorneo();
+  return getTorneoState();
+}
+
+export async function clearTorneoVotes(): Promise<void> {
+  const db = getAdminDatabase();
+  await db.ref("torneoVotes").set(null);
 }
 
 async function advanceTorneoPhaseIfNeeded(
@@ -304,8 +281,8 @@ export async function healTorneo(options?: {
   }
 
   if (options?.restartIfEnded && existing.phase === PHASES.TORNEO_ENDED) {
-    const fresh = getInitialTorneoState(now);
-    await initTorneoState(fresh as Record<string, unknown>);
+    const waiting = createWaitingTorneoState(now);
+    await initTorneoState(waiting as Record<string, unknown>);
     return { healed: true };
   }
 
@@ -336,4 +313,8 @@ export async function adminResetTorneo() {
   return waiting;
 }
 
-export { getTorneoState, initTorneoState, getInitialTorneoState };
+export {
+  getTorneoState,
+  initTorneoState,
+  startTorneoOctavosFromSeed as getInitialTorneoState,
+};

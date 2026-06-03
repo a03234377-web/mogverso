@@ -5,6 +5,7 @@ import { healRankvoteRound, ensureRankvoteRound } from "./server-rankvote";
 import {
   isValidEntryVoteCandidate,
   resolveTorneoVotePath,
+  validateTorneoVoteContext,
   validateRankVoteCandidate,
 } from "./validate-vote";
 
@@ -138,6 +139,9 @@ export async function castTorneoVoteServer(
   if (!stateSnap.exists()) return { ok: false, reason: "no_state" };
 
   const st = stateSnap.val() as Record<string, unknown>;
+  const phaseCheck = validateTorneoVoteContext(st, matchId);
+  if (!phaseCheck.ok) return { ok: false, reason: phaseCheck.reason };
+
   const resolved = resolveTorneoVotePath(st, matchId, candidateName);
   if (!resolved.ok) return { ok: false, reason: resolved.reason };
 

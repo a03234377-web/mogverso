@@ -31,15 +31,28 @@ export function MatchCard({
   const pct2 = 100 - pct1;
   const isResolved = !!(match.resolved && match.winner);
   const isVotingPhase =
+    (state.phase === PHASES.OCTAVOS_VOTING && round === "octavos") ||
     (state.phase === PHASES.CUARTOS_VOTING && round === "cuartos") ||
     (state.phase === PHASES.SEMIFINALS_VOTING && round === "semis") ||
     (state.phase === PHASES.FINAL_VOTING && round === "final");
   const canVote = isVotingPhase && !isResolved && !myVote;
   const showBars = isResolved || !!myVote;
   const roundIcon: IconName =
-    round === "cuartos" ? "landmark" : round === "semis" ? "trophy" : "crown";
+    round === "octavos"
+      ? "gamepad-2"
+      : round === "cuartos"
+        ? "landmark"
+        : round === "semis"
+          ? "trophy"
+          : "crown";
   const roundLabel =
-    round === "cuartos" ? "Cuartos" : round === "semis" ? "Semifinal" : "Gran Final";
+    round === "octavos"
+      ? "Octavos"
+      : round === "cuartos"
+        ? "Cuartos"
+        : round === "semis"
+          ? "Semifinal"
+          : "Gran Final";
 
   return (
     <div

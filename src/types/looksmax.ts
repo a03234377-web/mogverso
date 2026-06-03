@@ -87,6 +87,8 @@ export type TorneoState = {
   phaseStart?: number;
   phaseEnd: number;
   createdAt?: number;
+  editionStartMs?: number;
+  seedNames?: string[];
   nextPhaseLabel?: string;
   matches?: Record<string, TorneoMatch>;
   cuartosMatches?: Record<string, TorneoMatch>;

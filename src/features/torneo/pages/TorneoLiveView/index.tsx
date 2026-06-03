@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ScrollReveal } from "@/components/animations/ScrollReveal";
 import { IconLabel } from "@/components/icons";
 import { ActivePage } from "@/components/ui/ActivePage";
@@ -15,12 +15,20 @@ import {
   TORNEO_HERO_SUBTITLE,
   TORNEO_HERO_TITLE,
 } from "@/features/torneo/components/torneo-hero-content";
+import { TorneoEditionCalendar } from "@/features/torneo/components/TorneoEditionCalendar";
 import { useTorneo } from "@/features/torneo/hooks/useTorneo";
+import { getUpcomingTorneoStartMs } from "@/lib/torneo-schedule";
 
 export function TorneoLiveView() {
   const { state, loading, vote, getLocalVote, phases } = useTorneo(true);
   const [, setTick] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
   const refresh = useCallback(() => setTick((t) => t + 1), []);
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <ActivePage id="page-torneo" active>
@@ -34,6 +42,13 @@ export function TorneoLiveView() {
       </ScrollReveal>
 
       <TorneoPhaseCard state={state} loading={loading} onRestart={refresh} />
+
+      <div className="mx-auto mb-6 flex justify-center px-5 max-md:px-3">
+        <TorneoEditionCalendar
+          editionStartMs={state?.editionStartMs ?? getUpcomingTorneoStartMs(now)}
+          now={now}
+        />
+      </div>
 
       <TorneoMatchesSection
         state={state}
