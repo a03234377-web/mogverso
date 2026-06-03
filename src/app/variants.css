@@ -414,6 +414,99 @@
   color: var(--color-lm-gold);
 }
 
+/* ── Torneo: cuadro (bracket) ── */
+.torneo-bracket-shell {
+  border-color: rgba(255, 107, 53, 0.35);
+  background-color: var(--color-lm-card);
+  background-image: linear-gradient(
+    160deg,
+    rgba(255, 107, 53, 0.08) 0%,
+    rgba(46, 204, 113, 0.05) 45%,
+    rgba(168, 85, 247, 0.06) 75%,
+    rgba(232, 184, 75, 0.08) 100%
+  );
+  box-shadow: 0 0 32px rgba(255, 107, 53, 0.08);
+}
+
+.torneo-bracket-col-title--orange {
+  color: #ff6b35;
+  border-color: rgba(255, 107, 53, 0.35);
+}
+
+.torneo-bracket-col-title--green {
+  color: var(--color-lm-green2);
+  border-color: rgba(46, 204, 113, 0.35);
+}
+
+.torneo-bracket-col-title--purple {
+  color: var(--color-lm-purple);
+  border-color: rgba(168, 85, 247, 0.35);
+}
+
+.torneo-bracket-col-title--gold {
+  color: var(--color-lm-gold);
+  border-color: rgba(232, 184, 75, 0.45);
+}
+
+.torneo-bracket-slot--orange {
+  border: 1px solid rgba(255, 107, 53, 0.35);
+  background: rgba(255, 107, 53, 0.1);
+}
+
+.torneo-bracket-slot--green {
+  border: 1px solid rgba(46, 204, 113, 0.35);
+  background: rgba(46, 204, 113, 0.1);
+}
+
+.torneo-bracket-slot--purple {
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  background: rgba(168, 85, 247, 0.1);
+}
+
+.torneo-bracket-slot--gold {
+  border: 1px solid rgba(232, 184, 75, 0.4);
+  background: rgba(232, 184, 75, 0.12);
+}
+
+.torneo-bracket-slot--pending {
+  opacity: 0.55;
+}
+
+.torneo-bracket-slot--final-pending {
+  opacity: 1;
+  border-color: rgba(232, 184, 75, 0.5);
+  background: rgba(232, 184, 75, 0.14);
+}
+
+.torneo-bracket-slot--winner {
+  box-shadow: 0 0 12px rgba(232, 184, 75, 0.25);
+}
+
+.torneo-bracket-slot--champion {
+  border-width: 2px;
+  box-shadow: 0 0 18px rgba(232, 184, 75, 0.35);
+}
+
+.torneo-bracket-avatar--orange {
+  border-color: rgba(255, 107, 53, 0.55);
+  background: rgba(255, 107, 53, 0.15);
+}
+
+.torneo-bracket-avatar--green {
+  border-color: rgba(46, 204, 113, 0.55);
+  background: rgba(46, 204, 113, 0.15);
+}
+
+.torneo-bracket-avatar--purple {
+  border-color: rgba(168, 85, 247, 0.55);
+  background: rgba(168, 85, 247, 0.15);
+}
+
+.torneo-bracket-avatar--gold {
+  border-color: rgba(232, 184, 75, 0.65);
+  background: rgba(232, 184, 75, 0.18);
+}
+
 /* ── Consejo: categoría ── */
 .consejo-cat--piel {
   color: #e8b84b;

@@ -16,6 +16,7 @@ import {
   PhaseTitle,
 } from "@/features/torneo/components/PhaseCard";
 import { useCountdown } from "@/hooks/useCountdown";
+import { healTorneoApi } from "@/lib/api/vote-client";
 import { formatTorneoStartDate, getUpcomingTorneoStartMs } from "@/lib/torneo-schedule";
 import {
   TORNEO_PRESTART_BRACKET,
@@ -43,6 +44,13 @@ export function TorneoComingSoon() {
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    if (!cd.expired) return;
+    void healTorneoApi().catch((err) => {
+      console.error("[Torneo] heal after countdown:", err);
+    });
+  }, [cd.expired]);
+
   return (
     <ActivePage id="page-torneo" active>
       <ScrollReveal className="w-full" {...PAGE_SCROLL_REVEAL}>
@@ -61,7 +69,7 @@ export function TorneoComingSoon() {
             Torneo de LooksMaxing
           </div>
           <PhaseTitle color="orange" className="text-[clamp(2rem,6vw,4.5rem)]">
-            {TORNEO_PRESTART_HEADLINE}
+            {cd.expired ? "ARRANCANDO OCTAVOS" : TORNEO_PRESTART_HEADLINE}
           </PhaseTitle>
           <div className="mb-2 text-center text-base font-bold text-lm-text2">
             {TORNEO_PRESTART_FIRST_ROUND}

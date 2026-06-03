@@ -89,6 +89,19 @@ export function getTorneoEditionEndMs(editionStartMs: number): number {
   return getEditionEndMs(editionStartMs);
 }
 
+/** Objetivo de cuenta atrás en `waiting_octavos` (ignora phaseEnd obsoleto en RTDB). */
+export function getTorneoWaitingTargetMs(
+  state: { phaseEnd: number; editionStartMs?: number | null },
+  now = Date.now(),
+): number {
+  const editionStart =
+    state.editionStartMs ?? getEditionStartMsForWeekContaining(now);
+  const canonical =
+    now < editionStart ? getUpcomingTorneoStartMs(now) : editionStart;
+  if (Math.abs(state.phaseEnd - canonical) > 60_000) return canonical;
+  return state.phaseEnd;
+}
+
 export function formatTorneoStartDate(ms: number) {
   const date = new Date(ms);
   const dayName = TORNEO_DAY_NAME_FORMATTER.format(date);
@@ -165,10 +178,19 @@ export function shouldShowTorneoComingSoon(
   now: number,
   phase?: TorneoPhase | null,
 ): boolean {
+  const editionStart = getEditionStartMsForWeekContaining(now);
+  if (now >= editionStart && now < getEditionEndMs(editionStart)) {
+    return false;
+  }
   const upcomingStart = getUpcomingTorneoStartMs(now);
   if (now < upcomingStart) return true;
   if (phase === "torneo_ended") {
     return now < getUpcomingTorneoStartMs(upcomingStart + 60_000);
   }
   return false;
+}
+
+export function isTorneoEditionLive(now = Date.now()): boolean {
+  const start = getEditionStartMsForWeekContaining(now);
+  return now >= start && now < getEditionEndMs(start);
 }

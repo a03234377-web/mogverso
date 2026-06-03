@@ -7,7 +7,10 @@ import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import { TorneoComingSoon } from "@/features/torneo/pages/TorneoComingSoon";
 import { TorneoLiveView } from "@/features/torneo/pages/TorneoLiveView";
 import type { TorneoPhase } from "@/types/looksmax";
-import { shouldShowTorneoComingSoon } from "@/lib/torneo-schedule";
+import {
+  isTorneoEditionLive,
+  shouldShowTorneoComingSoon,
+} from "@/lib/torneo-schedule";
 import { TorneoPromoModal } from "@/features/torneo/components/TorneoPromoModal";
 import { useTorneoPromoModal } from "@/features/torneo/hooks/useTorneoPromoModal";
 import { healTorneoApi } from "@/lib/api/vote-client";
@@ -39,6 +42,18 @@ export function TorneoPage() {
       console.error("[Torneo] heal on mount:", err);
     });
   }, []);
+
+  useEffect(() => {
+    if (!isTorneoEditionLive(now) || showComingSoon) return;
+    const kick = () => {
+      void healTorneoApi().catch((err) => {
+        console.error("[Torneo] heal while live:", err);
+      });
+    };
+    kick();
+    const id = setInterval(kick, 20_000);
+    return () => clearInterval(id);
+  }, [now, showComingSoon]);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
