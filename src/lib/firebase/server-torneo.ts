@@ -4,7 +4,6 @@ import {
   PHASES,
 } from "@/features/torneo/data/torneo-players";
 import {
-  getEditionEndMs,
   getEditionStartMsForWeekContaining,
   getUpcomingTorneoStartMs,
   shouldForceTorneoWaitingBeforeStart,
@@ -73,10 +72,24 @@ export async function startTorneoOctavosFromSeed(
   now = Date.now(),
 ): Promise<TorneoState> {
   const seedNames = await fetchTorneoSeedNames();
-  const editionStartMs = getUpcomingTorneoStartMs(now);
+  const editionStartMs = getEditionStartMsForWeekContaining(now);
   const fresh = buildOctavosTorneoState(now, seedNames, editionStartMs);
   await initTorneoState(fresh as Record<string, unknown>);
   return fresh;
+}
+
+/** Tras la hora de inicio, pasar de `waiting_octavos` a octavos con top 16 (RTDB). */
+export async function ensureTorneoOctavosStarted(
+  now = Date.now(),
+): Promise<TorneoState | null> {
+  const existing = await getTorneoState();
+  if (!existing) return null;
+  if (existing.phase !== PHASES.WAITING_OCTAVOS) return existing;
+
+  const editionStart = getEditionStartMsForWeekContaining(now);
+  if (now < editionStart) return existing;
+
+  return startTorneoOctavosFromSeed(now);
 }
 
 async function doAdvanceTorneoPhase(
@@ -235,8 +248,7 @@ async function advanceTorneoPhaseIfNeeded(
 
   if (state.phase === PHASES.WAITING_OCTAVOS) {
     const editionStart = getEditionStartMsForWeekContaining(now);
-    const inEditionWindow = now >= editionStart && now < getEditionEndMs(editionStart);
-    if (!inEditionWindow && state.phaseEnd > now - 2000) return state;
+    if (now < editionStart && state.phaseEnd > now - 2000) return state;
   } else if (state.phaseEnd > now - 2000) {
     return state;
   }
@@ -263,7 +275,7 @@ export async function healTorneo(options?: {
   restartIfEnded?: boolean;
 }): Promise<{ healed: boolean }> {
   const now = Date.now();
-  let existing = await getTorneoState();
+  const existing = await getTorneoState();
 
   if (!existing) {
     const waiting = createWaitingTorneoState(now);
@@ -315,12 +327,7 @@ export async function healTorneo(options?: {
       return { healed: false };
     }
 
-    if (Math.abs(existing.phaseEnd - editionStart) > 60_000) {
-      const waiting = createWaitingTorneoState(now);
-      await initTorneoState(waiting as Record<string, unknown>);
-      existing = (await getTorneoState()) ?? existing;
-    }
-    await advanceTorneoPhaseIfNeeded(existing, now);
+    await ensureTorneoOctavosStarted(now);
     return { healed: true };
   }
 

@@ -38,15 +38,17 @@ export function MatchSide({
       aria-label={`Votar por ${player}`}
       aria-pressed={votedFor}
       className={cn(
-        "relative block w-full rounded-xl border-2 border-lm-border bg-lm-bg3",
-        "px-2.5 py-2.5 text-center lm-focus-ring transition-all duration-200",
+        "group relative block w-full rounded-xl border-2 border-lm-border bg-lm-bg3",
+        "px-2.5 py-2.5 text-center lm-focus-ring transition-all duration-250",
         "max-md:px-2.5 max-md:py-3",
         !canVote && "lm-vote-disabled cursor-not-allowed",
-        canVote && "cursor-pointer hover:-translate-y-0.5",
+        canVote &&
+          "cursor-pointer hover:-translate-y-1 hover:border-[rgba(46,204,113,0.8)] hover:bg-[rgba(46,204,113,0.16)] hover:shadow-[0_0_28px_rgba(46,204,113,0.4)] hover:ring-2 hover:ring-[rgba(46,204,113,0.35)] active:translate-y-0 active:scale-[0.98]",
         isWinner &&
           "border-lm-gold2 bg-[rgba(232,184,75,0.12)] shadow-[0_0_16px_rgba(232,184,75,0.2)]",
         isLoser && "border-[rgba(255,71,87,0.35)] opacity-70",
-        votedFor && "border-lm-green2 bg-[rgba(46,204,113,0.1)]",
+        votedFor &&
+          "border-lm-green2 bg-[rgba(46,204,113,0.1)] shadow-[0_0_20px_rgba(46,204,113,0.25)]",
       )}
       onClick={() => onVote()}
     >
@@ -63,8 +65,10 @@ export function MatchSide({
       <div
         className={cn(
           "relative mx-auto mb-1.5 h-[50px] w-[50px] overflow-hidden rounded-full",
-          "border-2 border-lm-border bg-lm-bg2 text-[1.3rem]",
+          "border-2 border-lm-border bg-lm-bg2 text-[1.3rem] transition-all duration-250",
           "max-md:h-[46px] max-md:w-[46px]",
+          canVote &&
+            "group-hover:scale-105 group-hover:border-lm-green2 group-hover:shadow-[0_0_14px_rgba(46,204,113,0.55)]",
         )}
       >
         <CreatorImage
@@ -75,7 +79,12 @@ export function MatchSide({
           fallback={<CreatorIcon name={player} icon={info.icon} size={22} />}
         />
       </div>
-      <div className="mb-0.5 font-sans text-base font-bold tracking-tight text-lm-text max-md:text-lg">
+      <div
+        className={cn(
+          "mb-0.5 font-sans text-base font-bold tracking-tight text-lm-text transition-colors duration-250 max-md:text-lg",
+          canVote && "group-hover:text-white",
+        )}
+      >
         {player}
       </div>
       {showBars ? (
@@ -95,8 +104,14 @@ export function MatchSide({
           </div>
         </>
       ) : canVote ? (
-        <div className="mt-1 flex items-center justify-center gap-1 text-base font-bold text-lm-green2">
-          <Icon name="pointer" size={12} />
+        <div
+          className={cn(
+            "mt-1 flex items-center justify-center gap-1.5 rounded-lg border border-transparent px-2 py-1",
+            "text-base font-bold text-lm-green2 transition-all duration-250",
+            "group-hover:scale-105 group-hover:border-[rgba(46,204,113,0.5)] group-hover:bg-[rgba(46,204,113,0.2)] group-hover:text-white group-hover:shadow-[0_0_12px_rgba(46,204,113,0.35)]",
+          )}
+        >
+          <Icon name="pointer" size={14} className="transition-transform duration-250 group-hover:scale-110" />
           Votar
         </div>
       ) : null}

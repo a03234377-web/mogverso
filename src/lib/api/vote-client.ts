@@ -60,6 +60,27 @@ export async function voteTorneoApi(
   candidateName: string,
   recaptchaToken?: string,
 ): Promise<VoteApiResponse> {
+  try {
+    const res = await fetch("/api/vote/torneo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        matchId,
+        candidateName,
+        deviceId: getDeviceId(),
+        recaptchaToken,
+      }),
+    });
+    const data = (await res.json()) as VoteApiResponse & {
+      reason?: string;
+      error?: string;
+    };
+    if (res.ok && data.ok) return data;
+    const reason = data.reason ?? data.error ?? "vote_failed";
+    return { ok: false, reason, error: reason };
+  } catch (err) {
+    console.warn("[voteTorneoApi] fetch failed, trying server action:", err);
+  }
   return submitTorneoVote(matchId, candidateName, getDeviceId(), recaptchaToken);
 }
 

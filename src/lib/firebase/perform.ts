@@ -3,7 +3,7 @@ import { verifyRecaptchaToken } from "@/lib/security/recaptcha";
 import { isAdminConfigured } from "./admin";
 import { healEntryVote } from "./server-entry-vote";
 import { healRankvote } from "./server-rankvote";
-import { healTorneo } from "./server-torneo";
+import { ensureTorneoOctavosStarted, healTorneo } from "./server-torneo";
 import { castAuraVoteServer } from "./server-aura";
 import {
   castEntryVoteServer,
@@ -141,7 +141,16 @@ export async function performTorneoVote(
   const captcha = await verifyRecaptchaToken(recaptchaToken, ip);
   if (!captcha.ok) return { ok: false, reason: captcha.reason, error: captcha.reason };
 
-  const result = await castTorneoVoteServer(matchId, candidateName, deviceId, ip);
+  let result = await castTorneoVoteServer(matchId, candidateName, deviceId, ip);
+  if (
+    !result.ok &&
+    (result.reason === "wrong_phase" ||
+      result.reason === "match_not_found" ||
+      result.reason === "no_state")
+  ) {
+    await ensureTorneoOctavosStarted();
+    result = await castTorneoVoteServer(matchId, candidateName, deviceId, ip);
+  }
   if (!result.ok) return { ok: false, reason: result.reason, error: result.reason };
   return { ok: true };
 }

@@ -507,6 +507,95 @@
   background: rgba(232, 184, 75, 0.18);
 }
 
+.torneo-bracket-match--orange {
+  border-color: rgba(255, 107, 53, 0.4);
+  background: rgba(255, 107, 53, 0.06);
+}
+
+.torneo-bracket-match--green {
+  border-color: rgba(46, 204, 113, 0.4);
+  background: rgba(46, 204, 113, 0.06);
+}
+
+.torneo-bracket-match--purple {
+  border-color: rgba(168, 85, 247, 0.4);
+  background: rgba(168, 85, 247, 0.06);
+}
+
+.torneo-bracket-match--gold {
+  border-color: rgba(232, 184, 75, 0.45);
+  background: rgba(232, 184, 75, 0.08);
+}
+
+.torneo-bracket-match--pending {
+  opacity: 0.6;
+}
+
+.torneo-bracket-match--voting {
+  border-width: 1.5px;
+  box-shadow: 0 0 16px rgba(46, 204, 113, 0.18);
+}
+
+.torneo-bracket-match--clickable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 20px rgba(46, 204, 113, 0.28);
+}
+
+.torneo-bracket-match--clickable:focus-visible {
+  outline: 2px solid var(--color-lm-green2);
+  outline-offset: 2px;
+}
+
+.torneo-bracket-match--clickable {
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.torneo-bracket-advance--orange {
+  border-color: rgba(255, 107, 53, 0.25);
+  color: #ff6b35;
+}
+
+.torneo-bracket-advance--green {
+  border-color: rgba(46, 204, 113, 0.25);
+  color: var(--color-lm-green2);
+}
+
+.torneo-bracket-advance--purple {
+  border-color: rgba(168, 85, 247, 0.25);
+  color: var(--color-lm-purple);
+}
+
+.torneo-bracket-advance--gold {
+  border-color: rgba(232, 184, 75, 0.3);
+  color: var(--color-lm-gold);
+}
+
+.torneo-bracket-slot--voted {
+  border-color: rgba(46, 204, 113, 0.55);
+  background: rgba(46, 204, 113, 0.14);
+}
+
+.torneo-bracket-slot--compact {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+}
+
+.torneo-match-highlight {
+  animation: torneo-match-pulse 1.8s ease-out;
+}
+
+@keyframes torneo-match-pulse {
+  0%,
+  15% {
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+  }
+}
+
 /* ── Consejo: categoría ── */
 .consejo-cat--piel {
   color: #e8b84b;

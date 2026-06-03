@@ -17,12 +17,10 @@ import {
 } from "@/features/torneo/components/torneo-hero-content";
 import { TorneoEditionCalendar } from "@/features/torneo/components/TorneoEditionCalendar";
 import { useTorneo } from "@/features/torneo/hooks/useTorneo";
-import { healTorneoApi } from "@/lib/api/vote-client";
-import { PHASES } from "@/features/torneo/data/torneo-players";
 import { getUpcomingTorneoStartMs } from "@/lib/torneo-schedule";
 
 export function TorneoLiveView() {
-  const { state, loading, vote, getLocalVote } = useTorneo(true);
+  const { state, loading, voting, voteError, vote, getLocalVote } = useTorneo(true);
   const [, setTick] = useState(0);
   const [now, setNow] = useState(() => Date.now());
   const refresh = useCallback(() => setTick((t) => t + 1), []);
@@ -52,16 +50,27 @@ export function TorneoLiveView() {
         />
       </div>
 
+      {voteError ? (
+        <p
+          className="mx-auto mb-4 max-w-[860px] px-5 text-center text-sm font-semibold text-lm-red2 max-md:px-3"
+          role="alert"
+        >
+          {voteError}
+        </p>
+      ) : null}
+      {voting ? (
+        <p className="mx-auto mb-4 max-w-[860px] px-5 text-center text-sm text-lm-text2 max-md:px-3">
+          Registrando voto…
+        </p>
+      ) : null}
+
       <TorneoMatchesSection
         state={state}
         getLocalVote={getLocalVote}
+        votingDisabled={voting}
         onVote={async (matchId, name) => {
-          if (state?.phase === PHASES.WAITING_OCTAVOS) {
-            await healTorneoApi();
-            refresh();
-          }
-          await vote(matchId, name);
-          refresh();
+          const result = await vote(matchId, name);
+          if (result.ok) refresh();
         }}
       />
 
@@ -71,7 +80,7 @@ export function TorneoLiveView() {
             Cuadro del Torneo
           </IconLabel>
         </SectionTitle>
-        <TorneoBracket state={state} />
+        <TorneoBracket state={state} getLocalVote={getLocalVote} />
       </div>
     </ActivePage>
   );
