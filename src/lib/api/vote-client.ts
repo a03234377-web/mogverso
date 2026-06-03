@@ -3,7 +3,11 @@
 import { submitAuraVote } from "@/features/aura/actions";
 import { healEntryVoteAction, submitEntryVote } from "@/features/rankings/actions";
 import { healRankvoteAction, submitRankVote } from "@/features/rankvote/actions";
-import { healTorneoAction, submitTorneoVote } from "@/features/torneo/actions";
+import {
+  fetchTorneoMyVotesAction,
+  healTorneoAction,
+  submitTorneoVote,
+} from "@/features/torneo/actions";
 import type { AuraVoteKind } from "@/types/aura";
 import type { ActionResult } from "@/lib/firebase/perform";
 import { getDeviceId } from "./device-id";
@@ -101,9 +105,17 @@ export async function fetchTorneoMyVotesApi(
       votes?: Record<string, string>;
     };
     if (res.ok && data.ok && data.votes) return data.votes;
-  } catch (err) {
-    console.warn("[fetchTorneoMyVotesApi] failed:", err);
+  } catch {
+    /* fetch puede fallar (offline, bloqueador); probamos server action */
   }
+
+  try {
+    const result = await fetchTorneoMyVotesAction(getDeviceId(), editionStartMs);
+    if (result.ok && result.votes) return result.votes;
+  } catch {
+    /* sin admin en local: localStorage sigue siendo fallback */
+  }
+
   return {};
 }
 

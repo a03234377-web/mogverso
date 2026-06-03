@@ -30,21 +30,26 @@ function useTorneoPhase() {
 
 export function TorneoPage() {
   const [now, setNow] = useState(() => Date.now());
+  const [promoReady, setPromoReady] = useState(false);
   const phase = useTorneoPhase();
   const showComingSoon = shouldShowTorneoComingSoon(now, phase);
   const { open: promoOpen, close: closePromo } = useTorneoPromoModal();
 
   useEffect(() => {
-    void healTorneoApi().catch((err) => {
-      console.error("[Torneo] heal on mount:", err);
+    setPromoReady(true);
+  }, []);
+
+  useEffect(() => {
+    void healTorneoApi().catch(() => {
+      /* fetch/API puede fallar sin admin; el hook useTorneo reintenta heal si hace falta */
     });
   }, []);
 
   useEffect(() => {
     if (!isTorneoEditionLive(now) || showComingSoon) return;
     const kick = () => {
-      void healTorneoApi().catch((err) => {
-        console.error("[Torneo] heal while live:", err);
+      void healTorneoApi().catch(() => {
+        /* silencioso: heal periódico es best-effort */
       });
     };
     kick();
@@ -72,7 +77,9 @@ export function TorneoPage() {
   return (
     <>
       {showComingSoon ? <TorneoComingSoon /> : <TorneoLiveView />}
-      <TorneoPromoModal open={promoOpen} onClose={closePromo} />
+      {promoReady ? (
+        <TorneoPromoModal open={promoOpen} onClose={closePromo} />
+      ) : null}
     </>
   );
 }
