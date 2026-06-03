@@ -3,6 +3,7 @@
 import { Icon } from "@/components/icons";
 import type { IconName } from "@/types/icons";
 import { getPlayerByName, PHASES } from "@/features/torneo/data/torneo-players";
+import { getTorneoMatchVoteStats } from "@/features/torneo/lib/torneo-match-votes";
 import { MatchSide } from "./MatchSide";
 import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 import { cn } from "@/lib/cn";
@@ -28,11 +29,7 @@ export function MatchCard({
 }) {
   const p1 = getPlayerByName(match.p1);
   const p2 = getPlayerByName(match.p2);
-  const v1 = match.votes?.[match.p1] ?? 0;
-  const v2 = match.votes?.[match.p2] ?? 0;
-  const total = Math.max(1, v1 + v2);
-  const pct1 = Math.round((v1 / total) * 100);
-  const pct2 = 100 - pct1;
+  const { v1, v2, pct1, pct2, leader, isTie, total } = getTorneoMatchVoteStats(match);
   const isResolved = !!(match.resolved && match.winner);
   const isVotingPhase =
     (state.phase === PHASES.OCTAVOS_VOTING && round === "octavos") ||
@@ -41,7 +38,15 @@ export function MatchCard({
     (state.phase === PHASES.FINAL_VOTING && round === "final");
   const canVote = (canVoteOverride ?? isVotingPhase) && !isResolved && !myVote;
   const showLiveBadge = previewLive || canVoteOverride === true || isVotingPhase;
-  const showBars = isResolved || !!myVote;
+  const showBars = isResolved || total > 0;
+
+  function sideHighlight(player: string) {
+    if (isResolved && match.winner === player) return "winner" as const;
+    if (isResolved) return "loser" as const;
+    if (myVote === player) return "voted" as const;
+    if (!isResolved && leader === player && total > 0) return "leading" as const;
+    return null;
+  }
   const roundIcon: IconName =
     round === "octavos"
       ? "gamepad-2"
@@ -115,24 +120,28 @@ export function MatchCard({
           votes={v1}
           showBars={showBars}
           canVote={canVote}
-          highlight={
-            isResolved && match.winner === match.p1
-              ? "winner"
-              : isResolved
-                ? "loser"
-                : myVote === match.p1
-                  ? "voted"
-                  : null
-          }
+          highlight={sideHighlight(match.p1)}
           onVote={() => onVote(match.p1)}
         />
         <div
           className={cn(
-            "shrink-0 bg-clip-text lm-type-score text-xl text-transparent",
-            "bg-[linear-gradient(135deg,var(--color-lm-green2),var(--color-lm-gold))]",
+            "flex shrink-0 flex-col items-center gap-0.5",
+            showLiveBadge && !isResolved && "min-w-[3rem]",
           )}
         >
-          VS
+          <div
+            className={cn(
+              "shrink-0 bg-clip-text lm-type-score text-xl text-transparent",
+              "bg-[linear-gradient(135deg,var(--color-lm-green2),var(--color-lm-gold))]",
+            )}
+          >
+            VS
+          </div>
+          {showBars && total > 0 ? (
+            <span className="text-center text-[11px] font-bold text-lm-text2">
+              {v1}–{v2}
+            </span>
+          ) : null}
         </div>
         <MatchSide
           player={match.p2}
@@ -141,15 +150,7 @@ export function MatchCard({
           votes={v2}
           showBars={showBars}
           canVote={canVote}
-          highlight={
-            isResolved && match.winner === match.p2
-              ? "winner"
-              : isResolved
-                ? "loser"
-                : myVote === match.p2
-                  ? "voted"
-                  : null
-          }
+          highlight={sideHighlight(match.p2)}
           onVote={() => onVote(match.p2)}
         />
       </div>
@@ -159,6 +160,28 @@ export function MatchCard({
           <strong>{myVote}</strong>
         </div>
       )}
+      {!isResolved && showLiveBadge && total > 0 ? (
+        <div
+          className={cn(
+            "mt-2 rounded-[10px] border px-3 py-2 text-center text-sm font-semibold",
+            leader
+              ? "border-[rgba(46,204,113,0.35)] bg-[rgba(46,204,113,0.1)] text-lm-green2"
+              : "border-lm-border bg-lm-bg3 text-lm-text2",
+          )}
+        >
+          {isTie ? (
+            <>Empate · {v1} votos cada uno</>
+          ) : (
+            <>
+              <Icon name="trending-up" size={13} className="mr-1 inline" />
+              Va ganando <strong className="text-white">{leader}</strong>
+              <span className="mt-0.5 block text-xs font-bold text-lm-text2">
+                {v1} – {v2} votos
+              </span>
+            </>
+          )}
+        </div>
+      ) : null}
       {isResolved && match.winner && (
         <div
           className={cn(

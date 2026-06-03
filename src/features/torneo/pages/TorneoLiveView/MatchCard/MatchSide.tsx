@@ -6,7 +6,7 @@ import type { CreatorPhoto } from "@/assets/creators";
 import type { IconName } from "@/types/icons";
 import { cn } from "@/lib/cn";
 
-export type MatchSideHighlight = "winner" | "loser" | "voted";
+export type MatchSideHighlight = "winner" | "loser" | "voted" | "leading";
 
 export function MatchSide({
   player,
@@ -30,6 +30,7 @@ export function MatchSide({
   const isWinner = highlight === "winner";
   const isLoser = highlight === "loser";
   const votedFor = highlight === "voted";
+  const isLeading = highlight === "leading";
 
   return (
     <button
@@ -49,9 +50,21 @@ export function MatchSide({
         isLoser && "border-[rgba(255,71,87,0.35)] opacity-70",
         votedFor &&
           "border-lm-green2 bg-[rgba(46,204,113,0.1)] shadow-[0_0_20px_rgba(46,204,113,0.25)]",
+        isLeading &&
+          "border-[rgba(46,204,113,0.55)] bg-[rgba(46,204,113,0.08)] shadow-[0_0_12px_rgba(46,204,113,0.2)]",
       )}
       onClick={() => onVote()}
     >
+      {isLeading && (
+        <div
+          className={cn(
+            "absolute -top-1.5 -right-1.5 flex h-[22px] w-[22px] items-center justify-center",
+            "rounded-full bg-lm-green2 text-black",
+          )}
+        >
+          <Icon name="trending-up" size={12} />
+        </div>
+      )}
       {isWinner && (
         <div
           className={cn(
@@ -112,6 +125,10 @@ export function MatchSide({
         >
           <Icon name="pointer" size={14} />
           Votar
+        </div>
+      ) : votes > 0 || showBars ? (
+        <div className="mt-1 text-base font-bold text-lm-text2">
+          {votes} voto{votes !== 1 ? "s" : ""}
         </div>
       ) : null}
     </button>

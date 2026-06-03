@@ -5,6 +5,10 @@ import { CreatorImage } from "@/components/CreatorImage";
 import { CreatorIcon, Icon } from "@/components/icons";
 import { getPlayerByName, PHASES } from "@/features/torneo/data/torneo-players";
 import { useTorneoBracketPreview } from "@/features/torneo/hooks/useTorneoBracketPreview";
+import {
+  getTorneoMatchVoteStats,
+  getTorneoPlayerVotes,
+} from "@/features/torneo/lib/torneo-match-votes";
 import { CUARTOS_IDS, OCTAVOS_IDS, SEMIS_IDS } from "@/lib/torneo-bracket";
 import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 import { cn } from "@/lib/cn";
@@ -280,6 +284,10 @@ function BracketMatchGroup({
   const player2 = match?.p2 ?? p2;
   const resolved = match?.resolved && match.winner;
   const clickable = votingActive && !!onVoteClick;
+  const stats = match ? getTorneoMatchVoteStats(match) : null;
+  const votes1 = match && player1 ? getTorneoPlayerVotes(match, player1) : 0;
+  const votes2 = match && player2 ? getTorneoPlayerVotes(match, player2) : 0;
+  const showVotes = !!match && (stats?.total ?? 0) > 0;
 
   const handleClick = () => {
     if (!clickable) return;
@@ -328,6 +336,13 @@ function BracketMatchGroup({
             <Icon name="circle-check" size={9} />
             Votado
           </span>
+        ) : showVotes && stats?.leader ? (
+          <span
+            className="max-w-[4.5rem] truncate text-[9px] font-bold text-lm-green2"
+            title={`Va ganando ${stats.leader}`}
+          >
+            ↑ {stats.leader}
+          </span>
         ) : null}
       </div>
 
@@ -344,7 +359,9 @@ function BracketMatchGroup({
           <BracketSlot
             tone={tone}
             name={player1}
+            votes={showVotes ? votes1 : undefined}
             winner={resolved ? match!.winner === player1 : false}
+            leading={!resolved && stats?.leader === player1 && showVotes}
             voted={myVote === player1}
             compact
           />
@@ -354,12 +371,14 @@ function BracketMatchGroup({
               votingActive ? "text-lm-green2" : "text-lm-text2",
             )}
           >
-            VS
+            {showVotes ? `${votes1}–${votes2}` : "VS"}
           </div>
           <BracketSlot
             tone={tone}
             name={player2}
+            votes={showVotes ? votes2 : undefined}
             winner={resolved ? match!.winner === player2 : false}
+            leading={!resolved && stats?.leader === player2 && showVotes}
             voted={myVote === player2}
             compact
           />
@@ -375,6 +394,27 @@ function BracketMatchGroup({
         <span className="truncate">{advanceLabel}</span>
       </div>
 
+      {showVotes && stats && !resolved ? (
+        <p className="mt-1 text-center text-[9px] font-semibold text-lm-text2">
+          {stats.isTie ? (
+            <>Empate · {stats.v1} votos</>
+          ) : (
+            <>
+              <Icon
+                name="trending-up"
+                size={9}
+                className="mr-0.5 inline text-lm-green2"
+              />
+              <span className="text-lm-green2">Gana {stats.leader}</span>
+              <span className="text-lm-text2">
+                {" "}
+                · {stats.v1}–{stats.v2}
+              </span>
+            </>
+          )}
+        </p>
+      ) : null}
+
       {clickable ? (
         <p className="mt-1 text-center text-[9px] font-semibold text-lm-green2 opacity-90">
           Toca para votar
@@ -387,7 +427,9 @@ function BracketMatchGroup({
 function BracketSlot({
   name,
   winner,
+  leading,
   voted,
+  votes,
   pending,
   gold,
   finalPending,
@@ -396,7 +438,9 @@ function BracketSlot({
 }: {
   name?: string;
   winner?: boolean;
+  leading?: boolean;
   voted?: boolean;
+  votes?: number;
   pending?: boolean;
   gold?: boolean;
   finalPending?: boolean;
@@ -434,6 +478,7 @@ function BracketSlot({
         compact && "torneo-bracket-slot--compact",
         `torneo-bracket-slot--${tone}`,
         winner && "torneo-bracket-slot--winner",
+        leading && "torneo-bracket-slot--leading",
         voted && "torneo-bracket-slot--voted",
         gold && "torneo-bracket-slot--champion",
       )}
@@ -470,8 +515,22 @@ function BracketSlot({
           p.name
         )}
       </div>
+      {typeof votes === "number" ? (
+        <span
+          className={cn(
+            "shrink-0 rounded-md px-1.5 py-px text-[10px] font-black tabular-nums",
+            leading
+              ? "bg-[rgba(46,204,113,0.2)] text-lm-green2"
+              : "bg-white/8 text-lm-text2",
+          )}
+        >
+          {votes}
+        </span>
+      ) : null}
       {voted ? (
         <Icon name="circle-check" size={12} className="shrink-0 text-lm-green2" />
+      ) : leading ? (
+        <Icon name="trending-up" size={11} className="shrink-0 text-lm-green2" />
       ) : null}
     </div>
   );
