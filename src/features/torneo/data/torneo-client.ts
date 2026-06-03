@@ -12,13 +12,11 @@ async function readTorneoState(fb: FirebaseBridge): Promise<TorneoState | null> 
   return snap.exists() ? (snap.val() as TorneoState) : null;
 }
 
-/** Asegura estado torneo vía heal server-side y devuelve lectura RTDB. */
+/** Asegura estado torneo vía heal server-side solo cuando hace falta. */
 export async function ensureTorneoState(
   fb: FirebaseBridge,
   now = Date.now(),
 ): Promise<TorneoState> {
-  await healTorneoApi();
-
   let existing = await readTorneoState(fb);
   if (!existing) {
     await healTorneoApi();

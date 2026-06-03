@@ -30,7 +30,8 @@ async function getTorneoState(): Promise<TorneoState | null> {
   return snap.exists() ? (snap.val() as TorneoState) : null;
 }
 
-async function initTorneoState(state: Record<string, unknown>) {
+/** Full reset: new waiting/edition — clears vote dedup records. */
+async function resetTorneoState(state: Record<string, unknown>) {
   const db = getAdminDatabase();
   await db.ref("torneoVotes").set(null);
   await db.ref("torneo/state").set(state);
@@ -74,11 +75,14 @@ export async function startTorneoOctavosFromSeed(
   const seedNames = await fetchTorneoSeedNames();
   const editionStartMs = getEditionStartMsForWeekContaining(now);
   const fresh = buildOctavosTorneoState(now, seedNames, editionStartMs);
-  await initTorneoState(fresh as Record<string, unknown>);
+  await resetTorneoState(fresh as Record<string, unknown>);
   return fresh;
 }
 
-/** Tras la hora de inicio, pasar de `waiting_octavos` a octavos con top 16 (RTDB). */
+/**
+ * Tras la hora de inicio, pasar de `waiting_octavos` a octavos (RTDB).
+ * Transición atómica: no borra votos ni reinicia si otro request ya avanzó la fase.
+ */
 export async function ensureTorneoOctavosStarted(
   now = Date.now(),
 ): Promise<TorneoState | null> {
@@ -89,7 +93,36 @@ export async function ensureTorneoOctavosStarted(
   const editionStart = getEditionStartMsForWeekContaining(now);
   if (now < editionStart) return existing;
 
-  return startTorneoOctavosFromSeed(now);
+  const db = getAdminDatabase();
+  const phaseRef = db.ref("torneo/state/phase");
+  let shouldWrite = false;
+
+  const tx = await phaseRef.transaction((cur) => {
+    if (cur !== PHASES.WAITING_OCTAVOS) return cur;
+    shouldWrite = true;
+    return PHASES.OCTAVOS_VOTING;
+  });
+
+  if (!shouldWrite || !tx.committed) {
+    return getTorneoState();
+  }
+
+  const seedNames = await fetchTorneoSeedNames();
+  const fresh = buildOctavosTorneoState(now, seedNames, editionStart);
+
+  await db.ref("torneo/state").update({
+    phase: fresh.phase,
+    phaseStart: fresh.phaseStart,
+    phaseEnd: fresh.phaseEnd,
+    editionStartMs: fresh.editionStartMs,
+    seedNames: fresh.seedNames,
+    matches: fresh.matches,
+    createdAt: fresh.createdAt,
+    octavosWinners: null,
+    cuartosWinners: null,
+  });
+
+  return getTorneoState();
 }
 
 async function doAdvanceTorneoPhase(
@@ -97,8 +130,7 @@ async function doAdvanceTorneoPhase(
   now: number,
 ): Promise<TorneoState> {
   if (state.phase === PHASES.WAITING_OCTAVOS) {
-    const fresh = await startTorneoOctavosFromSeed(now);
-    return fresh;
+    return (await ensureTorneoOctavosStarted(now)) ?? state;
   }
 
   if (state.phase === PHASES.OCTAVOS_VOTING) {
@@ -279,7 +311,7 @@ export async function healTorneo(options?: {
 
   if (!existing) {
     const waiting = createWaitingTorneoState(now);
-    await initTorneoState(waiting as Record<string, unknown>);
+    await resetTorneoState(waiting as Record<string, unknown>);
     return { healed: true };
   }
 
@@ -287,7 +319,7 @@ export async function healTorneo(options?: {
 
   if (shouldForceTorneoWaitingBeforeStart(now, existing.phase)) {
     const waiting = createWaitingTorneoState(now);
-    await initTorneoState(waiting as Record<string, unknown>);
+    await resetTorneoState(waiting as Record<string, unknown>);
     return { healed: true };
   }
 
@@ -297,13 +329,13 @@ export async function healTorneo(options?: {
       Math.abs(existing.phaseEnd - editionStart) > 60_000)
   ) {
     const waiting = createWaitingTorneoState(now);
-    await initTorneoState(waiting as Record<string, unknown>);
+    await resetTorneoState(waiting as Record<string, unknown>);
     return { healed: true };
   }
 
   if (options?.restartIfEnded && existing.phase === PHASES.TORNEO_ENDED) {
     const waiting = createWaitingTorneoState(now);
-    await initTorneoState(waiting as Record<string, unknown>);
+    await resetTorneoState(waiting as Record<string, unknown>);
     return { healed: true };
   }
 
@@ -312,7 +344,7 @@ export async function healTorneo(options?: {
     (!existing.semisMatches || Object.keys(existing.semisMatches).length === 0)
   ) {
     const waiting = createWaitingTorneoState(now);
-    await initTorneoState(waiting as Record<string, unknown>);
+    await resetTorneoState(waiting as Record<string, unknown>);
     return { healed: true };
   }
 
@@ -321,7 +353,7 @@ export async function healTorneo(options?: {
     if (now < editionStart) {
       if (Math.abs(existing.phaseEnd - editionStart) > 60_000) {
         const waiting = createWaitingTorneoState(now);
-        await initTorneoState(waiting as Record<string, unknown>);
+        await resetTorneoState(waiting as Record<string, unknown>);
         return { healed: true };
       }
       return { healed: false };
@@ -336,17 +368,17 @@ export async function healTorneo(options?: {
 }
 
 export async function adminInitTorneo(state: Record<string, unknown>) {
-  await initTorneoState(state);
+  await resetTorneoState(state);
 }
 
 export async function adminResetTorneo() {
   const waiting = createWaitingTorneoState(Date.now());
-  await initTorneoState(waiting as Record<string, unknown>);
+  await resetTorneoState(waiting as Record<string, unknown>);
   return waiting;
 }
 
 export {
   getTorneoState,
-  initTorneoState,
+  resetTorneoState as initTorneoState,
   startTorneoOctavosFromSeed as getInitialTorneoState,
 };

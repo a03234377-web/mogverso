@@ -8,7 +8,12 @@ import {
   ensureTorneoState,
 } from "@/features/torneo/data/torneo-client";
 import { PHASES } from "@/features/torneo/data/torneo-players";
-import { healTorneoApi, voteTorneoApi } from "@/lib/api/vote-client";
+import { patchTorneoVoteCount } from "@/features/torneo/lib/patch-torneo-vote";
+import { healTorneoApi, voteTorneoApi, fetchTorneoMyVotesApi } from "@/lib/api/vote-client";
+import {
+  torneoLocalVoteStorageKey,
+  torneoLocalVoteStorageKeyLegacy,
+} from "@/lib/torneo-vote-keys";
 import {
   getEditionStartMsForWeekContaining,
   getTorneoWaitingTargetMs,
@@ -52,6 +57,7 @@ export function useTorneo(active: boolean) {
   const { getToken } = useRecaptcha("torneo_vote");
   const [voteError, setVoteError] = useState<string | null>(null);
   const [voting, setVoting] = useState(false);
+  const [serverVotes, setServerVotes] = useState<Record<string, string>>({});
   const [{ state, loading }, dispatch] = useReducer(
     torneoHookReducer,
     initialTorneoHookState,
@@ -115,6 +121,23 @@ export function useTorneo(active: boolean) {
   }, [fb, active, applyState]);
 
   useEffect(() => {
+    const editionStartMs = state?.editionStartMs;
+    if (!active || !editionStartMs) {
+      setServerVotes({});
+      return;
+    }
+
+    let cancelled = false;
+    void fetchTorneoMyVotesApi(editionStartMs).then((votes) => {
+      if (!cancelled) setServerVotes(votes);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [active, state?.editionStartMs]);
+
+  useEffect(() => {
     if (!fb || !active || !state) return;
 
     const tick = async () => {
@@ -151,22 +174,34 @@ export function useTorneo(active: boolean) {
 
   const getTorneoVoteKey = useCallback(
     (matchId: string) => {
-      const createdAt = state?.createdAt ?? 0;
-      return `torneoVote_${createdAt}_${matchId}`;
+      const editionStartMs =
+        state?.editionStartMs ?? getEditionStartMsForWeekContaining(Date.now());
+      return torneoLocalVoteStorageKey(editionStartMs, matchId);
     },
-    [state?.createdAt],
+    [state?.editionStartMs],
   );
 
   const getLocalVote = useCallback(
     (matchId: string) => {
-      if (typeof window === "undefined") return null;
+      if (typeof window === "undefined") return serverVotes[matchId] ?? null;
+
       try {
-        return localStorage.getItem(getTorneoVoteKey(matchId));
+        const fromStorage = localStorage.getItem(getTorneoVoteKey(matchId));
+        if (fromStorage) return fromStorage;
+
+        const legacyKey = torneoLocalVoteStorageKeyLegacy(
+          state?.createdAt ?? 0,
+          matchId,
+        );
+        const legacy = state?.createdAt ? localStorage.getItem(legacyKey) : null;
+        if (legacy) return legacy;
       } catch {
-        return null;
+        /* quota / private mode */
       }
+
+      return serverVotes[matchId] ?? null;
     },
-    [getTorneoVoteKey],
+    [getTorneoVoteKey, serverVotes, state?.createdAt],
   );
 
   const vote = useCallback(
@@ -194,6 +229,15 @@ export function useTorneo(active: boolean) {
         } catch {
           /* quota / private mode */
         }
+        setServerVotes((prev) => ({ ...prev, [matchId]: playerName }));
+
+        if (state) {
+          dispatch({
+            type: "patch",
+            payload: patchTorneoVoteCount(state, matchId, playerName),
+          });
+        }
+
         if (fb) {
           const snap = await fb.get(fb.ref(fb.db, "torneo/state"));
           if (snap.exists()) {
@@ -205,7 +249,7 @@ export function useTorneo(active: boolean) {
         setVoting(false);
       }
     },
-    [fb, getToken, getTorneoVoteKey],
+    [fb, getToken, getTorneoVoteKey, state],
   );
 
   const resetTorneo = useCallback(async () => {
