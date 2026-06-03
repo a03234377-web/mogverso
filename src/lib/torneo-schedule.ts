@@ -9,9 +9,10 @@ import {
 
 export const TORNEO_START_HOUR = 22;
 export const TORNEO_START_MINUTE = 30;
-/** 0=dom … 3=miércoles (inicio octavos). */
+/** 0=dom … 3=miércoles (inicio octavos, 22:30 Madrid). */
 export const TORNEO_START_WEEKDAY = 3;
 export const TORNEO_PHASE_DURATION_MS = 24 * 60 * 60 * 1000;
+const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
 
 const TORNEO_DAY_NAME_FORMATTER = new Intl.DateTimeFormat("es-ES", {
   timeZone: SPAIN_TIMEZONE,
@@ -41,22 +42,12 @@ export type TorneoScheduleMilestone = {
   status: "past" | "active" | "upcoming";
 };
 
-/** Próximo miércoles 22:30 (Europe/Madrid). Si hoy es miércoles antes de las 22:30, devuelve hoy. */
-export function getUpcomingTorneoStartMs(from = Date.now()): number {
+/** Instant UTC del miércoles (día de inicio) 22:30 de la semana que contiene `from`. */
+export function getEditionStartMsForWeekContaining(from = Date.now()): number {
   const weekday = getMadridWeekday(from);
-  const start = getMadridParts(from);
-  let daysUntilStart: number;
-
-  if (weekday === TORNEO_START_WEEKDAY) {
-    const pastStart =
-      start.hour > TORNEO_START_HOUR ||
-      (start.hour === TORNEO_START_HOUR && start.minute >= TORNEO_START_MINUTE);
-    daysUntilStart = pastStart ? 7 : 0;
-  } else {
-    daysUntilStart = (TORNEO_START_WEEKDAY - weekday + 7) % 7;
-  }
-
-  const target = addDaysMadrid(start.year, start.month, start.day, daysUntilStart);
+  const parts = getMadridParts(from);
+  const daysBack = (weekday - TORNEO_START_WEEKDAY + 7) % 7;
+  const target = addDaysMadrid(parts.year, parts.month, parts.day, -daysBack);
   return madridLocalToUtc(
     target.year,
     target.month,
@@ -66,8 +57,36 @@ export function getUpcomingTorneoStartMs(from = Date.now()): number {
   );
 }
 
-export function getTorneoEditionEndMs(editionStartMs: number): number {
+/** Fin de la edición en curso (sábado 22:30 si el arranque es miércoles, 4×24 h). */
+export function getEditionEndMs(editionStartMs: number): number {
   return editionStartMs + TORNEO_PHASE_DURATION_MS * 4;
+}
+
+/**
+ * Próximo arranque de edición (cuenta atrás / waiting).
+ * Si ya pasó el miércoles 22:30 de esta semana pero la edición sigue en curso, devuelve ese miércoles
+ * (no salta +7 días — eso impedía el auto-arranque).
+ */
+export function getUpcomingTorneoStartMs(from = Date.now()): number {
+  const thisWeekStart = getEditionStartMsForWeekContaining(from);
+  const thisWeekEnd = getEditionEndMs(thisWeekStart);
+
+  if (from < thisWeekStart) return thisWeekStart;
+  if (from < thisWeekEnd) return thisWeekStart;
+
+  return thisWeekStart + MS_PER_WEEK;
+}
+
+/** La edición semanal activa ahora (null si estamos entre ediciones). */
+export function getActiveEditionStartMs(now = Date.now()): number | null {
+  const start = getEditionStartMsForWeekContaining(now);
+  if (now >= start && now < getEditionEndMs(start)) return start;
+  return null;
+}
+
+/** @deprecated Usar getEditionEndMs */
+export function getTorneoEditionEndMs(editionStartMs: number): number {
+  return getEditionEndMs(editionStartMs);
 }
 
 export function formatTorneoStartDate(ms: number) {
@@ -92,7 +111,7 @@ const MILESTONE_META: {
   { id: "octavos", label: "Octavos de Final", weekdayShort: "Mié", dayOffset: 0 },
   { id: "cuartos", label: "Cuartos de Final", weekdayShort: "Jue", dayOffset: 1 },
   { id: "semis", label: "Semifinales", weekdayShort: "Vie", dayOffset: 2 },
-  { id: "final", label: "Gran Final", weekdayShort: "Dom", dayOffset: 3 },
+  { id: "final", label: "Gran Final", weekdayShort: "Sáb", dayOffset: 3 },
 ];
 
 export function getTorneoPhaseSchedule(
