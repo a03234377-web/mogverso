@@ -17,7 +17,7 @@ const VOTE_ERROR_MESSAGES: Record<string, string> = {
   recaptcha_low_score: "Actividad sospechosa detectada. Inténtalo más tarde.",
   already_voted: "Ya has votado en este combate (1 voto por dispositivo e IP).",
   wrong_phase:
-    "El servidor no pasó a octavos en Firebase (sigue en espera). Recarga la página; si persiste, en Vercel revisa FIREBASE_SERVICE_ACCOUNT_JSON o usa «Iniciar octavos ahora» en /admin/torneo.",
+    "El servidor no pasó a octavos en Firebase (sigue en espera). Recarga la página; si persiste, revisa FIREBASE_SERVICE_ACCOUNT_JSON en Vercel.",
   match_not_found: "Este combate aún no está activo en el servidor. Recarga la página.",
   phase_ended: "Esta fase del torneo ya terminó.",
   no_state: "Estado del torneo no disponible. Recarga la página.",

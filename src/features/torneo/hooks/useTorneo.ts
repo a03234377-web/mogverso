@@ -157,8 +157,9 @@ export function useTorneo(active: boolean) {
       const editionStart = getEditionStartMsForWeekContaining(now);
       const waitingPastStart =
         state.phase === PHASES.WAITING_OCTAVOS && now >= editionStart;
+      const phaseExpired = state.phaseEnd <= now - 2000;
 
-      if (!waitingPastStart && state.phaseEnd > now - 2000) return;
+      if (!waitingPastStart && !phaseExpired) return;
 
       if (waitingPastStart) {
         await healTorneoApi();
@@ -176,11 +177,15 @@ export function useTorneo(active: boolean) {
       }
     };
 
+    const now = Date.now();
+    const editionStart = getEditionStartMsForWeekContaining(now);
+    const waitingPastStart =
+      state.phase === PHASES.WAITING_OCTAVOS && now >= editionStart;
+    const phaseExpired = state.phaseEnd <= now - 2000;
+    const intervalMs = waitingPastStart || phaseExpired ? 15_000 : 60_000;
+
     void tick();
-    const id = setInterval(
-      () => void tick(),
-      state.phase === PHASES.WAITING_OCTAVOS ? 5000 : 1000,
-    );
+    const id = setInterval(() => void tick(), intervalMs);
     return () => clearInterval(id);
   }, [fb, active, state?.phase, state?.phaseEnd, state?.createdAt]);
 

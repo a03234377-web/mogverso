@@ -16,6 +16,7 @@ export function MatchSide({
   showBars,
   canVote,
   highlight,
+  votedInMatch,
   onVote,
 }: {
   player: string;
@@ -25,6 +26,7 @@ export function MatchSide({
   showBars: boolean;
   canVote: boolean;
   highlight?: MatchSideHighlight | null;
+  votedInMatch?: boolean;
   onVote: () => void;
 }) {
   const isWinner = highlight === "winner";
@@ -42,28 +44,40 @@ export function MatchSide({
         "group relative block w-full rounded-xl border-2 border-lm-border bg-lm-bg3",
         "px-2.5 py-2.5 text-center lm-focus-ring transition-all duration-250",
         "max-md:px-2.5 max-md:py-3",
-        !canVote && "lm-vote-disabled cursor-not-allowed",
+        !canVote && votedInMatch && "cursor-not-allowed disabled:cursor-not-allowed",
+        !canVote && !votedInMatch && "lm-vote-disabled disabled:cursor-not-allowed",
         canVote &&
           "cursor-pointer hover:-translate-y-1 hover:border-[rgba(46,204,113,0.8)] hover:bg-[rgba(46,204,113,0.16)] hover:shadow-[0_0_28px_rgba(46,204,113,0.4)] hover:ring-2 hover:ring-[rgba(46,204,113,0.35)] active:translate-y-0 active:scale-[0.98]",
         isWinner &&
           "border-lm-gold2 bg-[rgba(232,184,75,0.12)] shadow-[0_0_16px_rgba(232,184,75,0.2)]",
         isLoser && "border-[rgba(255,71,87,0.35)] opacity-70",
         votedFor &&
-          "border-lm-green2 bg-[rgba(46,204,113,0.1)] shadow-[0_0_20px_rgba(46,204,113,0.25)]",
-        isLeading &&
-          "border-[rgba(46,204,113,0.55)] bg-[rgba(46,204,113,0.08)] shadow-[0_0_12px_rgba(46,204,113,0.2)]",
+          "border-lm-green2 bg-[rgba(46,204,113,0.14)] shadow-[0_0_20px_rgba(46,204,113,0.3)] ring-2 ring-[rgba(46,204,113,0.25)]",
+        votedInMatch &&
+          !votedFor &&
+          !isWinner &&
+          !isLoser &&
+          "opacity-80 saturate-[0.85]",
       )}
       onClick={() => onVote()}
     >
-      {isLeading && (
-        <div
+      {votedFor && (
+        <span
           className={cn(
-            "absolute -top-1.5 -right-1.5 flex h-[22px] w-[22px] items-center justify-center",
-            "rounded-full bg-lm-green2 text-black",
+            "absolute top-1.5 left-1.5 rounded-full border border-[rgba(46,204,113,0.55)]",
+            "bg-[rgba(46,204,113,0.2)] px-1.5 py-px text-[10px] font-black tracking-wide text-lm-green2 uppercase",
           )}
         >
-          <Icon name="trending-up" size={12} />
-        </div>
+          Tu voto
+        </span>
+      )}
+      {isLeading && !votedFor && (
+        <Icon
+          name="trending-up"
+          size={14}
+          className="absolute top-1.5 right-1.5 text-lm-gold"
+          aria-hidden
+        />
       )}
       {isWinner && (
         <div
