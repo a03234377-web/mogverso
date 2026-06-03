@@ -30,7 +30,7 @@ const PROMO_ITEMS = [
   },
   {
     icon: "target" as const,
-    text: "Portafolio con ICFES Master, To-Do, retos Frontend Mentor y más.",
+    text: "Portafolio con diferentes proyectos y mucho más.",
   },
 ] as const;
 
