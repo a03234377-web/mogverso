@@ -4,6 +4,8 @@ import {
   PHASES,
 } from "@/features/torneo/data/torneo-players";
 import {
+  getEditionEndMs,
+  getEditionStartMsForWeekContaining,
   getUpcomingTorneoStartMs,
   shouldForceTorneoWaitingBeforeStart,
   TORNEO_PHASE_DURATION_MS,
@@ -230,7 +232,14 @@ async function advanceTorneoPhaseIfNeeded(
   now = Date.now(),
 ): Promise<TorneoState | null> {
   if (!state) return state;
-  if (state.phaseEnd > now - 2000) return state;
+
+  if (state.phase === PHASES.WAITING_OCTAVOS) {
+    const editionStart = getEditionStartMsForWeekContaining(now);
+    const inEditionWindow = now >= editionStart && now < getEditionEndMs(editionStart);
+    if (!inEditionWindow && state.phaseEnd > now - 2000) return state;
+  } else if (state.phaseEnd > now - 2000) {
+    return state;
+  }
 
   if (torneoAdvancing) {
     await new Promise((r) => setTimeout(r, 500));
@@ -295,8 +304,16 @@ export async function healTorneo(options?: {
     return { healed: true };
   }
 
-  if (existing.phase === PHASES.WAITING_OCTAVOS && existing.phaseEnd > now) {
-    return { healed: false };
+  if (existing.phase === PHASES.WAITING_OCTAVOS) {
+    const editionStart = getEditionStartMsForWeekContaining(now);
+    if (now < editionStart) {
+      if (Math.abs(existing.phaseEnd - editionStart) > 60_000) {
+        const waiting = createWaitingTorneoState(now);
+        await initTorneoState(waiting as Record<string, unknown>);
+        return { healed: true };
+      }
+      return { healed: false };
+    }
   }
 
   await advanceTorneoPhaseIfNeeded(existing, now);
