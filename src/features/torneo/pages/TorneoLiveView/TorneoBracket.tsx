@@ -126,7 +126,6 @@ export function TorneoBracket({
               <BracketMatchGroup
                 tone="orange"
                 matchNum={i + 1}
-                advanceLabel={`Cuartos ${Math.floor(i / 2) + 1}`}
                 pending
               />
             ) : (
@@ -134,7 +133,6 @@ export function TorneoBracket({
                 tone="orange"
                 match={oMatch}
                 matchNum={i + 1}
-                advanceLabel={`Cuartos ${Math.floor(i / 2) + 1}`}
                 votingActive={octavosVoting && !oMatch.resolved}
                 myVote={getLocalVote?.(matchId) ?? null}
                 onVoteClick={() => scrollToTorneoMatch(matchId)}
@@ -161,7 +159,6 @@ export function TorneoBracket({
                 tone="green"
                 match={cMatch}
                 matchNum={i + 1}
-                advanceLabel={`Semifinal ${Math.floor(i / 2) + 1}`}
                 votingActive={isRoundVoting(state, "cuartos") && !cMatch.resolved}
                 myVote={getLocalVote?.(matchId) ?? null}
                 onVoteClick={() => scrollToTorneoMatch(matchId)}
@@ -172,13 +169,11 @@ export function TorneoBracket({
                 matchNum={i + 1}
                 p1={w1}
                 p2={w2}
-                advanceLabel={`Semifinal ${Math.floor(i / 2) + 1}`}
               />
             ) : (
               <BracketMatchGroup
                 tone="green"
                 matchNum={i + 1}
-                advanceLabel={`Semifinal ${Math.floor(i / 2) + 1}`}
                 pending
               />
             )}
@@ -203,7 +198,6 @@ export function TorneoBracket({
                 tone="purple"
                 match={semiMatch}
                 matchNum={i + 1}
-                advanceLabel="Gran Final"
                 votingActive={isRoundVoting(state, "semis") && !semiMatch.resolved}
                 myVote={getLocalVote?.(matchId) ?? null}
                 onVoteClick={() => scrollToTorneoMatch(matchId)}
@@ -214,13 +208,11 @@ export function TorneoBracket({
                 matchNum={i + 1}
                 p1={w1}
                 p2={w2}
-                advanceLabel="Gran Final"
               />
             ) : (
               <BracketMatchGroup
                 tone="purple"
                 matchNum={i + 1}
-                advanceLabel="Gran Final"
                 pending
               />
             )}
@@ -241,7 +233,6 @@ export function TorneoBracket({
             tone="gold"
             match={fm}
             matchNum={1}
-            advanceLabel="Campeón"
             votingActive={isRoundVoting(state, "final") && !fm.resolved}
             myVote={getLocalVote?.("final_0") ?? null}
             onVoteClick={() => scrollToTorneoMatch("final_0")}
@@ -252,7 +243,6 @@ export function TorneoBracket({
             matchNum={1}
             p1={state.semisWinners[0]}
             p2={state.semisWinners[1]}
-            advanceLabel="Campeón"
           />
         ) : (
           <BracketSlot tone="gold" pending finalPending />
@@ -406,7 +396,6 @@ function BracketMatchGroup({
   p1,
   p2,
   matchNum,
-  advanceLabel,
   pending,
   votingActive,
   myVote,
@@ -417,7 +406,6 @@ function BracketMatchGroup({
   p1?: string;
   p2?: string;
   matchNum: number;
-  advanceLabel: string;
   pending?: boolean;
   votingActive?: boolean;
   myVote?: string | null;
@@ -448,7 +436,7 @@ function BracketMatchGroup({
   return (
     <div
       className={cn(
-        "torneo-bracket-match rounded-xl border p-1.5",
+        "torneo-bracket-match rounded-lg border p-2",
         `torneo-bracket-match--${tone}`,
         pending && "torneo-bracket-match--pending",
         votingActive && "torneo-bracket-match--voting",
@@ -459,14 +447,14 @@ function BracketMatchGroup({
       tabIndex={clickable ? 0 : undefined}
       aria-label={
         clickable && player1 && player2
-          ? `Ir a votar: ${player1} contra ${player2}. ${advanceLabel}`
+          ? `Ir a votar: ${player1} contra ${player2}`
           : undefined
       }
       onClick={handleClick}
       onKeyDown={handleKeyDown}
     >
-      <div className="mb-1 flex items-center justify-between gap-1 px-0.5">
-        <span className="truncate text-[10px] font-bold tracking-wide text-lm-text2 uppercase">
+      <div className="mb-1.5 flex items-center justify-between gap-2">
+        <span className="text-[10px] font-bold tracking-wide text-lm-text2 uppercase">
           Duelo {matchNum}
         </span>
         {votingActive ? (
@@ -475,93 +463,113 @@ function BracketMatchGroup({
             Votar
           </span>
         ) : myVote ? (
-          <span className="flex shrink-0 items-center gap-0.5 text-[9px] font-bold text-lm-green2">
-            <Icon name="circle-check" size={9} />
-            Votado
-          </span>
-        ) : showVotes && stats?.leader ? (
-          <span
-            className="max-w-[7rem] truncate text-[9px] font-bold text-lm-green2"
-            title={`Va ganando ${stats.leader}`}
-          >
-            ↑ {stats.leader}
-          </span>
+          <Icon name="circle-check" size={11} className="shrink-0 text-lm-green2" aria-label="Votado" />
         ) : null}
       </div>
 
       {pending || !player1 || !player2 ? (
-        <div className="flex flex-col gap-1">
-          <BracketSlot tone={tone} pending compact />
-          <div className="torneo-bracket-vs py-0.5 text-center text-[10px] font-black tracking-wider text-lm-text2">
-            VS
-          </div>
-          <BracketSlot tone={tone} pending compact />
+        <div className="torneo-bracket-players divide-y divide-white/6 rounded-md bg-black/20">
+          <BracketPlayerRow tone={tone} pending />
+          <BracketPlayerRow tone={tone} pending />
         </div>
       ) : (
-        <div className="flex flex-col gap-0.5">
-          <BracketSlot
+        <div className="torneo-bracket-players divide-y divide-white/6 rounded-md bg-black/20">
+          <BracketPlayerRow
             tone={tone}
             name={player1}
             votes={showVotes ? votes1 : undefined}
             winner={resolved ? match!.winner === player1 : false}
             leading={!resolved && stats?.leader === player1 && showVotes}
             voted={myVote === player1}
-            compact
           />
-          <div
-            className={cn(
-              "torneo-bracket-vs py-0.5 text-center text-[10px] font-black tracking-wider",
-              votingActive ? "text-lm-green2" : "text-lm-text2",
-            )}
-          >
-            {showVotes ? `${votes1}–${votes2}` : "VS"}
-          </div>
-          <BracketSlot
+          <BracketPlayerRow
             tone={tone}
             name={player2}
             votes={showVotes ? votes2 : undefined}
             winner={resolved ? match!.winner === player2 : false}
             leading={!resolved && stats?.leader === player2 && showVotes}
             voted={myVote === player2}
-            compact
           />
         </div>
       )}
+    </div>
+  );
+}
 
+function BracketPlayerRow({
+  tone,
+  name,
+  winner,
+  leading,
+  voted,
+  votes,
+  pending,
+}: {
+  tone: BracketTone;
+  name?: string;
+  winner?: boolean;
+  leading?: boolean;
+  voted?: boolean;
+  votes?: number;
+  pending?: boolean;
+}) {
+  if (pending) {
+    return (
+      <div className="flex items-center gap-1.5 px-1.5 py-1.5">
+        <div
+          className={cn(
+            "h-5 w-5 shrink-0 rounded-full border opacity-40",
+            `torneo-bracket-avatar--${tone}`,
+          )}
+        />
+        <span className="text-xs font-bold text-lm-text2 opacity-50">—</span>
+      </div>
+    );
+  }
+
+  const p = getPlayerByName(name!);
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-1.5 px-1.5 py-1.5",
+        voted && "bg-[rgba(46,204,113,0.1)]",
+        winner && "bg-[rgba(232,184,75,0.12)]",
+      )}
+      title={p.name}
+    >
       <div
         className={cn(
-          "torneo-bracket-advance mt-1.5 flex items-center justify-center gap-0.5 border-t pt-1 text-[10px] font-semibold",
-          `torneo-bracket-advance--${tone}`,
+          "relative h-5 w-5 shrink-0 overflow-hidden rounded-full border",
+          `torneo-bracket-avatar--${tone}`,
         )}
       >
-        <span className="truncate">{advanceLabel}</span>
+        <CreatorImage
+          src={p.photo}
+          alt={p.name}
+          className="rounded-full object-cover"
+          sizes="20px"
+          fallback={<CreatorIcon name={p.name} icon={p.icon} size={10} />}
+        />
       </div>
-
-      {showVotes && stats && !resolved ? (
-        <p className="mt-1 text-center text-[9px] font-semibold text-lm-text2">
-          {stats.isTie ? (
-            <>Empate · {stats.v1} votos</>
-          ) : (
-            <>
-              <Icon
-                name="trending-up"
-                size={9}
-                className="mr-0.5 inline text-lm-green2"
-              />
-              <span className="text-lm-green2">Gana {stats.leader}</span>
-              <span className="text-lm-text2">
-                {" "}
-                · {stats.v1}–{stats.v2}
-              </span>
-            </>
-          )}
-        </p>
+      <span
+        className={cn(
+          "torneo-bracket-slot-name min-w-0 flex-1 text-xs font-bold leading-tight",
+          winner ? "text-lm-gold" : "text-lm-text",
+        )}
+      >
+        {p.name}
+      </span>
+      {typeof votes === "number" ? (
+        <span className="shrink-0 text-[10px] font-black tabular-nums text-lm-text2">
+          {votes}
+        </span>
       ) : null}
-
-      {clickable ? (
-        <p className="mt-1 text-center text-[9px] font-semibold text-lm-green2 opacity-90">
-          Toca para votar
-        </p>
+      {voted ? (
+        <Icon name="circle-check" size={10} className="shrink-0 text-lm-green2" />
+      ) : winner ? (
+        <Icon name="crown" size={10} className="shrink-0 text-lm-gold" />
+      ) : leading ? (
+        <Icon name="trending-up" size={10} className="shrink-0 text-lm-gold" aria-hidden />
       ) : null}
     </div>
   );

@@ -469,7 +469,7 @@
     200px
     40px
     200px;
-  grid-template-rows: auto repeat(8, minmax(58px, auto));
+  grid-template-rows: auto repeat(8, minmax(48px, auto));
   column-gap: 0;
   row-gap: 4px;
   width: max-content;
