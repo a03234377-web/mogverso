@@ -84,6 +84,29 @@ export async function voteTorneoApi(
   return submitTorneoVote(matchId, candidateName, getDeviceId(), recaptchaToken);
 }
 
+export async function fetchTorneoMyVotesApi(
+  editionStartMs: number,
+): Promise<Record<string, string>> {
+  try {
+    const res = await fetch("/api/vote/torneo/my-votes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        deviceId: getDeviceId(),
+        editionStartMs,
+      }),
+    });
+    const data = (await res.json()) as {
+      ok?: boolean;
+      votes?: Record<string, string>;
+    };
+    if (res.ok && data.ok && data.votes) return data.votes;
+  } catch (err) {
+    console.warn("[fetchTorneoMyVotesApi] failed:", err);
+  }
+  return {};
+}
+
 export async function voteAuraApi(
   name: string,
   kind: AuraVoteKind,

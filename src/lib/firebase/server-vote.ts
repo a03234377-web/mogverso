@@ -1,5 +1,9 @@
 import { PHASES } from "@/features/torneo/data/torneo-players";
 import { getEditionStartMsForWeekContaining } from "@/lib/torneo-schedule";
+import {
+  torneoVoteDeviceKey,
+  torneoVoteIpKey,
+} from "@/lib/torneo-vote-keys";
 import { coerceVoteCount } from "@/lib/coerce-vote-count";
 import { hashIpForVote } from "@/lib/security/client-ip";
 import { getAdminDatabase } from "./admin";
@@ -117,6 +121,37 @@ export async function castEntryVoteServer(
   }
 }
 
+export async function getTorneoVotesForDevice(
+  deviceId: string,
+  editionStartMs: number,
+): Promise<Record<string, string>> {
+  const db = getAdminDatabase();
+  const snap = await db.ref("torneoVotes").get();
+  if (!snap.exists()) return {};
+
+  const scopedPrefix = `dev_${deviceId}_${editionStartMs}_`;
+  const legacyPrefix = `dev_${deviceId}_`;
+  const out: Record<string, string> = {};
+  const val = snap.val() as Record<string, { candidate?: string }>;
+
+  for (const [key, data] of Object.entries(val)) {
+    const candidate = data?.candidate;
+    if (!candidate) continue;
+
+    if (key.startsWith(scopedPrefix)) {
+      out[key.slice(scopedPrefix.length)] = candidate;
+      continue;
+    }
+
+    if (!key.startsWith(legacyPrefix)) continue;
+    const rest = key.slice(legacyPrefix.length);
+    if (/^\d+_/.test(rest)) continue;
+    out[rest] ??= candidate;
+  }
+
+  return out;
+}
+
 export async function castTorneoVoteServer(
   matchId: string,
   candidateName: string,
@@ -124,20 +159,6 @@ export async function castTorneoVoteServer(
   ip: string,
 ): Promise<VoteResult> {
   const db = getAdminDatabase();
-  const stateSnapPre = await db.ref("torneo/state").get();
-  const torneoCreatedAt = stateSnapPre.exists()
-    ? ((stateSnapPre.val() as { createdAt?: number }).createdAt ?? 0)
-    : 0;
-
-  const [devSnap, ipSnapPre] = await Promise.all([
-    db.ref(`torneoVotes/dev_${deviceId}_${matchId}`).get(),
-    db.ref(`torneoVotes/ip_${hashIpForVote(ip)}_${matchId}`).get(),
-  ]);
-
-  if (devSnap.exists() || ipSnapPre.exists()) {
-    return { ok: false, reason: "already_voted" };
-  }
-
   const now = Date.now();
   let stateSnap = await db.ref("torneo/state").get();
   if (!stateSnap.exists()) return { ok: false, reason: "no_state" };
@@ -156,22 +177,42 @@ export async function castTorneoVoteServer(
     }
   }
 
+  const voteEditionStartMs =
+    typeof st.editionStartMs === "number"
+      ? st.editionStartMs
+      : getEditionStartMsForWeekContaining(now);
+  const voteDevKey = torneoVoteDeviceKey(deviceId, voteEditionStartMs, matchId);
+  const voteIpKey = torneoVoteIpKey(hashIpForVote(ip), voteEditionStartMs, matchId);
+
+  const [devSnap, ipSnapPre, legacyDevSnap, legacyIpSnap] = await Promise.all([
+    db.ref(`torneoVotes/${voteDevKey}`).get(),
+    db.ref(`torneoVotes/${voteIpKey}`).get(),
+    db.ref(`torneoVotes/dev_${deviceId}_${matchId}`).get(),
+    db.ref(`torneoVotes/ip_${hashIpForVote(ip)}_${matchId}`).get(),
+  ]);
+
+  if (
+    devSnap.exists() ||
+    ipSnapPre.exists() ||
+    legacyDevSnap.exists() ||
+    legacyIpSnap.exists()
+  ) {
+    return { ok: false, reason: "already_voted" };
+  }
+
   const phaseCheck = validateTorneoVoteContext(st, matchId, now);
   if (!phaseCheck.ok) return { ok: false, reason: phaseCheck.reason };
 
   const resolved = resolveTorneoVotePath(st, matchId, candidateName);
   if (!resolved.ok) return { ok: false, reason: resolved.reason };
 
-  const ipHash = hashIpForVote(ip);
-
   try {
     await db.ref(resolved.votePath).transaction((cur) => (cur || 0) + 1);
     const ts = Date.now();
     await db.ref("/").update({
-      [`torneoVotes/dev_${deviceId}_${matchId}`]: { candidate: candidateName, ts },
-      [`torneoVotes/ip_${ipHash}_${matchId}`]: { candidate: candidateName, ts },
+      [`torneoVotes/${voteDevKey}`]: { candidate: candidateName, ts },
+      [`torneoVotes/${voteIpKey}`]: { candidate: candidateName, ts },
     });
-    void torneoCreatedAt;
     return { ok: true };
   } catch {
     return { ok: false, reason: "transaction_failed" };
