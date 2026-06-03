@@ -50,7 +50,7 @@ export function buildOctavosTorneoState(
   };
 }
 
-/** Cuenta atrás hasta el próximo jueves 22:30 (inicio del torneo). */
+/** Cuenta atrás hasta el próximo miércoles 22:30 (inicio del torneo). */
 export function createWaitingTorneoState(now = Date.now()): TorneoState {
   const phaseEnd = getUpcomingTorneoStartMs(now);
   return {

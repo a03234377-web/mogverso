@@ -9,6 +9,8 @@ import {
 
 export const TORNEO_START_HOUR = 22;
 export const TORNEO_START_MINUTE = 30;
+/** 0=dom … 3=miércoles (inicio octavos). */
+export const TORNEO_START_WEEKDAY = 3;
 export const TORNEO_PHASE_DURATION_MS = 24 * 60 * 60 * 1000;
 
 const TORNEO_DAY_NAME_FORMATTER = new Intl.DateTimeFormat("es-ES", {
@@ -39,22 +41,22 @@ export type TorneoScheduleMilestone = {
   status: "past" | "active" | "upcoming";
 };
 
-/** Próximo jueves 22:30 (Europe/Madrid). Si hoy es jueves antes de las 22:30, devuelve hoy. */
+/** Próximo miércoles 22:30 (Europe/Madrid). Si hoy es miércoles antes de las 22:30, devuelve hoy. */
 export function getUpcomingTorneoStartMs(from = Date.now()): number {
   const weekday = getMadridWeekday(from);
   const start = getMadridParts(from);
-  let daysUntilThursday: number;
+  let daysUntilStart: number;
 
-  if (weekday === 4) {
+  if (weekday === TORNEO_START_WEEKDAY) {
     const pastStart =
       start.hour > TORNEO_START_HOUR ||
       (start.hour === TORNEO_START_HOUR && start.minute >= TORNEO_START_MINUTE);
-    daysUntilThursday = pastStart ? 7 : 0;
+    daysUntilStart = pastStart ? 7 : 0;
   } else {
-    daysUntilThursday = (4 - weekday + 7) % 7;
+    daysUntilStart = (TORNEO_START_WEEKDAY - weekday + 7) % 7;
   }
 
-  const target = addDaysMadrid(start.year, start.month, start.day, daysUntilThursday);
+  const target = addDaysMadrid(start.year, start.month, start.day, daysUntilStart);
   return madridLocalToUtc(
     target.year,
     target.month,
@@ -87,9 +89,9 @@ const MILESTONE_META: {
   weekdayShort: string;
   dayOffset: number;
 }[] = [
-  { id: "octavos", label: "Octavos de Final", weekdayShort: "Jue", dayOffset: 0 },
-  { id: "cuartos", label: "Cuartos de Final", weekdayShort: "Vie", dayOffset: 1 },
-  { id: "semis", label: "Semifinales", weekdayShort: "Sáb", dayOffset: 2 },
+  { id: "octavos", label: "Octavos de Final", weekdayShort: "Mié", dayOffset: 0 },
+  { id: "cuartos", label: "Cuartos de Final", weekdayShort: "Jue", dayOffset: 1 },
+  { id: "semis", label: "Semifinales", weekdayShort: "Vie", dayOffset: 2 },
   { id: "final", label: "Gran Final", weekdayShort: "Dom", dayOffset: 3 },
 ];
 
@@ -126,7 +128,7 @@ export function getActiveScheduleMilestone(
 }
 
 /**
- * Antes del jueves de inicio, Firebase no debe quedar en fase intermedia.
+ * Antes del miércoles de inicio, Firebase no debe quedar en fase intermedia.
  */
 export function shouldForceTorneoWaitingBeforeStart(
   now: number,

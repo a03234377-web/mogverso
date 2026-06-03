@@ -16,7 +16,7 @@ import type { TorneoState } from "@/types/looksmax";
 type LogEntry = { ok: boolean; message: string; at: number };
 
 const CHECKLIST = [
-  "Coming soon + calendario + countdown jueves 22:30",
+  "Coming soon + calendario + countdown miércoles 22:30",
   "Octavos: 8 duelos, votar todos, rechazar doble voto",
   "Fast-forward → cuartos con ganadores 1v2, 3v4…",
   "Semis y final",
