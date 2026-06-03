@@ -13,10 +13,12 @@ export function TorneoMatchesSection({
   state,
   getLocalVote,
   onVote,
+  votingDisabled,
 }: {
   state: TorneoState | null;
   getLocalVote: (matchId: string) => string | null;
   onVote: (matchId: string, name: string) => Promise<void>;
+  votingDisabled?: boolean;
 }) {
   const [now, setNow] = useState(() => Date.now());
   const needsPreview = state?.phase === PHASES.WAITING_OCTAVOS && !state.matches?.oct_0;
@@ -61,7 +63,7 @@ export function TorneoMatchesSection({
                 round={view.round}
                 state={state!}
                 myVote={getLocalVote(id)}
-                canVote={view.canVote}
+                canVote={view.canVote && !votingDisabled}
                 previewLive={view.pendingStart}
                 onVote={(name) => onVote(id, name)}
               />

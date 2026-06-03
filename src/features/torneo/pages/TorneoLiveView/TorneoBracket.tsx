@@ -3,16 +3,46 @@
 import type { ReactNode } from "react";
 import { CreatorImage } from "@/components/CreatorImage";
 import { CreatorIcon, Icon } from "@/components/icons";
-import { getPlayerByName } from "@/features/torneo/data/torneo-players";
+import { getPlayerByName, PHASES } from "@/features/torneo/data/torneo-players";
 import { useTorneoBracketPreview } from "@/features/torneo/hooks/useTorneoBracketPreview";
-import { PHASES } from "@/features/torneo/data/torneo-players";
-import { OCTAVOS_IDS } from "@/lib/torneo-bracket";
-import type { TorneoState } from "@/types/looksmax";
+import {
+  CUARTOS_IDS,
+  OCTAVOS_IDS,
+  SEMIS_IDS,
+} from "@/lib/torneo-bracket";
+import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 import { cn } from "@/lib/cn";
 
 type BracketTone = "orange" | "green" | "purple" | "gold";
+type BracketRound = "octavos" | "cuartos" | "semis" | "final";
 
-export function TorneoBracket({ state }: { state: TorneoState | null }) {
+const VOTING_PHASE_BY_ROUND: Record<BracketRound, string> = {
+  octavos: PHASES.OCTAVOS_VOTING,
+  cuartos: PHASES.CUARTOS_VOTING,
+  semis: PHASES.SEMIFINALS_VOTING,
+  final: PHASES.FINAL_VOTING,
+};
+
+function scrollToTorneoMatch(matchId: string) {
+  const el = document.getElementById(`torneo-match-${matchId}`);
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.classList.add("torneo-match-highlight");
+  window.setTimeout(() => el.classList.remove("torneo-match-highlight"), 1800);
+}
+
+function isRoundVoting(state: TorneoState | null, round: BracketRound): boolean {
+  if (!state) return false;
+  return state.phase === VOTING_PHASE_BY_ROUND[round];
+}
+
+export function TorneoBracket({
+  state,
+  getLocalVote,
+}: {
+  state: TorneoState | null;
+  getLocalVote?: (matchId: string) => string | null;
+}) {
   const needsPreview =
     !state?.matches?.oct_0 &&
     (state?.phase === PHASES.WAITING_OCTAVOS || !state?.matches);
@@ -29,69 +59,120 @@ export function TorneoBracket({ state }: { state: TorneoState | null }) {
   const cuartosWinners = state?.cuartosWinners ?? [];
   const champion = state?.champion ?? null;
   const fm = state?.finalMatch;
+  const octavosVoting = isRoundVoting(state, "octavos");
 
   return (
     <TorneoBracketShell>
       <BracketColumn title="Octavos" tone="orange">
-        {OCTAVOS_IDS.flatMap((matchId) => {
+        {OCTAVOS_IDS.map((matchId, i) => {
           const oMatch = octavosSource?.[matchId];
           if (!oMatch) {
-            return [
-              <BracketSlot key={`${matchId}-a`} tone="orange" pending />,
-              <BracketSlot key={`${matchId}-b`} tone="orange" pending />,
-            ];
+            return (
+              <BracketMatchGroup
+                key={matchId}
+                tone="orange"
+                matchNum={i + 1}
+                advanceLabel={`→ Cuartos ${Math.floor(i / 2) + 1}`}
+                pending
+              />
+            );
           }
-          return [oMatch.p1, oMatch.p2].map((pname) => (
-            <BracketSlot
-              key={`${matchId}-${pname}`}
+          return (
+            <BracketMatchGroup
+              key={matchId}
               tone="orange"
-              name={pname}
-              winner={oMatch.resolved && oMatch.winner === pname}
+              match={oMatch}
+              matchNum={i + 1}
+              advanceLabel={`→ Cuartos ${Math.floor(i / 2) + 1}`}
+              votingActive={octavosVoting && !oMatch.resolved}
+              myVote={getLocalVote?.(matchId) ?? null}
+              onVoteClick={() => scrollToTorneoMatch(matchId)}
             />
-          ));
+          );
         })}
       </BracketColumn>
 
       <BracketColumn title="Cuartos" tone="green">
-        {(["cua_0", "cua_1", "cua_2", "cua_3"] as const).flatMap((matchId, i) => {
+        {CUARTOS_IDS.map((matchId, i) => {
           const cMatch = state?.cuartosMatches?.[matchId];
-          if (!cMatch) {
-            const w1 = octavosWinners[i * 2];
-            const w2 = octavosWinners[i * 2 + 1];
-            if (w1 && w2) {
-              return [
-                <BracketSlot key={`${matchId}-a`} tone="green" name={w1} />,
-                <BracketSlot key={`${matchId}-b`} tone="green" name={w2} />,
-              ];
-            }
-            return [
-              <BracketSlot key={`${matchId}-a`} tone="green" pending />,
-              <BracketSlot key={`${matchId}-b`} tone="green" pending />,
-            ];
+          if (cMatch) {
+            return (
+              <BracketMatchGroup
+                key={matchId}
+                tone="green"
+                match={cMatch}
+                matchNum={i + 1}
+                advanceLabel={`→ Semifinal ${Math.floor(i / 2) + 1}`}
+                votingActive={isRoundVoting(state, "cuartos") && !cMatch.resolved}
+                myVote={getLocalVote?.(matchId) ?? null}
+                onVoteClick={() => scrollToTorneoMatch(matchId)}
+              />
+            );
           }
-          return [cMatch.p1, cMatch.p2].map((pname) => (
-            <BracketSlot
-              key={`${matchId}-${pname}`}
+          const w1 = octavosWinners[i * 2];
+          const w2 = octavosWinners[i * 2 + 1];
+          if (w1 && w2) {
+            return (
+              <BracketMatchGroup
+                key={matchId}
+                tone="green"
+                matchNum={i + 1}
+                p1={w1}
+                p2={w2}
+                advanceLabel={`→ Semifinal ${Math.floor(i / 2) + 1}`}
+              />
+            );
+          }
+          return (
+            <BracketMatchGroup
+              key={matchId}
               tone="green"
-              name={pname}
-              winner={cMatch.resolved && cMatch.winner === pname}
+              matchNum={i + 1}
+              advanceLabel={`→ Semifinal ${Math.floor(i / 2) + 1}`}
+              pending
             />
-          ));
+          );
         })}
       </BracketColumn>
 
       <BracketColumn title="Semifinales" tone="purple">
-        {[0, 1, 2, 3].map((i) => {
-          const w = cuartosWinners[i] ?? null;
-          const semiMatchId = `semi_${Math.floor(i / 2)}`;
-          const semiMatch = state?.semisMatches?.[semiMatchId];
-          if (!w) return <BracketSlot key={i} tone="purple" pending />;
+        {SEMIS_IDS.map((matchId, i) => {
+          const semiMatch = state?.semisMatches?.[matchId];
+          if (semiMatch) {
+            return (
+              <BracketMatchGroup
+                key={matchId}
+                tone="purple"
+                match={semiMatch}
+                matchNum={i + 1}
+                advanceLabel="→ Gran Final"
+                votingActive={isRoundVoting(state, "semis") && !semiMatch.resolved}
+                myVote={getLocalVote?.(matchId) ?? null}
+                onVoteClick={() => scrollToTorneoMatch(matchId)}
+              />
+            );
+          }
+          const w1 = cuartosWinners[i * 2];
+          const w2 = cuartosWinners[i * 2 + 1];
+          if (w1 && w2) {
+            return (
+              <BracketMatchGroup
+                key={matchId}
+                tone="purple"
+                matchNum={i + 1}
+                p1={w1}
+                p2={w2}
+                advanceLabel="→ Gran Final"
+              />
+            );
+          }
           return (
-            <BracketSlot
-              key={i}
+            <BracketMatchGroup
+              key={matchId}
               tone="purple"
-              name={w}
-              winner={semiMatch?.resolved && semiMatch.winner === w}
+              matchNum={i + 1}
+              advanceLabel="→ Gran Final"
+              pending
             />
           );
         })}
@@ -100,15 +181,24 @@ export function TorneoBracket({ state }: { state: TorneoState | null }) {
       <BracketColumn title="Final" tone="gold">
         {champion ? (
           <BracketSlot name={champion} tone="gold" winner gold />
+        ) : fm ? (
+          <BracketMatchGroup
+            tone="gold"
+            match={fm}
+            matchNum={1}
+            advanceLabel="→ Campeón"
+            votingActive={isRoundVoting(state, "final") && !fm.resolved}
+            myVote={getLocalVote?.("final_0") ?? null}
+            onVoteClick={() => scrollToTorneoMatch("final_0")}
+          />
         ) : state?.semisWinners && state.semisWinners.length >= 2 ? (
-          [state.semisWinners[0], state.semisWinners[1]].map((w) => (
-            <BracketSlot
-              key={w}
-              tone="gold"
-              name={w}
-              winner={fm?.resolved && fm.winner === w}
-            />
-          ))
+          <BracketMatchGroup
+            tone="gold"
+            matchNum={1}
+            p1={state.semisWinners[0]}
+            p2={state.semisWinners[1]}
+            advanceLabel="→ Campeón"
+          />
         ) : (
           <BracketSlot tone="gold" pending finalPending />
         )}
@@ -153,7 +243,7 @@ function BracketColumn({
   children: ReactNode;
 }) {
   return (
-    <div className="flex min-w-[118px] shrink-0 flex-col gap-2">
+    <div className="flex min-w-[148px] shrink-0 flex-col gap-2.5">
       <div
         className={cn(
           "torneo-bracket-col-title mb-0.5 border-b py-1.5 text-center lm-type-label max-md:text-base",
@@ -167,26 +257,162 @@ function BracketColumn({
   );
 }
 
+function BracketMatchGroup({
+  tone,
+  match,
+  p1,
+  p2,
+  matchNum,
+  advanceLabel,
+  pending,
+  votingActive,
+  myVote,
+  onVoteClick,
+}: {
+  tone: BracketTone;
+  match?: TorneoMatch;
+  p1?: string;
+  p2?: string;
+  matchNum: number;
+  advanceLabel: string;
+  pending?: boolean;
+  votingActive?: boolean;
+  myVote?: string | null;
+  onVoteClick?: () => void;
+}) {
+  const player1 = match?.p1 ?? p1;
+  const player2 = match?.p2 ?? p2;
+  const resolved = match?.resolved && match.winner;
+  const clickable = votingActive && !!onVoteClick;
+
+  const handleClick = () => {
+    if (!clickable) return;
+    onVoteClick?.();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!clickable) return;
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onVoteClick?.();
+    }
+  };
+
+  return (
+    <div
+      className={cn(
+        "torneo-bracket-match rounded-xl border p-1.5",
+        `torneo-bracket-match--${tone}`,
+        pending && "torneo-bracket-match--pending",
+        votingActive && "torneo-bracket-match--voting",
+        clickable && "torneo-bracket-match--clickable cursor-pointer",
+        resolved && "torneo-bracket-match--resolved",
+      )}
+      role={clickable ? "button" : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      aria-label={
+        clickable && player1 && player2
+          ? `Ir a votar: ${player1} contra ${player2}. ${advanceLabel}`
+          : undefined
+      }
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+    >
+      <div className="mb-1 flex items-center justify-between gap-1 px-0.5">
+        <span className="truncate text-[10px] font-bold uppercase tracking-wide text-lm-text2">
+          Duelo {matchNum}
+        </span>
+        {votingActive ? (
+          <span className="flex shrink-0 items-center gap-0.5 rounded-full border border-[rgba(46,204,113,0.45)] bg-[rgba(46,204,113,0.12)] px-1.5 py-px text-[9px] font-black uppercase tracking-wide text-lm-green2">
+            <Icon name="radio" size={8} className="text-lm-red2" />
+            Votar
+          </span>
+        ) : myVote ? (
+          <span className="flex shrink-0 items-center gap-0.5 text-[9px] font-bold text-lm-green2">
+            <Icon name="circle-check" size={9} />
+            Votado
+          </span>
+        ) : null}
+      </div>
+
+      {pending || !player1 || !player2 ? (
+        <div className="flex flex-col gap-1">
+          <BracketSlot tone={tone} pending compact />
+          <div className="torneo-bracket-vs py-0.5 text-center text-[10px] font-black tracking-wider text-lm-text2">
+            VS
+          </div>
+          <BracketSlot tone={tone} pending compact />
+        </div>
+      ) : (
+        <div className="flex flex-col gap-0.5">
+          <BracketSlot
+            tone={tone}
+            name={player1}
+            winner={resolved ? match!.winner === player1 : false}
+            voted={myVote === player1}
+            compact
+          />
+          <div
+            className={cn(
+              "torneo-bracket-vs py-0.5 text-center text-[10px] font-black tracking-wider",
+              votingActive ? "text-lm-green2" : "text-lm-text2",
+            )}
+          >
+            VS
+          </div>
+          <BracketSlot
+            tone={tone}
+            name={player2}
+            winner={resolved ? match!.winner === player2 : false}
+            voted={myVote === player2}
+            compact
+          />
+        </div>
+      )}
+
+      <div
+        className={cn(
+          "torneo-bracket-advance mt-1.5 flex items-center justify-center gap-0.5 border-t pt-1 text-[10px] font-semibold",
+          `torneo-bracket-advance--${tone}`,
+        )}
+      >
+        <span className="truncate">{advanceLabel}</span>
+      </div>
+
+      {clickable ? (
+        <p className="mt-1 text-center text-[9px] font-semibold text-lm-green2 opacity-90">
+          Toca para votar
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 function BracketSlot({
   name,
   winner,
+  voted,
   pending,
   gold,
   finalPending,
+  compact,
   tone = "orange",
 }: {
   name?: string;
   winner?: boolean;
+  voted?: boolean;
   pending?: boolean;
   gold?: boolean;
   finalPending?: boolean;
+  compact?: boolean;
   tone?: BracketTone;
 }) {
   if (pending) {
     return (
       <div
         className={cn(
-          "torneo-bracket-slot flex items-center gap-2 rounded-xl px-2.5 py-2",
+          "torneo-bracket-slot flex items-center gap-2 rounded-lg px-2 py-1.5",
+          compact && "torneo-bracket-slot--compact",
           `torneo-bracket-slot--${tone}`,
           "torneo-bracket-slot--pending",
           finalPending && "torneo-bracket-slot--final-pending",
@@ -208,15 +434,18 @@ function BracketSlot({
   return (
     <div
       className={cn(
-        "torneo-bracket-slot flex items-center gap-2 rounded-xl px-2.5 py-2",
+        "torneo-bracket-slot flex items-center gap-2 rounded-lg px-2 py-1.5",
+        compact && "torneo-bracket-slot--compact",
         `torneo-bracket-slot--${tone}`,
         winner && "torneo-bracket-slot--winner",
+        voted && "torneo-bracket-slot--voted",
         gold && "torneo-bracket-slot--champion",
       )}
     >
       <div
         className={cn(
-          "relative h-7 w-7 shrink-0 overflow-hidden rounded-full border-2",
+          "relative shrink-0 overflow-hidden rounded-full border-2",
+          compact ? "h-6 w-6" : "h-7 w-7",
           `torneo-bracket-avatar--${tone}`,
         )}
       >
@@ -224,8 +453,8 @@ function BracketSlot({
           src={p.photo}
           alt={p.name}
           className="rounded-full object-cover"
-          sizes="28px"
-          fallback={<CreatorIcon name={p.name} icon={p.icon} size={14} />}
+          sizes={compact ? "24px" : "28px"}
+          fallback={<CreatorIcon name={p.name} icon={p.icon} size={compact ? 12 : 14} />}
         />
       </div>
       <div
@@ -243,6 +472,9 @@ function BracketSlot({
           p.name
         )}
       </div>
+      {voted ? (
+        <Icon name="circle-check" size={12} className="shrink-0 text-lm-green2" />
+      ) : null}
     </div>
   );
 }

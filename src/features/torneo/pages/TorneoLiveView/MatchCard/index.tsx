@@ -61,6 +61,7 @@ export function MatchCard({
 
   return (
     <div
+      id={`torneo-match-${match.id}`}
       className={cn(
         "relative overflow-hidden rounded-[14px] border border-lm-border bg-lm-card",
         "px-5 py-4 transition-colors duration-300",

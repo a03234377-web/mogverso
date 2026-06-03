@@ -1,7 +1,10 @@
+import { PHASES } from "@/features/torneo/data/torneo-players";
+import { getEditionStartMsForWeekContaining } from "@/lib/torneo-schedule";
 import { coerceVoteCount } from "@/lib/coerce-vote-count";
 import { hashIpForVote } from "@/lib/security/client-ip";
 import { getAdminDatabase } from "./admin";
 import { healRankvoteRound, ensureRankvoteRound } from "./server-rankvote";
+import { ensureTorneoOctavosStarted } from "./server-torneo";
 import {
   isValidEntryVoteCandidate,
   resolveTorneoVotePath,
@@ -135,11 +138,25 @@ export async function castTorneoVoteServer(
     return { ok: false, reason: "already_voted" };
   }
 
-  const stateSnap = await db.ref("torneo/state").get();
+  const now = Date.now();
+  let stateSnap = await db.ref("torneo/state").get();
   if (!stateSnap.exists()) return { ok: false, reason: "no_state" };
 
-  const st = stateSnap.val() as Record<string, unknown>;
-  const phaseCheck = validateTorneoVoteContext(st, matchId);
+  let st = stateSnap.val() as Record<string, unknown>;
+  if (st.phase === PHASES.WAITING_OCTAVOS) {
+    const editionStart = getEditionStartMsForWeekContaining(now);
+    if (now >= editionStart) {
+      const fresh = await ensureTorneoOctavosStarted(now);
+      if (fresh) {
+        st = fresh as unknown as Record<string, unknown>;
+      } else {
+        stateSnap = await db.ref("torneo/state").get();
+        if (stateSnap.exists()) st = stateSnap.val() as Record<string, unknown>;
+      }
+    }
+  }
+
+  const phaseCheck = validateTorneoVoteContext(st, matchId, now);
   if (!phaseCheck.ok) return { ok: false, reason: phaseCheck.reason };
 
   const resolved = resolveTorneoVotePath(st, matchId, candidateName);

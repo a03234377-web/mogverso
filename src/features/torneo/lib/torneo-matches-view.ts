@@ -19,13 +19,17 @@ export function getTorneoMatchesView(
 ): TorneoMatchesView | null {
   if (!state) return null;
 
-  if (state.phase === PHASES.OCTAVOS_VOTING && state.matches) {
+  if (
+    (state.phase === PHASES.OCTAVOS_VOTING || state.matches?.oct_0) &&
+    state.matches
+  ) {
     return {
       matches: state.matches,
       ids: [...OCTAVOS_IDS],
       round: "octavos",
       title: "Octavos de Final — ¡Vota en todos los duelos!",
-      canVote: true,
+      canVote: state.phase === PHASES.OCTAVOS_VOTING,
+      pendingStart: state.phase === PHASES.WAITING_OCTAVOS,
     };
   }
 
@@ -40,7 +44,7 @@ export function getTorneoMatchesView(
       ids: [...OCTAVOS_IDS],
       round: "octavos",
       title: "Octavos de Final — ¡Vota en todos los duelos!",
-      canVote: false,
+      canVote: true,
       pendingStart: true,
     };
   }
