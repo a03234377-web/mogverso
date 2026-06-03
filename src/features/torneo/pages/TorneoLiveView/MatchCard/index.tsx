@@ -37,6 +37,8 @@ export function MatchCard({
     (state.phase === PHASES.SEMIFINALS_VOTING && round === "semis") ||
     (state.phase === PHASES.FINAL_VOTING && round === "final");
   const canVote = (canVoteOverride ?? isVotingPhase) && !isResolved && !myVote;
+  const hasVoted = !!myVote && !isResolved;
+  const pendingVote = canVote;
   const showLiveBadge = previewLive || canVoteOverride === true || isVotingPhase;
   const showBars = isResolved || total > 0;
 
@@ -68,9 +70,18 @@ export function MatchCard({
     <div
       id={`torneo-match-${match.id}`}
       className={cn(
-        "relative overflow-hidden rounded-[14px] border border-lm-border bg-lm-card",
+        "relative overflow-hidden rounded-[14px] border bg-lm-card",
         "px-5 py-4 transition-colors duration-300",
-        showLiveBadge && !isResolved && "border-[rgba(46,204,113,0.45)]",
+        hasVoted &&
+          "border-lm-green2 bg-[rgba(46,204,113,0.07)] shadow-[0_0_28px_rgba(46,204,113,0.18)]",
+        pendingVote &&
+          "border-[rgba(255,107,53,0.55)] bg-[rgba(255,107,53,0.05)] shadow-[0_0_20px_rgba(255,107,53,0.12)]",
+        showLiveBadge &&
+          !isResolved &&
+          !hasVoted &&
+          !pendingVote &&
+          "border-[rgba(46,204,113,0.45)]",
+        !hasVoted && !pendingVote && !isResolved && "border-lm-border",
         isResolved && "border-[rgba(232,184,75,0.35)]",
       )}
       data-matchid={match.id}
@@ -89,6 +100,26 @@ export function MatchCard({
           >
             <Icon name="circle-check" size={12} />
             Terminado
+          </span>
+        ) : hasVoted ? (
+          <span
+            className={cn(
+              "flex items-center gap-1 rounded-full border border-[rgba(46,204,113,0.55)]",
+              "bg-[rgba(46,204,113,0.2)] px-2 py-0.5 text-sm font-black tracking-wide text-lm-green2 max-md:text-base",
+            )}
+          >
+            <Icon name="circle-check" size={12} />
+            VOTADO
+          </span>
+        ) : pendingVote ? (
+          <span
+            className={cn(
+              "flex items-center gap-1 rounded-full border border-[rgba(255,107,53,0.55)]",
+              "bg-[rgba(255,107,53,0.15)] px-2 py-0.5 text-sm font-black tracking-wide text-[#ff6b35] max-md:text-base",
+            )}
+          >
+            <Icon name="pointer" size={12} />
+            SIN VOTAR
           </span>
         ) : showLiveBadge ? (
           <span
@@ -156,10 +187,26 @@ export function MatchCard({
           onVote={() => onVote(match.p2)}
         />
       </div>
-      {myVote && !isResolved && (
-        <div className="mt-2 text-center text-base font-bold text-lm-green2">
-          <Icon name="circle-check" size={14} className="inline" /> Votaste por{" "}
-          <strong>{myVote}</strong>
+      {hasVoted && (
+        <div
+          className={cn(
+            "mt-2.5 rounded-[10px] border border-[rgba(46,204,113,0.5)]",
+            "bg-[rgba(46,204,113,0.14)] px-3 py-2 text-center text-base font-bold text-lm-green2",
+          )}
+        >
+          <Icon name="circle-check" size={14} className="mr-1 inline" />
+          Votaste por <strong className="text-white">{myVote}</strong>
+        </div>
+      )}
+      {pendingVote && (
+        <div
+          className={cn(
+            "mt-2.5 rounded-[10px] border border-[rgba(255,107,53,0.45)]",
+            "bg-[rgba(255,107,53,0.1)] px-3 py-2 text-center text-base font-semibold text-[#ff6b35]",
+          )}
+        >
+          <Icon name="pointer" size={14} className="mr-1 inline" />
+          Toca un participante para votar
         </div>
       )}
       {!isResolved && showLiveBadge && total > 0 ? (

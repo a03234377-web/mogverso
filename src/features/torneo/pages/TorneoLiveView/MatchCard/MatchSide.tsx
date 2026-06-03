@@ -52,10 +52,25 @@ export function MatchSide({
           "border-lm-gold2 bg-[rgba(232,184,75,0.12)] shadow-[0_0_16px_rgba(232,184,75,0.2)]",
         isLoser && "border-[rgba(255,71,87,0.35)] opacity-70",
         votedFor &&
-          "border-lm-green2 bg-[rgba(46,204,113,0.1)] shadow-[0_0_20px_rgba(46,204,113,0.25)]",
+          "border-lm-green2 bg-[rgba(46,204,113,0.14)] shadow-[0_0_20px_rgba(46,204,113,0.3)] ring-2 ring-[rgba(46,204,113,0.25)]",
+        votedInMatch &&
+          !votedFor &&
+          !isWinner &&
+          !isLoser &&
+          "opacity-80 saturate-[0.85]",
       )}
       onClick={() => onVote()}
     >
+      {votedFor && (
+        <span
+          className={cn(
+            "absolute top-1.5 left-1.5 rounded-full border border-[rgba(46,204,113,0.55)]",
+            "bg-[rgba(46,204,113,0.2)] px-1.5 py-px text-[10px] font-black tracking-wide text-lm-green2 uppercase",
+          )}
+        >
+          Tu voto
+        </span>
+      )}
       {isLeading && !votedFor && (
         <Icon
           name="trending-up"
