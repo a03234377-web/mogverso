@@ -45,7 +45,7 @@ export function FighterCard({
         "relative block w-full overflow-hidden rounded-2xl border-2 border-lm-border bg-lm-card",
         "px-4 py-5 text-center lm-focus-ring transition-all duration-250",
         "max-[400px]:px-1.5 max-[400px]:py-2.5 max-md:rounded-xl max-md:px-2 max-md:py-3.5",
-        !canVote && "lm-vote-disabled cursor-not-allowed",
+        !canVote && "lm-vote-disabled disabled:cursor-not-allowed",
         canVote &&
           "cursor-pointer hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(0,0,0,0.3)]",
         canVote &&

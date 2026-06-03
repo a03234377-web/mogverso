@@ -121,6 +121,7 @@ export function MatchCard({
           showBars={showBars}
           canVote={canVote}
           highlight={sideHighlight(match.p1)}
+          votedInMatch={!!myVote && !isResolved}
           onVote={() => onVote(match.p1)}
         />
         <div
@@ -151,6 +152,7 @@ export function MatchCard({
           showBars={showBars}
           canVote={canVote}
           highlight={sideHighlight(match.p2)}
+          votedInMatch={!!myVote && !isResolved}
           onVote={() => onVote(match.p2)}
         />
       </div>

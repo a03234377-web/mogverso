@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { CreatorImage } from "@/components/CreatorImage";
 import { CreatorIcon, Icon } from "@/components/icons";
 import { getPlayerByName, PHASES } from "@/features/torneo/data/torneo-players";
@@ -15,6 +16,21 @@ import { cn } from "@/lib/cn";
 
 type BracketTone = "orange" | "green" | "purple" | "gold";
 type BracketRound = "octavos" | "cuartos" | "semis" | "final";
+
+const BRACKET_ROWS = 8;
+
+const BRACKET_WIRE_COLORS = {
+  "oct-cua": "rgba(255, 107, 53, 0.5)",
+  "cua-sem": "rgba(46, 204, 113, 0.5)",
+  "sem-fin": "rgba(168, 85, 247, 0.5)",
+} as const;
+
+function bracketNodeRow(round: BracketRound, index: number): string {
+  if (round === "octavos") return `${index + 2} / ${index + 3}`;
+  if (round === "cuartos") return `${index * 2 + 2} / ${index * 2 + 4}`;
+  if (round === "semis") return `${index * 4 + 2} / ${index * 4 + 6}`;
+  return "2 / 10";
+}
 
 const VOTING_PHASE_BY_ROUND: Record<BracketRound, string> = {
   octavos: PHASES.OCTAVOS_VOTING,
@@ -35,6 +51,30 @@ function isRoundVoting(state: TorneoState | null, round: BracketRound): boolean 
   if (!state) return false;
   return state.phase === VOTING_PHASE_BY_ROUND[round];
 }
+
+function getBracketFocusRound(phase: string | undefined): BracketRound {
+  switch (phase) {
+    case PHASES.BREAK_CUARTOS:
+    case PHASES.CUARTOS_VOTING:
+      return "cuartos";
+    case PHASES.SEMIFINALS_PROMO:
+    case PHASES.SEMIFINALS_VOTING:
+      return "semis";
+    case PHASES.BREAK_FINAL:
+    case PHASES.FINAL_VOTING:
+    case PHASES.TORNEO_ENDED:
+      return "final";
+    default:
+      return "octavos";
+  }
+}
+
+const BRACKET_ROUND_COLUMN: Record<BracketRound, number> = {
+  octavos: 1,
+  cuartos: 3,
+  semis: 5,
+  final: 7,
+};
 
 export function TorneoBracket({
   state,
@@ -60,125 +100,140 @@ export function TorneoBracket({
   const champion = state?.champion ?? null;
   const fm = state?.finalMatch;
   const octavosVoting = isRoundVoting(state, "octavos");
+  const focusRound = getBracketFocusRound(state?.phase);
 
   return (
-    <TorneoBracketShell>
-      <BracketColumn title="Octavos" tone="orange">
-        {OCTAVOS_IDS.map((matchId, i) => {
-          const oMatch = octavosSource?.[matchId];
-          if (!oMatch) {
-            return (
+    <TorneoBracketShell focusRound={focusRound}>
+      <BracketRoundAnchor round="octavos" column={BRACKET_ROUND_COLUMN.octavos} />
+      <BracketRoundAnchor round="cuartos" column={BRACKET_ROUND_COLUMN.cuartos} />
+      <BracketRoundAnchor round="semis" column={BRACKET_ROUND_COLUMN.semis} />
+      <BracketRoundAnchor round="final" column={BRACKET_ROUND_COLUMN.final} />
+
+      <BracketRoundHeader title="Octavos" tone="orange" column={1} />
+      <BracketRoundHeader title="Cuartos" tone="green" column={3} />
+      <BracketRoundHeader title="Semifinales" tone="purple" column={5} />
+      <BracketRoundHeader title="Final" tone="gold" column={7} />
+
+      {OCTAVOS_IDS.map((matchId, i) => {
+        const oMatch = octavosSource?.[matchId];
+        return (
+          <div
+            key={matchId}
+            className="torneo-bracket-node torneo-bracket-node--out"
+            style={{ gridColumn: 1, gridRow: bracketNodeRow("octavos", i) }}
+          >
+            {!oMatch ? (
               <BracketMatchGroup
-                key={matchId}
                 tone="orange"
                 matchNum={i + 1}
-                advanceLabel={`→ Cuartos ${Math.floor(i / 2) + 1}`}
+                advanceLabel={`Cuartos ${Math.floor(i / 2) + 1}`}
                 pending
               />
-            );
-          }
-          return (
-            <BracketMatchGroup
-              key={matchId}
-              tone="orange"
-              match={oMatch}
-              matchNum={i + 1}
-              advanceLabel={`→ Cuartos ${Math.floor(i / 2) + 1}`}
-              votingActive={octavosVoting && !oMatch.resolved}
-              myVote={getLocalVote?.(matchId) ?? null}
-              onVoteClick={() => scrollToTorneoMatch(matchId)}
-            />
-          );
-        })}
-      </BracketColumn>
-
-      <BracketColumn title="Cuartos" tone="green">
-        {CUARTOS_IDS.map((matchId, i) => {
-          const cMatch = state?.cuartosMatches?.[matchId];
-          if (cMatch) {
-            return (
+            ) : (
               <BracketMatchGroup
-                key={matchId}
+                tone="orange"
+                match={oMatch}
+                matchNum={i + 1}
+                advanceLabel={`Cuartos ${Math.floor(i / 2) + 1}`}
+                votingActive={octavosVoting && !oMatch.resolved}
+                myVote={getLocalVote?.(matchId) ?? null}
+                onVoteClick={() => scrollToTorneoMatch(matchId)}
+              />
+            )}
+          </div>
+        );
+      })}
+
+      <BracketWires column={2} pairs={4} color={BRACKET_WIRE_COLORS["oct-cua"]} />
+
+      {CUARTOS_IDS.map((matchId, i) => {
+        const cMatch = state?.cuartosMatches?.[matchId];
+        const w1 = octavosWinners[i * 2];
+        const w2 = octavosWinners[i * 2 + 1];
+        return (
+          <div
+            key={matchId}
+            className="torneo-bracket-node torneo-bracket-node--in torneo-bracket-node--out"
+            style={{ gridColumn: 3, gridRow: bracketNodeRow("cuartos", i) }}
+          >
+            {cMatch ? (
+              <BracketMatchGroup
                 tone="green"
                 match={cMatch}
                 matchNum={i + 1}
-                advanceLabel={`→ Semifinal ${Math.floor(i / 2) + 1}`}
+                advanceLabel={`Semifinal ${Math.floor(i / 2) + 1}`}
                 votingActive={isRoundVoting(state, "cuartos") && !cMatch.resolved}
                 myVote={getLocalVote?.(matchId) ?? null}
                 onVoteClick={() => scrollToTorneoMatch(matchId)}
               />
-            );
-          }
-          const w1 = octavosWinners[i * 2];
-          const w2 = octavosWinners[i * 2 + 1];
-          if (w1 && w2) {
-            return (
+            ) : w1 && w2 ? (
               <BracketMatchGroup
-                key={matchId}
                 tone="green"
                 matchNum={i + 1}
                 p1={w1}
                 p2={w2}
-                advanceLabel={`→ Semifinal ${Math.floor(i / 2) + 1}`}
+                advanceLabel={`Semifinal ${Math.floor(i / 2) + 1}`}
               />
-            );
-          }
-          return (
-            <BracketMatchGroup
-              key={matchId}
-              tone="green"
-              matchNum={i + 1}
-              advanceLabel={`→ Semifinal ${Math.floor(i / 2) + 1}`}
-              pending
-            />
-          );
-        })}
-      </BracketColumn>
-
-      <BracketColumn title="Semifinales" tone="purple">
-        {SEMIS_IDS.map((matchId, i) => {
-          const semiMatch = state?.semisMatches?.[matchId];
-          if (semiMatch) {
-            return (
+            ) : (
               <BracketMatchGroup
-                key={matchId}
+                tone="green"
+                matchNum={i + 1}
+                advanceLabel={`Semifinal ${Math.floor(i / 2) + 1}`}
+                pending
+              />
+            )}
+          </div>
+        );
+      })}
+
+      <BracketWires column={4} pairs={2} color={BRACKET_WIRE_COLORS["cua-sem"]} />
+
+      {SEMIS_IDS.map((matchId, i) => {
+        const semiMatch = state?.semisMatches?.[matchId];
+        const w1 = cuartosWinners[i * 2];
+        const w2 = cuartosWinners[i * 2 + 1];
+        return (
+          <div
+            key={matchId}
+            className="torneo-bracket-node torneo-bracket-node--in torneo-bracket-node--out"
+            style={{ gridColumn: 5, gridRow: bracketNodeRow("semis", i) }}
+          >
+            {semiMatch ? (
+              <BracketMatchGroup
                 tone="purple"
                 match={semiMatch}
                 matchNum={i + 1}
-                advanceLabel="→ Gran Final"
+                advanceLabel="Gran Final"
                 votingActive={isRoundVoting(state, "semis") && !semiMatch.resolved}
                 myVote={getLocalVote?.(matchId) ?? null}
                 onVoteClick={() => scrollToTorneoMatch(matchId)}
               />
-            );
-          }
-          const w1 = cuartosWinners[i * 2];
-          const w2 = cuartosWinners[i * 2 + 1];
-          if (w1 && w2) {
-            return (
+            ) : w1 && w2 ? (
               <BracketMatchGroup
-                key={matchId}
                 tone="purple"
                 matchNum={i + 1}
                 p1={w1}
                 p2={w2}
-                advanceLabel="→ Gran Final"
+                advanceLabel="Gran Final"
               />
-            );
-          }
-          return (
-            <BracketMatchGroup
-              key={matchId}
-              tone="purple"
-              matchNum={i + 1}
-              advanceLabel="→ Gran Final"
-              pending
-            />
-          );
-        })}
-      </BracketColumn>
+            ) : (
+              <BracketMatchGroup
+                tone="purple"
+                matchNum={i + 1}
+                advanceLabel="Gran Final"
+                pending
+              />
+            )}
+          </div>
+        );
+      })}
 
-      <BracketColumn title="Final" tone="gold">
+      <BracketWires column={6} pairs={1} color={BRACKET_WIRE_COLORS["sem-fin"]} />
+
+      <div
+        className="torneo-bracket-node torneo-bracket-node--final torneo-bracket-node--in"
+        style={{ gridColumn: 7, gridRow: bracketNodeRow("final", 0) }}
+      >
         {champion ? (
           <BracketSlot name={champion} tone="gold" winner gold />
         ) : fm ? (
@@ -186,7 +241,7 @@ export function TorneoBracket({
             tone="gold"
             match={fm}
             matchNum={1}
-            advanceLabel="→ Campeón"
+            advanceLabel="Campeón"
             votingActive={isRoundVoting(state, "final") && !fm.resolved}
             myVote={getLocalVote?.("final_0") ?? null}
             onVoteClick={() => scrollToTorneoMatch("final_0")}
@@ -197,12 +252,12 @@ export function TorneoBracket({
             matchNum={1}
             p1={state.semisWinners[0]}
             p2={state.semisWinners[1]}
-            advanceLabel="→ Campeón"
+            advanceLabel="Campeón"
           />
         ) : (
           <BracketSlot tone="gold" pending finalPending />
         )}
-      </BracketColumn>
+      </div>
     </TorneoBracketShell>
   );
 }
@@ -210,10 +265,36 @@ export function TorneoBracket({
 function TorneoBracketShell({
   children,
   empty,
+  focusRound,
 }: {
   children?: ReactNode;
   empty?: boolean;
+  focusRound?: BracketRound;
 }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const hasScrolledRef = useRef(false);
+
+  useLayoutEffect(() => {
+    if (empty || !focusRound) return;
+    const scroller = scrollRef.current;
+    if (!scroller) return;
+
+    const anchor = scroller.querySelector<HTMLElement>(
+      `#torneo-bracket-round-${focusRound}`,
+    );
+    if (!anchor) return;
+
+    const targetLeft =
+      anchor.offsetLeft - (scroller.clientWidth - anchor.offsetWidth) / 2;
+    const maxScroll = scroller.scrollWidth - scroller.clientWidth;
+
+    scroller.scrollTo({
+      left: Math.max(0, Math.min(targetLeft, maxScroll)),
+      behavior: hasScrolledRef.current ? "smooth" : "auto",
+    });
+    hasScrolledRef.current = true;
+  }, [empty, focusRound]);
+
   return (
     <div
       className={cn(
@@ -227,32 +308,94 @@ function TorneoBracketShell({
           Cargando cuadro del torneo…
         </p>
       ) : (
-        <div className="flex gap-3 overflow-x-auto pb-1">{children}</div>
+        <div ref={scrollRef} className="torneo-bracket-scroll">
+          <div className="torneo-bracket-tree">{children}</div>
+        </div>
       )}
     </div>
   );
 }
 
-function BracketColumn({
+function BracketRoundAnchor({
+  round,
+  column,
+}: {
+  round: BracketRound;
+  column: number;
+}) {
+  return (
+    <div
+      id={`torneo-bracket-round-${round}`}
+      className="torneo-bracket-round-anchor pointer-events-none"
+      style={{ gridColumn: column, gridRow: "1 / -1" }}
+      aria-hidden
+    />
+  );
+}
+
+function BracketRoundHeader({
   title,
   tone,
-  children,
+  column,
 }: {
   title: string;
   tone: BracketTone;
-  children: ReactNode;
+  column: number;
 }) {
   return (
-    <div className="flex min-w-[148px] shrink-0 flex-col gap-2.5">
-      <div
-        className={cn(
-          "torneo-bracket-col-title mb-0.5 border-b py-1.5 text-center lm-type-label max-md:text-base",
-          `torneo-bracket-col-title--${tone}`,
-        )}
-      >
-        {title}
-      </div>
-      {children}
+    <div
+      className={cn(
+        "torneo-bracket-col-title border-b py-1.5 text-center lm-type-label max-md:text-base",
+        `torneo-bracket-col-title--${tone}`,
+      )}
+      style={{ gridColumn: column, gridRow: 1 }}
+    >
+      {title}
+    </div>
+  );
+}
+
+function BracketWires({
+  column,
+  pairs,
+  color,
+}: {
+  column: number;
+  pairs: number;
+  color: string;
+}) {
+  const totalSlots = pairs * 2;
+  const paths: string[] = [];
+
+  for (let p = 0; p < pairs; p++) {
+    const yTop = ((p * 2 + 0.5) / totalSlots) * 100;
+    const yBottom = ((p * 2 + 1.5) / totalSlots) * 100;
+    const yMid = ((p * 2 + 1) / totalSlots) * 100;
+    paths.push(
+      `M 0 ${yTop} H 50 V ${yMid} M 0 ${yBottom} H 50 V ${yMid} H 100`,
+    );
+  }
+
+  return (
+    <div
+      className="torneo-bracket-wires"
+      style={{ gridColumn: column, gridRow: `2 / ${BRACKET_ROWS + 2}` }}
+      aria-hidden
+    >
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+        {paths.map((d, i) => (
+          <path
+            key={i}
+            d={d}
+            fill="none"
+            stroke={color}
+            strokeWidth={1.75}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
+      </svg>
     </div>
   );
 }
@@ -338,7 +481,7 @@ function BracketMatchGroup({
           </span>
         ) : showVotes && stats?.leader ? (
           <span
-            className="max-w-[4.5rem] truncate text-[9px] font-bold text-lm-green2"
+            className="max-w-[7rem] truncate text-[9px] font-bold text-lm-green2"
             title={`Va ganando ${stats.leader}`}
           >
             ↑ {stats.leader}
@@ -478,7 +621,6 @@ function BracketSlot({
         compact && "torneo-bracket-slot--compact",
         `torneo-bracket-slot--${tone}`,
         winner && "torneo-bracket-slot--winner",
-        leading && "torneo-bracket-slot--leading",
         voted && "torneo-bracket-slot--voted",
         gold && "torneo-bracket-slot--champion",
       )}
@@ -502,7 +644,7 @@ function BracketSlot({
       </div>
       <div
         className={cn(
-          "min-w-0 flex-1 truncate text-sm font-bold",
+          "torneo-bracket-slot-name min-w-0 flex-1 text-sm font-bold leading-tight",
           gold ? "text-lm-gold" : "text-lm-text",
         )}
       >
@@ -516,21 +658,14 @@ function BracketSlot({
         )}
       </div>
       {typeof votes === "number" ? (
-        <span
-          className={cn(
-            "shrink-0 rounded-md px-1.5 py-px text-[10px] font-black tabular-nums",
-            leading
-              ? "bg-[rgba(46,204,113,0.2)] text-lm-green2"
-              : "bg-white/8 text-lm-text2",
-          )}
-        >
+        <span className="shrink-0 rounded-md bg-white/8 px-1.5 py-px text-[10px] font-black tabular-nums text-lm-text2">
           {votes}
         </span>
       ) : null}
       {voted ? (
         <Icon name="circle-check" size={12} className="shrink-0 text-lm-green2" />
       ) : leading ? (
-        <Icon name="trending-up" size={11} className="shrink-0 text-lm-green2" />
+        <Icon name="trending-up" size={11} className="shrink-0 text-lm-gold" aria-hidden />
       ) : null}
     </div>
   );
