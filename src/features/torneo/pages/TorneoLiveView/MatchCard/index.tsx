@@ -13,6 +13,8 @@ export function MatchCard({
   round,
   state,
   myVote,
+  canVote: canVoteOverride,
+  previewLive,
   onVote,
 }: {
   match: TorneoMatch;
@@ -20,6 +22,8 @@ export function MatchCard({
   round: string;
   state: TorneoState;
   myVote: string | null;
+  canVote?: boolean;
+  previewLive?: boolean;
   onVote: (name: string) => void;
 }) {
   const p1 = getPlayerByName(match.p1);
@@ -35,7 +39,8 @@ export function MatchCard({
     (state.phase === PHASES.CUARTOS_VOTING && round === "cuartos") ||
     (state.phase === PHASES.SEMIFINALS_VOTING && round === "semis") ||
     (state.phase === PHASES.FINAL_VOTING && round === "final");
-  const canVote = isVotingPhase && !isResolved && !myVote;
+  const canVote = (canVoteOverride ?? isVotingPhase) && !isResolved && !myVote;
+  const showLiveBadge = previewLive || canVoteOverride === true || isVotingPhase;
   const showBars = isResolved || !!myVote;
   const roundIcon: IconName =
     round === "octavos"
@@ -59,7 +64,7 @@ export function MatchCard({
       className={cn(
         "relative overflow-hidden rounded-[14px] border border-lm-border bg-lm-card",
         "px-5 py-4 transition-colors duration-300",
-        isVotingPhase && !isResolved && "border-[rgba(46,204,113,0.45)]",
+        showLiveBadge && !isResolved && "border-[rgba(46,204,113,0.45)]",
         isResolved && "border-[rgba(232,184,75,0.35)]",
       )}
       data-matchid={match.id}
@@ -79,7 +84,7 @@ export function MatchCard({
             <Icon name="circle-check" size={12} />
             Terminado
           </span>
-        ) : isVotingPhase ? (
+        ) : showLiveBadge ? (
           <span
             className={cn(
               "flex items-center gap-1 rounded-full border border-[rgba(46,204,113,0.4)]",

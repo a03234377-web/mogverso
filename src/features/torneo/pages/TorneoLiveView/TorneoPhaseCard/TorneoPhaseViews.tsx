@@ -25,7 +25,6 @@ import {
 import { formatSpainTime, formatSpainWeekdayDate } from "@/lib/spain-time";
 
 export function TorneoPhaseWaitingOctavos({
-  state,
   cd,
   targetMs,
 }: {

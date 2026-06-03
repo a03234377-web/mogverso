@@ -63,14 +63,9 @@ export function useTorneo(active: boolean) {
         incoming.phase === PHASES.WAITING_OCTAVOS && now >= editionStart;
       const waitingStaleTarget =
         incoming.phase === PHASES.WAITING_OCTAVOS &&
-        Math.abs(incoming.phaseEnd - getTorneoWaitingTargetMs(incoming, now)) >
-          60_000;
+        Math.abs(incoming.phaseEnd - getTorneoWaitingTargetMs(incoming, now)) > 60_000;
 
-      if (
-        waitingPastStart ||
-        waitingStaleTarget ||
-        incoming.phaseEnd <= now - 2000
-      ) {
+      if (waitingPastStart || waitingStaleTarget || incoming.phaseEnd <= now - 2000) {
         if (waitingPastStart || waitingStaleTarget) {
           await healTorneoApi();
         } else {
@@ -79,9 +74,7 @@ export function useTorneo(active: boolean) {
         const advanced = await fb.get(fb.ref(fb.db, "torneo/state"));
         dispatch({
           type: "sync",
-          payload: advanced.exists()
-            ? (advanced.val() as TorneoState)
-            : incoming,
+          payload: advanced.exists() ? (advanced.val() as TorneoState) : incoming,
         });
       } else {
         dispatch({ type: "sync", payload: incoming });
@@ -117,17 +110,38 @@ export function useTorneo(active: boolean) {
 
   useEffect(() => {
     if (!fb || !active || !state) return;
-    if (state.phaseEnd > Date.now()) return;
 
-    const id = setInterval(() => {
-      if (state.phaseEnd <= Date.now()) {
-        void advanceTorneoPhaseIfNeeded(fb, state).then((advanced) => {
-          if (advanced) dispatch({ type: "patch", payload: advanced });
-        });
+    const tick = async () => {
+      const now = Date.now();
+      const editionStart = getEditionStartMsForWeekContaining(now);
+      const waitingPastStart =
+        state.phase === PHASES.WAITING_OCTAVOS && now >= editionStart;
+
+      if (!waitingPastStart && state.phaseEnd > now - 2000) return;
+
+      if (waitingPastStart) {
+        await healTorneoApi();
+      } else {
+        const advanced = await advanceTorneoPhaseIfNeeded(fb, state, now);
+        if (advanced) {
+          dispatch({ type: "patch", payload: advanced });
+          return;
+        }
       }
-    }, 1000);
+
+      const snap = await fb.get(fb.ref(fb.db, "torneo/state"));
+      if (snap.exists()) {
+        dispatch({ type: "patch", payload: snap.val() as TorneoState });
+      }
+    };
+
+    void tick();
+    const id = setInterval(
+      () => void tick(),
+      state.phase === PHASES.WAITING_OCTAVOS ? 5000 : 1000,
+    );
     return () => clearInterval(id);
-  }, [fb, active, state]);
+  }, [fb, active, state?.phase, state?.phaseEnd, state?.createdAt]);
 
   const vote = useCallback(
     async (matchId: string, playerName: string) => {

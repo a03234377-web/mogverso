@@ -11,10 +11,7 @@ export function useTorneoBracketPreview(enabled: boolean) {
   > | null>(null);
 
   useEffect(() => {
-    if (!enabled) {
-      setPreviewMatches(null);
-      return;
-    }
+    if (!enabled) return;
 
     let cancelled = false;
     void (async () => {
@@ -36,5 +33,5 @@ export function useTorneoBracketPreview(enabled: boolean) {
     };
   }, [enabled]);
 
-  return previewMatches;
+  return enabled ? previewMatches : null;
 }

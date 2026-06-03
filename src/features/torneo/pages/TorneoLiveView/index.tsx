@@ -17,10 +17,12 @@ import {
 } from "@/features/torneo/components/torneo-hero-content";
 import { TorneoEditionCalendar } from "@/features/torneo/components/TorneoEditionCalendar";
 import { useTorneo } from "@/features/torneo/hooks/useTorneo";
+import { healTorneoApi } from "@/lib/api/vote-client";
+import { PHASES } from "@/features/torneo/data/torneo-players";
 import { getUpcomingTorneoStartMs } from "@/lib/torneo-schedule";
 
 export function TorneoLiveView() {
-  const { state, loading, vote, getLocalVote, phases } = useTorneo(true);
+  const { state, loading, vote, getLocalVote } = useTorneo(true);
   const [, setTick] = useState(0);
   const [now, setNow] = useState(() => Date.now());
   const refresh = useCallback(() => setTick((t) => t + 1), []);
@@ -54,10 +56,13 @@ export function TorneoLiveView() {
         state={state}
         getLocalVote={getLocalVote}
         onVote={async (matchId, name) => {
+          if (state?.phase === PHASES.WAITING_OCTAVOS) {
+            await healTorneoApi();
+            refresh();
+          }
           await vote(matchId, name);
           refresh();
         }}
-        phases={phases}
       />
 
       <div className="mx-auto mb-8 max-w-[860px] px-5 pb-8 max-md:px-3 max-md:pb-4">
