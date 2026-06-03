@@ -1,16 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+
+function subscribeNoop() {
+  return () => {};
+}
 
 /** Cuenta atrás en segundos al abrir un modal (p. ej. 5 s antes de poder cerrar). */
 export function useCloseCountdown(open: boolean, seconds = 5) {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    subscribeNoop,
+    () => true,
+    () => false,
+  );
   const [elapsed, setElapsed] = useState(0);
   const [prevOpen, setPrevOpen] = useState(open);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   if (open !== prevOpen) {
     setPrevOpen(open);

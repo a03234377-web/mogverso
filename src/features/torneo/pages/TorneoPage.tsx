@@ -11,6 +11,7 @@ import { isTorneoEditionLive, shouldShowTorneoComingSoon } from "@/lib/torneo-sc
 import { TorneoPromoModal } from "@/features/torneo/components/TorneoPromoModal";
 import { useTorneoPromoModal } from "@/features/torneo/hooks/useTorneoPromoModal";
 import { healTorneoApi } from "@/lib/api/vote-client";
+import { useIsClient } from "@/hooks/useIsClient";
 
 function useTorneoPhase() {
   const { fb } = useFirebase();
@@ -30,14 +31,10 @@ function useTorneoPhase() {
 
 export function TorneoPage() {
   const [now, setNow] = useState(() => Date.now());
-  const [promoReady, setPromoReady] = useState(false);
+  const promoReady = useIsClient();
   const phase = useTorneoPhase();
   const showComingSoon = shouldShowTorneoComingSoon(now, phase);
   const { open: promoOpen, close: closePromo } = useTorneoPromoModal();
-
-  useEffect(() => {
-    setPromoReady(true);
-  }, []);
 
   useEffect(() => {
     void healTorneoApi().catch(() => {
@@ -77,9 +74,7 @@ export function TorneoPage() {
   return (
     <>
       {showComingSoon ? <TorneoComingSoon /> : <TorneoLiveView />}
-      {promoReady ? (
-        <TorneoPromoModal open={promoOpen} onClose={closePromo} />
-      ) : null}
+      {promoReady ? <TorneoPromoModal open={promoOpen} onClose={closePromo} /> : null}
     </>
   );
 }

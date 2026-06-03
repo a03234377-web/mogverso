@@ -9,7 +9,11 @@ import {
 } from "@/features/torneo/data/torneo-client";
 import { PHASES } from "@/features/torneo/data/torneo-players";
 import { patchTorneoVoteCount } from "@/features/torneo/lib/patch-torneo-vote";
-import { healTorneoApi, voteTorneoApi, fetchTorneoMyVotesApi } from "@/lib/api/vote-client";
+import {
+  fetchTorneoMyVotesApi,
+  healTorneoApi,
+  voteTorneoApi,
+} from "@/lib/api/vote-client";
 import {
   torneoLocalVoteStorageKey,
   torneoLocalVoteStorageKeyLegacy,
@@ -57,11 +61,19 @@ export function useTorneo(active: boolean) {
   const { getToken } = useRecaptcha("torneo_vote");
   const [voteError, setVoteError] = useState<string | null>(null);
   const [voting, setVoting] = useState(false);
-  const [serverVotes, setServerVotes] = useState<Record<string, string>>({});
+  const [serverVotesCache, setServerVotesCache] = useState<{
+    editionStartMs: number;
+    votes: Record<string, string>;
+  } | null>(null);
   const [{ state, loading }, dispatch] = useReducer(
     torneoHookReducer,
     initialTorneoHookState,
   );
+  const editionStartMs = state?.editionStartMs;
+  const serverVotes =
+    editionStartMs && serverVotesCache?.editionStartMs === editionStartMs
+      ? serverVotesCache.votes
+      : {};
 
   const applyState = useCallback(
     async (incoming: TorneoState) => {
@@ -121,16 +133,12 @@ export function useTorneo(active: boolean) {
   }, [fb, active, applyState]);
 
   useEffect(() => {
-    const editionStartMs = state?.editionStartMs;
-    if (!active || !editionStartMs) {
-      setServerVotes({});
-      return;
-    }
+    if (!active || !editionStartMs) return;
 
     let cancelled = false;
     void fetchTorneoMyVotesApi(editionStartMs)
       .then((votes) => {
-        if (!cancelled) setServerVotes(votes);
+        if (!cancelled) setServerVotesCache({ editionStartMs, votes });
       })
       .catch(() => {
         /* best-effort: localStorage cubre el voto del usuario */
@@ -139,7 +147,7 @@ export function useTorneo(active: boolean) {
     return () => {
       cancelled = true;
     };
-  }, [active, state?.editionStartMs]);
+  }, [active, editionStartMs]);
 
   useEffect(() => {
     if (!fb || !active || !state) return;
@@ -205,7 +213,7 @@ export function useTorneo(active: boolean) {
 
       return serverVotes[matchId] ?? null;
     },
-    [getTorneoVoteKey, serverVotes, state?.createdAt],
+    [getTorneoVoteKey, serverVotes, state],
   );
 
   const vote = useCallback(
@@ -233,7 +241,15 @@ export function useTorneo(active: boolean) {
         } catch {
           /* quota / private mode */
         }
-        setServerVotes((prev) => ({ ...prev, [matchId]: playerName }));
+        setServerVotesCache((prev) => {
+          const edition = state?.editionStartMs ?? prev?.editionStartMs;
+          if (!edition) return prev;
+          const votes = prev?.editionStartMs === edition ? prev.votes : {};
+          return {
+            editionStartMs: edition,
+            votes: { ...votes, [matchId]: playerName },
+          };
+        });
 
         if (state) {
           dispatch({
