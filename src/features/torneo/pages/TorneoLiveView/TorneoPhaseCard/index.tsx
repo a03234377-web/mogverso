@@ -15,9 +15,11 @@ import { PHASES } from "@/features/torneo/data/torneo-players";
 import { healTorneoApi } from "@/lib/api/vote-client";
 import { useCountdown } from "@/hooks/useCountdown";
 import {
+  getTorneoPhaseCountdownTargetMs,
   getTorneoVotingTargetMs,
-  getTorneoWaitingTargetMs,
   getUpcomingTorneoStartMs,
+  isTorneoLegacyBreakReadyToOpen,
+  isTorneoPhaseExpired,
 } from "@/lib/torneo-schedule";
 import type { TorneoState } from "@/types/looksmax";
 import { TorneoPhaseEnded, TorneoPhaseWaitingOctavos } from "./TorneoPhaseViews";
@@ -31,13 +33,15 @@ export function TorneoPhaseCard({
   loading: boolean;
   onRestart: () => void;
 }) {
-  const waitingTargetMs =
-    state?.phase === PHASES.WAITING_OCTAVOS ? getTorneoWaitingTargetMs(state) : null;
-  const votingTargetMs = state ? getTorneoVotingTargetMs(state) : null;
-  const countdownEnd =
-    state?.phase === PHASES.WAITING_OCTAVOS
-      ? waitingTargetMs
-      : (votingTargetMs ?? state?.phaseEnd);
+  const cuartosVotingLive =
+    state?.phase === PHASES.CUARTOS_VOTING ||
+    (state?.phase === PHASES.BREAK_CUARTOS &&
+      isTorneoLegacyBreakReadyToOpen(state));
+  const countdownEnd = state
+    ? cuartosVotingLive && state.phase === PHASES.BREAK_CUARTOS
+      ? getTorneoVotingTargetMs({ ...state, phase: PHASES.CUARTOS_VOTING })
+      : getTorneoPhaseCountdownTargetMs(state)
+    : null;
   const cd = useCountdown(countdownEnd);
   const restartEnd =
     state?.phase === PHASES.TORNEO_ENDED ? getUpcomingTorneoStartMs() : null;
@@ -52,17 +56,31 @@ export function TorneoPhaseCard({
   }, [state?.phase, cd.expired, onRestart]);
 
   useEffect(() => {
-    const isVotingPhase =
+    const needsHealOnExpire =
       state?.phase === PHASES.OCTAVOS_VOTING ||
       state?.phase === PHASES.CUARTOS_VOTING ||
       state?.phase === PHASES.SEMIFINALS_VOTING ||
-      state?.phase === PHASES.FINAL_VOTING;
-    if (!isVotingPhase || !cd.expired) return;
+      state?.phase === PHASES.FINAL_VOTING ||
+      state?.phase === PHASES.BREAK_CUARTOS ||
+      state?.phase === PHASES.SEMIFINALS_PROMO ||
+      state?.phase === PHASES.BREAK_FINAL;
+    const legacyBreakOpen =
+      state &&
+      (state.phase === PHASES.BREAK_CUARTOS ||
+        state.phase === PHASES.SEMIFINALS_PROMO) &&
+      isTorneoLegacyBreakReadyToOpen(state);
+    if (
+      !needsHealOnExpire ||
+      !state ||
+      (!legacyBreakOpen && !cd.expired && !isTorneoPhaseExpired(state))
+    ) {
+      return;
+    }
     void (async () => {
       await healTorneoApi();
       onRestart();
     })();
-  }, [state?.phase, cd.expired, onRestart]);
+  }, [state, cd.expired, onRestart]);
 
   useEffect(() => {
     if (state?.phase !== PHASES.TORNEO_ENDED || !restartCd.expired) return;
@@ -96,7 +114,7 @@ export function TorneoPhaseCard({
       <TorneoPhaseWaitingOctavos
         state={state}
         cd={cd}
-        targetMs={waitingTargetMs ?? state.phaseEnd}
+        targetMs={countdownEnd ?? state.phaseEnd}
       />
     );
   }
@@ -121,7 +139,30 @@ export function TorneoPhaseCard({
     );
   }
 
-  if (state.phase === PHASES.CUARTOS_VOTING) {
+  if (state.phase === PHASES.BREAK_CUARTOS && !cuartosVotingLive) {
+    return (
+      <PhaseDisplay>
+        <PhaseCard variant="break">
+          <PhaseLabel color="green">PAUSA · CUARTOS PRONTO</PhaseLabel>
+          <PhaseTitle color="green">
+            <Icon
+              name="landmark"
+              size={18}
+              className="mr-1.5 inline shrink-0 align-middle"
+            />
+            CUARTOS DE FINAL
+          </PhaseTitle>
+          <PhaseSub>La votación de cuartos abre en breve</PhaseSub>
+          <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="green" />
+        </PhaseCard>
+      </PhaseDisplay>
+    );
+  }
+
+  if (
+    state.phase === PHASES.CUARTOS_VOTING ||
+    (state.phase === PHASES.BREAK_CUARTOS && cuartosVotingLive)
+  ) {
     return (
       <PhaseDisplay>
         <PhaseCard variant="voting">
@@ -136,6 +177,26 @@ export function TorneoPhaseCard({
           </PhaseTitle>
           <PhaseSub>{TORNEO_VOTING_SUB}</PhaseSub>
           <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="green" />
+        </PhaseCard>
+      </PhaseDisplay>
+    );
+  }
+
+  if (state.phase === PHASES.SEMIFINALS_PROMO) {
+    return (
+      <PhaseDisplay>
+        <PhaseCard variant="break">
+          <PhaseLabel color="gold">PAUSA · SEMIFINALES PRONTO</PhaseLabel>
+          <PhaseTitle color="gold">
+            <Icon
+              name="trophy"
+              size={18}
+              className="mr-1.5 inline shrink-0 align-middle"
+            />
+            SEMIFINALES
+          </PhaseTitle>
+          <PhaseSub>La votación de semifinales abre en breve</PhaseSub>
+          <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="gold" />
         </PhaseCard>
       </PhaseDisplay>
     );

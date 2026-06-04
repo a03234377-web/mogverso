@@ -132,3 +132,31 @@ export function repairActiveRoundMatches(
 
   return null;
 }
+
+/** Abre la votación tras una pausa (`break_*` / `semifinals_promo` en RTDB). */
+export function openBreakToVotingState(
+  state: TorneoState,
+  now: number,
+): TorneoState | null {
+  if (state.phase === PHASES.BREAK_CUARTOS) {
+    const draft: TorneoState = {
+      ...state,
+      phase: PHASES.CUARTOS_VOTING,
+      phaseStart: now,
+      phaseEnd: now + 86_400_000,
+    };
+    return finalizeVotingPhaseEnd(draft, now);
+  }
+
+  if (state.phase === PHASES.SEMIFINALS_PROMO) {
+    const draft: TorneoState = {
+      ...state,
+      phase: PHASES.SEMIFINALS_VOTING,
+      phaseStart: now,
+      phaseEnd: now + 86_400_000,
+    };
+    return finalizeVotingPhaseEnd(draft, now);
+  }
+
+  return null;
+}

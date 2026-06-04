@@ -5,6 +5,7 @@ import {
   getTorneoVotingCanonicalEndMs,
   getTorneoVotingTargetMs,
   getUpcomingTorneoStartMs,
+  isTorneoLegacyBreakReadyToOpen,
   isTorneoPhaseExpired,
 } from "@/lib/torneo-schedule";
 import type { TorneoState } from "@/types/looksmax";
@@ -39,7 +40,17 @@ export async function ensureTorneoState(
     getTorneoVotingCanonicalEndMs(existing, now) != null &&
     Math.abs(existing.phaseEnd - getTorneoVotingTargetMs(existing, now)) > 60_000;
 
-  if (waitingNeedsHeal || votingStaleTarget || isTorneoPhaseExpired(existing, now)) {
+  const legacyBreakNeedsOpen =
+    (existing.phase === PHASES.BREAK_CUARTOS ||
+      existing.phase === PHASES.SEMIFINALS_PROMO) &&
+    isTorneoLegacyBreakReadyToOpen(existing, now);
+
+  if (
+    waitingNeedsHeal ||
+    votingStaleTarget ||
+    legacyBreakNeedsOpen ||
+    isTorneoPhaseExpired(existing, now)
+  ) {
     await healTorneoApi();
     const refreshed = await readTorneoState(fb);
     return refreshed ?? existing;

@@ -7,6 +7,7 @@ import {
   getEditionStartMsForWeekContaining,
   getTorneoVotingCanonicalEndMs,
   getUpcomingTorneoStartMs,
+  isTorneoLegacyBreakReadyToOpen,
   isTorneoPhaseExpired,
   isTorneoVotingPhaseExpired,
   shouldForceTorneoWaitingBeforeStart,
@@ -17,6 +18,7 @@ import {
   buildCuartosToSemisState,
   buildOctavosToCuartosState,
   buildSemisToFinalState,
+  openBreakToVotingState,
   repairActiveRoundMatches,
   withCanonicalVotingPhaseEnd,
 } from "@/lib/torneo-phase-transition";
@@ -293,6 +295,25 @@ export async function healTorneo(options?: {
     return { healed: true };
   }
 
+  if (
+    existing.phase === PHASES.BREAK_CUARTOS ||
+    existing.phase === PHASES.SEMIFINALS_PROMO
+  ) {
+    const readyToOpen =
+      isTorneoLegacyBreakReadyToOpen(existing, now) ||
+      isTorneoPhaseExpired(existing, now);
+    if (!readyToOpen) {
+      return { healed: false };
+    }
+    const opened = openBreakToVotingState(existing, now);
+    if (!opened) return { healed: false };
+    const ok = await atomicAdvanceTorneoPhase(
+      existing.phase,
+      preserveEditionMeta(existing, opened) as Record<string, unknown>,
+    );
+    return { healed: ok };
+  }
+
   if (existing.phase === PHASES.WAITING_OCTAVOS) {
     const editionStart = getEditionStartMsForWeekContaining(now);
     if (now < editionStart) {
@@ -313,6 +334,15 @@ export async function healTorneo(options?: {
     return { healed: true };
   }
 
+  const votingTimedOut =
+    getTorneoVotingCanonicalEndMs(existing, now) != null &&
+    isTorneoVotingPhaseExpired(existing, now);
+
+  if (votingTimedOut) {
+    await advanceTorneoPhaseIfNeeded(existing, now);
+    return { healed: true };
+  }
+
   const synced = withCanonicalVotingPhaseEnd(existing, now);
   if (synced.phaseEnd !== existing.phaseEnd) {
     await applyTorneoStatePatch({ phaseEnd: synced.phaseEnd });
@@ -320,13 +350,6 @@ export async function healTorneo(options?: {
   }
 
   const votingEnd = getTorneoVotingCanonicalEndMs(existing, now);
-  const votingTimedOut = votingEnd != null && isTorneoVotingPhaseExpired(existing, now);
-
-  if (votingTimedOut) {
-    await advanceTorneoPhaseIfNeeded(existing, now);
-    return { healed: true };
-  }
-
   if (votingEnd != null && Math.abs(existing.phaseEnd - votingEnd) > 60_000) {
     const db = getAdminDatabase();
     await db.ref("torneo/state/phaseEnd").set(votingEnd);
