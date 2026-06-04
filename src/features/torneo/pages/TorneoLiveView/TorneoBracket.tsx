@@ -10,7 +10,13 @@ import {
   getTorneoMatchVoteStats,
   getTorneoPlayerVotes,
 } from "@/features/torneo/lib/torneo-match-votes";
-import { CUARTOS_IDS, OCTAVOS_IDS, SEMIS_IDS } from "@/lib/torneo-bracket";
+import {
+  CUARTOS_IDS,
+  getCuartosWinnersForBracket,
+  getOctavosWinnersForBracket,
+  OCTAVOS_IDS,
+  SEMIS_IDS,
+} from "@/lib/torneo-bracket";
 import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 import { cn } from "@/lib/cn";
 
@@ -95,8 +101,8 @@ export function TorneoBracket({
     return <TorneoBracketShell empty />;
   }
 
-  const octavosWinners = state?.octavosWinners ?? [];
-  const cuartosWinners = state?.cuartosWinners ?? [];
+  const octavosWinners = getOctavosWinnersForBracket(state);
+  const cuartosWinners = getCuartosWinnersForBracket(state);
   const champion = state?.champion ?? null;
   const fm = state?.finalMatch;
   const octavosVoting = isRoundVoting(state, "octavos");

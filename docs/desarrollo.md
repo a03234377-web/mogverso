@@ -101,6 +101,7 @@ En **Vercel/producción** sí debes tener las dos claves del mismo sitio reCAPTC
 
 - **Calendario:** octavos (top 16 del ranking, 1v2, 3v4…) → cuartos → semis → final. Votación simultánea en todos los duelos de la fase activa (1 voto por combate).
 - **Producción:** `heal` al visitar `/torneo` y al votar; opcional cron `GET /api/cron/torneo-advance` en Vercel Pro.
+- **Invariantes (no romper):** timer, avance, votos y lista de duelos usan `torneo-schedule.ts` (`isTorneoPhaseExpired`, `getTorneoVotingCanonicalEndMs`). Tras octavos→cuartos hay que persistir `octavosWinners` (8 posiciones) y `cuartosMatches`. La UI de votos elige ronda por `state.phase` (`getTorneoMatchesView`), no por `matches.oct_0`. Transiciones en `torneo-phase-transition.ts`; tests en `pnpm test` (`torneo-invariants.test.ts`).
 
 ## Editar estilos
 

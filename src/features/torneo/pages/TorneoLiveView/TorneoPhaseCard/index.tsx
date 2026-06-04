@@ -52,6 +52,19 @@ export function TorneoPhaseCard({
   }, [state?.phase, cd.expired, onRestart]);
 
   useEffect(() => {
+    const isVotingPhase =
+      state?.phase === PHASES.OCTAVOS_VOTING ||
+      state?.phase === PHASES.CUARTOS_VOTING ||
+      state?.phase === PHASES.SEMIFINALS_VOTING ||
+      state?.phase === PHASES.FINAL_VOTING;
+    if (!isVotingPhase || !cd.expired) return;
+    void (async () => {
+      await healTorneoApi();
+      onRestart();
+    })();
+  }, [state?.phase, cd.expired, onRestart]);
+
+  useEffect(() => {
     if (state?.phase !== PHASES.TORNEO_ENDED || !restartCd.expired) return;
     void (async () => {
       await healTorneoApi({ restartIfEnded: true });

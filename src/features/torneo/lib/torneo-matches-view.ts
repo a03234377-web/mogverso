@@ -1,5 +1,9 @@
 import { PHASES } from "@/features/torneo/data/torneo-players";
-import { OCTAVOS_IDS } from "@/lib/torneo-bracket";
+import {
+  buildCuartosFromOctavosWinners,
+  getOctavosWinnersForBracket,
+  OCTAVOS_IDS,
+} from "@/lib/torneo-bracket";
 import { isTorneoEditionLive } from "@/lib/torneo-schedule";
 import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 
@@ -12,6 +16,13 @@ export type TorneoMatchesView = {
   pendingStart?: boolean;
 };
 
+function resolveCuartosMatches(state: TorneoState): Record<string, TorneoMatch> | null {
+  if (state.cuartosMatches?.cua_0) return state.cuartosMatches;
+  const winners = getOctavosWinnersForBracket(state);
+  if (winners.filter(Boolean).length < 2) return null;
+  return buildCuartosFromOctavosWinners(winners);
+}
+
 export function getTorneoMatchesView(
   state: TorneoState | null,
   previewOctavos: Record<string, TorneoMatch> | null,
@@ -19,44 +30,17 @@ export function getTorneoMatchesView(
 ): TorneoMatchesView | null {
   if (!state) return null;
 
-  if (
-    (state.phase === PHASES.OCTAVOS_VOTING || state.matches?.oct_0) &&
-    state.matches
-  ) {
-    return {
-      matches: state.matches,
-      ids: [...OCTAVOS_IDS],
-      round: "octavos",
-      title: "Octavos de Final — ¡Vota en todos los duelos!",
-      canVote: state.phase === PHASES.OCTAVOS_VOTING,
-      pendingStart: state.phase === PHASES.WAITING_OCTAVOS,
-    };
-  }
-
-  if (
-    state.phase === PHASES.WAITING_OCTAVOS &&
-    isTorneoEditionLive(now) &&
-    previewOctavos &&
-    previewOctavos.oct_0
-  ) {
-    return {
-      matches: previewOctavos,
-      ids: [...OCTAVOS_IDS],
-      round: "octavos",
-      title: "Octavos de Final — ¡Vota en todos los duelos!",
-      canVote: true,
-      pendingStart: true,
-    };
-  }
-
-  if (state.phase === PHASES.CUARTOS_VOTING && state.cuartosMatches) {
-    return {
-      matches: state.cuartosMatches,
-      ids: ["cua_0", "cua_1", "cua_2", "cua_3"],
-      round: "cuartos",
-      title: "Cuartos de Final — ¡Vota Ahora!",
-      canVote: true,
-    };
+  if (state.phase === PHASES.CUARTOS_VOTING) {
+    const matches = resolveCuartosMatches(state);
+    if (matches) {
+      return {
+        matches,
+        ids: ["cua_0", "cua_1", "cua_2", "cua_3"],
+        round: "cuartos",
+        title: "Cuartos de Final — ¡Vota Ahora!",
+        canVote: true,
+      };
+    }
   }
 
   if (state.phase === PHASES.SEMIFINALS_VOTING && state.semisMatches) {
@@ -86,6 +70,43 @@ export function getTorneoMatchesView(
       round: "final",
       title: "Gran Final — Resultado Final",
       canVote: false,
+    };
+  }
+
+  if (state.phase === PHASES.OCTAVOS_VOTING && state.matches?.oct_0) {
+    return {
+      matches: state.matches,
+      ids: [...OCTAVOS_IDS],
+      round: "octavos",
+      title: "Octavos de Final — ¡Vota en todos los duelos!",
+      canVote: true,
+    };
+  }
+
+  if (
+    state.phase === PHASES.WAITING_OCTAVOS &&
+    isTorneoEditionLive(now) &&
+    previewOctavos &&
+    previewOctavos.oct_0
+  ) {
+    return {
+      matches: previewOctavos,
+      ids: [...OCTAVOS_IDS],
+      round: "octavos",
+      title: "Octavos de Final — ¡Vota en todos los duelos!",
+      canVote: true,
+      pendingStart: true,
+    };
+  }
+
+  if (state.phase === PHASES.WAITING_OCTAVOS && state.matches?.oct_0) {
+    return {
+      matches: state.matches,
+      ids: [...OCTAVOS_IDS],
+      round: "octavos",
+      title: "Octavos de Final — ¡Vota en todos los duelos!",
+      canVote: false,
+      pendingStart: true,
     };
   }
 

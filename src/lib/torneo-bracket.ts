@@ -113,6 +113,71 @@ export function resolveMatchPair(m: TorneoMatch): {
   };
 }
 
+/** Lista de ganadores alineada con `ids` (índice i = duelo ids[i]). */
+export function deriveRoundWinnersInOrder(
+  ids: readonly string[],
+  obj: Record<string, TorneoMatch> | undefined,
+): (string | null)[] {
+  return ids.map((id) => {
+    const m = obj?.[id];
+    if (!m) return null;
+    if (m.winner) return m.winner;
+    const v1 = m.votes?.[m.p1] ?? 0;
+    const v2 = m.votes?.[m.p2] ?? 0;
+    return v1 >= v2 ? m.p1 : m.p2;
+  });
+}
+
+/** RTDB a veces devuelve arrays como objetos `{0: "…", 1: "…"}`. */
+export function normalizeTorneoWinnersList(
+  winners: (string | null)[] | Record<string, string> | null | undefined,
+  expectedLen: number,
+): (string | null)[] {
+  const empty = Array.from({ length: expectedLen }, () => null as string | null);
+  if (!winners) return empty;
+  if (Array.isArray(winners)) {
+    for (let i = 0; i < Math.min(winners.length, expectedLen); i++) {
+      empty[i] = winners[i] ?? null;
+    }
+    return empty;
+  }
+  if (typeof winners === "object") {
+    for (let i = 0; i < expectedLen; i++) {
+      const w = (winners as Record<string, string>)[String(i)];
+      if (typeof w === "string" && w.length > 0) empty[i] = w;
+    }
+  }
+  return empty;
+}
+
+export function getOctavosWinnersForBracket(
+  state: {
+    octavosWinners?: (string | null)[] | Record<string, string> | null;
+    matches?: Record<string, TorneoMatch>;
+  } | null,
+): (string | null)[] {
+  if (!state) return [];
+  const fromMatches = deriveRoundWinnersInOrder(OCTAVOS_IDS, state.matches);
+  if (fromMatches.filter(Boolean).length >= 2) return fromMatches;
+  const fromList = normalizeTorneoWinnersList(state.octavosWinners, OCTAVOS_IDS.length);
+  if (fromList.filter(Boolean).length >= 2) return fromList;
+  return fromMatches;
+}
+
+export function getCuartosWinnersForBracket(
+  state: {
+    cuartosWinners?: (string | null)[] | Record<string, string> | null;
+    cuartosMatches?: Record<string, TorneoMatch>;
+  } | null,
+): (string | null)[] {
+  if (!state) return [];
+  const fromMatches = deriveRoundWinnersInOrder(CUARTOS_IDS, state.cuartosMatches);
+  if (fromMatches.filter(Boolean).length >= 2) return fromMatches;
+  const fromList = normalizeTorneoWinnersList(state.cuartosWinners, CUARTOS_IDS.length);
+  if (fromList.filter(Boolean).length >= 2) return fromList;
+  return fromMatches;
+}
+
 export function resolveRoundMatches(
   ids: readonly string[],
   obj: Record<string, TorneoMatch>,
