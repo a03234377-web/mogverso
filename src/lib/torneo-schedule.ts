@@ -110,9 +110,7 @@ export function getTorneoMilestoneEndMs(
   return editionStartMs + (meta.dayOffset + 1) * TORNEO_PHASE_DURATION_MS;
 }
 
-const VOTING_PHASE_TO_MILESTONE: Partial<
-  Record<TorneoPhase, TorneoSchedulePhaseId>
-> = {
+const VOTING_PHASE_TO_MILESTONE: Partial<Record<TorneoPhase, TorneoSchedulePhaseId>> = {
   octavos_voting: "octavos",
   cuartos_voting: "cuartos",
   semifinals_voting: "semis",
@@ -127,8 +125,7 @@ export function getTorneoVotingCanonicalEndMs(
   const milestoneId = VOTING_PHASE_TO_MILESTONE[state.phase];
   if (!milestoneId) return null;
 
-  const editionStart =
-    state.editionStartMs ?? getEditionStartMsForWeekContaining(now);
+  const editionStart = state.editionStartMs ?? getEditionStartMsForWeekContaining(now);
   const canonical = getTorneoMilestoneEndMs(editionStart, milestoneId);
   const dailyClose = getTodayTorneoCloseMs(now);
 

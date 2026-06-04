@@ -37,7 +37,7 @@ export function TorneoPhaseCard({
   const countdownEnd =
     state?.phase === PHASES.WAITING_OCTAVOS
       ? waitingTargetMs
-      : votingTargetMs ?? state?.phaseEnd;
+      : (votingTargetMs ?? state?.phaseEnd);
   const cd = useCountdown(countdownEnd);
   const restartEnd =
     state?.phase === PHASES.TORNEO_ENDED ? getUpcomingTorneoStartMs() : null;

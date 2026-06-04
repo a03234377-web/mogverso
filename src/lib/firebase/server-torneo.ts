@@ -332,10 +332,7 @@ export async function healTorneo(options?: {
   }
 
   const votingEnd = getTorneoVotingCanonicalEndMs(existing, now);
-  if (
-    votingEnd != null &&
-    Math.abs(existing.phaseEnd - votingEnd) > 60_000
-  ) {
+  if (votingEnd != null && Math.abs(existing.phaseEnd - votingEnd) > 60_000) {
     const db = getAdminDatabase();
     await db.ref("torneo/state/phaseEnd").set(votingEnd);
     return { healed: true };
