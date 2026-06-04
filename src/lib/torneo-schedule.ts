@@ -150,9 +150,7 @@ const TORNEO_BREAK_PHASES: TorneoPhase[] = [
   "break_final",
 ];
 
-const LEGACY_BREAK_TO_MILESTONE: Partial<
-  Record<TorneoPhase, TorneoSchedulePhaseId>
-> = {
+const LEGACY_BREAK_TO_MILESTONE: Partial<Record<TorneoPhase, TorneoSchedulePhaseId>> = {
   break_cuartos: "cuartos",
   semifinals_promo: "semis",
 };
@@ -167,8 +165,7 @@ export function isTorneoLegacyBreakReadyToOpen(
 ): boolean {
   const milestoneId = LEGACY_BREAK_TO_MILESTONE[state.phase];
   if (!milestoneId) return false;
-  const editionStart =
-    state.editionStartMs ?? getEditionStartMsForWeekContaining(now);
+  const editionStart = state.editionStartMs ?? getEditionStartMsForWeekContaining(now);
   const milestone = getTorneoPhaseSchedule(editionStart, now).find(
     (m) => m.id === milestoneId,
   );

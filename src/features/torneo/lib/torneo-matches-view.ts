@@ -38,10 +38,7 @@ export function getTorneoMatchesView(
 ): TorneoMatchesView | null {
   if (!state) return null;
 
-  if (
-    state.phase === PHASES.CUARTOS_VOTING ||
-    state.phase === PHASES.BREAK_CUARTOS
-  ) {
+  if (state.phase === PHASES.CUARTOS_VOTING || state.phase === PHASES.BREAK_CUARTOS) {
     const matches = resolveCuartosMatches(state);
     if (matches) {
       const voting =
@@ -73,9 +70,7 @@ export function getTorneoMatchesView(
       matches: state.semisMatches,
       ids: ["semi_0", "semi_1"],
       round: "semis",
-      title: voting
-        ? "Semifinales — ¡Vota Ahora!"
-        : "Semifinales — duelos listos",
+      title: voting ? "Semifinales — ¡Vota Ahora!" : "Semifinales — duelos listos",
       canVote: voting,
     };
   }

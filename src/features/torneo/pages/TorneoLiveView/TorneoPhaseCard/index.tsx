@@ -35,8 +35,7 @@ export function TorneoPhaseCard({
 }) {
   const cuartosVotingLive =
     state?.phase === PHASES.CUARTOS_VOTING ||
-    (state?.phase === PHASES.BREAK_CUARTOS &&
-      isTorneoLegacyBreakReadyToOpen(state));
+    (state?.phase === PHASES.BREAK_CUARTOS && isTorneoLegacyBreakReadyToOpen(state));
   const countdownEnd = state
     ? cuartosVotingLive && state.phase === PHASES.BREAK_CUARTOS
       ? getTorneoVotingTargetMs({ ...state, phase: PHASES.CUARTOS_VOTING })

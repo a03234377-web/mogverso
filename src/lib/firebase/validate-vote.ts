@@ -35,15 +35,13 @@ export function validateTorneoVoteContext(
     phase != null &&
     isTorneoLegacyBreakReadyToOpen({ phase, editionStartMs }, now) &&
     ((phase === PHASES.BREAK_CUARTOS && expected === PHASES.CUARTOS_VOTING) ||
-      (phase === PHASES.SEMIFINALS_PROMO &&
-        expected === PHASES.SEMIFINALS_VOTING));
+      (phase === PHASES.SEMIFINALS_PROMO && expected === PHASES.SEMIFINALS_VOTING));
 
   if (phase !== expected && !legacyBreakOk) {
     return { ok: false, reason: "wrong_phase" };
   }
 
-  const phaseForEnd =
-    legacyBreakOk && expected != null ? expected : phase;
+  const phaseForEnd = legacyBreakOk && expected != null ? expected : phase;
   const canonicalEnd =
     phaseForEnd != null
       ? getTorneoVotingCanonicalEndMs({ phase: phaseForEnd, editionStartMs }, now)
