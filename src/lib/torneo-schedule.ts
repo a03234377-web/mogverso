@@ -110,9 +110,7 @@ export function getTorneoMilestoneEndMs(
   return editionStartMs + (meta.dayOffset + 1) * TORNEO_PHASE_DURATION_MS;
 }
 
-const VOTING_PHASE_TO_MILESTONE: Partial<
-  Record<TorneoPhase, TorneoSchedulePhaseId>
-> = {
+const VOTING_PHASE_TO_MILESTONE: Partial<Record<TorneoPhase, TorneoSchedulePhaseId>> = {
   octavos_voting: "octavos",
   cuartos_voting: "cuartos",
   semifinals_voting: "semis",
@@ -127,8 +125,7 @@ export function getTorneoVotingCanonicalEndMs(
   const milestoneId = VOTING_PHASE_TO_MILESTONE[state.phase];
   if (!milestoneId) return null;
 
-  const editionStart =
-    state.editionStartMs ?? getEditionStartMsForWeekContaining(now);
+  const editionStart = state.editionStartMs ?? getEditionStartMsForWeekContaining(now);
   const canonical = getTorneoMilestoneEndMs(editionStart, milestoneId);
   const dailyClose = getTodayTorneoCloseMs(now);
 
@@ -156,6 +153,32 @@ export function getTorneoVotingTargetMs(
   if (canonical == null) return state.phaseEnd;
   if (Math.abs(state.phaseEnd - canonical) > 60_000) return canonical;
   return state.phaseEnd;
+}
+
+const PHASE_EXPIRE_GRACE_MS = 2000;
+
+/** La fase de votación terminó (calendario 22:40 o `phaseEnd` en RTDB). */
+export function isTorneoVotingPhaseExpired(
+  state: { phase: TorneoPhase; phaseEnd: number; editionStartMs?: number | null },
+  now = Date.now(),
+): boolean {
+  const canonical = getTorneoVotingCanonicalEndMs(state, now);
+  if (canonical != null && canonical <= now - PHASE_EXPIRE_GRACE_MS) return true;
+  return state.phaseEnd <= now - PHASE_EXPIRE_GRACE_MS;
+}
+
+/** Cuenta atrás de espera u hora canónica de votación agotada. */
+export function isTorneoPhaseExpired(
+  state: { phase: TorneoPhase; phaseEnd: number; editionStartMs?: number | null },
+  now = Date.now(),
+): boolean {
+  if (state.phase === "waiting_octavos") {
+    return getTorneoWaitingTargetMs(state, now) <= now - PHASE_EXPIRE_GRACE_MS;
+  }
+  if (VOTING_PHASE_TO_MILESTONE[state.phase]) {
+    return isTorneoVotingPhaseExpired(state, now);
+  }
+  return state.phaseEnd <= now - PHASE_EXPIRE_GRACE_MS;
 }
 
 export function formatTorneoStartDate(ms: number) {

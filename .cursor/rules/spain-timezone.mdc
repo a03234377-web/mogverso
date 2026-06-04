@@ -14,7 +14,7 @@ Todas las fechas y horas visibles al usuario deben interpretarse y formatearse e
 | :--- | :--- |
 | Constantes y formateo | `src/lib/spain-time.ts` |
 | Duraciones relativas (`3 min 12s`) | `src/lib/time.ts` |
-| Calendario del torneo (miércoles 22:30) | `src/lib/torneo-schedule.ts` (usa `spain-time`) |
+| Calendario del torneo (miércoles 22:40) | `src/lib/torneo-schedule.ts` (usa `spain-time`) |
 
 ## Reglas
 

@@ -37,7 +37,7 @@ export function TorneoPhaseCard({
   const countdownEnd =
     state?.phase === PHASES.WAITING_OCTAVOS
       ? waitingTargetMs
-      : votingTargetMs ?? state?.phaseEnd;
+      : (votingTargetMs ?? state?.phaseEnd);
   const cd = useCountdown(countdownEnd);
   const restartEnd =
     state?.phase === PHASES.TORNEO_ENDED ? getUpcomingTorneoStartMs() : null;
@@ -45,6 +45,19 @@ export function TorneoPhaseCard({
 
   useEffect(() => {
     if (state?.phase !== PHASES.WAITING_OCTAVOS || !cd.expired) return;
+    void (async () => {
+      await healTorneoApi();
+      onRestart();
+    })();
+  }, [state?.phase, cd.expired, onRestart]);
+
+  useEffect(() => {
+    const isVotingPhase =
+      state?.phase === PHASES.OCTAVOS_VOTING ||
+      state?.phase === PHASES.CUARTOS_VOTING ||
+      state?.phase === PHASES.SEMIFINALS_VOTING ||
+      state?.phase === PHASES.FINAL_VOTING;
+    if (!isVotingPhase || !cd.expired) return;
     void (async () => {
       await healTorneoApi();
       onRestart();

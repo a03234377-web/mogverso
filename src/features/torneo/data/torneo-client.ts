@@ -5,6 +5,7 @@ import {
   getTorneoVotingCanonicalEndMs,
   getTorneoVotingTargetMs,
   getUpcomingTorneoStartMs,
+  isTorneoPhaseExpired,
 } from "@/lib/torneo-schedule";
 import type { TorneoState } from "@/types/looksmax";
 import { PHASES } from "./torneo-players";
@@ -38,7 +39,7 @@ export async function ensureTorneoState(
     getTorneoVotingCanonicalEndMs(existing, now) != null &&
     Math.abs(existing.phaseEnd - getTorneoVotingTargetMs(existing, now)) > 60_000;
 
-  if (waitingNeedsHeal || votingStaleTarget || existing.phaseEnd <= now - 2000) {
+  if (waitingNeedsHeal || votingStaleTarget || isTorneoPhaseExpired(existing, now)) {
     await healTorneoApi();
     const refreshed = await readTorneoState(fb);
     return refreshed ?? existing;
@@ -53,7 +54,7 @@ export async function advanceTorneoPhaseIfNeeded(
   now = Date.now(),
 ): Promise<TorneoState | null | undefined> {
   if (!state) return state;
-  if (state.phaseEnd > now - 2000) return state;
+  if (!isTorneoPhaseExpired(state, now)) return state;
 
   await healTorneoApi();
   return readTorneoState(fb);

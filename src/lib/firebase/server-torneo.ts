@@ -7,18 +7,19 @@ import {
   getEditionStartMsForWeekContaining,
   getTorneoVotingCanonicalEndMs,
   getUpcomingTorneoStartMs,
+  isTorneoPhaseExpired,
+  isTorneoVotingPhaseExpired,
   shouldForceTorneoWaitingBeforeStart,
   TORNEO_PHASE_DURATION_MS,
 } from "@/lib/torneo-schedule";
+import { buildFinalMatch } from "@/lib/torneo-bracket";
 import {
-  buildCuartosFromOctavosWinners,
-  buildFinalMatch,
-  buildSemisMatches,
-  CUARTOS_IDS,
-  OCTAVOS_IDS,
-  resolveRoundMatches,
-  SEMIS_IDS,
-} from "@/lib/torneo-bracket";
+  buildCuartosToSemisState,
+  buildOctavosToCuartosState,
+  buildSemisToFinalState,
+  repairActiveRoundMatches,
+  withCanonicalVotingPhaseEnd,
+} from "@/lib/torneo-phase-transition";
 import { fetchTorneoSeedNames } from "@/lib/firebase/torneo-seed";
 import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 import { getAdminDatabase } from "./admin";
@@ -68,6 +69,13 @@ function preserveEditionMeta(state: TorneoState, patch: TorneoState): TorneoStat
     seedNames: patch.seedNames ?? state.seedNames,
     createdAt: patch.createdAt ?? state.createdAt,
   };
+}
+
+async function applyTorneoStatePatch(patch: Partial<TorneoState>): Promise<boolean> {
+  if (Object.keys(patch).length === 0) return false;
+  const db = getAdminDatabase();
+  await db.ref("torneo/state").update(patch);
+  return true;
 }
 
 /**
@@ -125,17 +133,7 @@ async function doAdvanceTorneoPhase(
   }
 
   if (state.phase === PHASES.OCTAVOS_VOTING) {
-    const octavosObj = state.matches || {};
-    const resolved = resolveRoundMatches(OCTAVOS_IDS, octavosObj);
-    const cuartosMatches = buildCuartosFromOctavosWinners(resolved.winners);
-    const newState: TorneoState = {
-      phase: PHASES.CUARTOS_VOTING,
-      phaseStart: now,
-      phaseEnd: now + TORNEO_PHASE_DURATION_MS,
-      octavosWinners: resolved.winners.filter((w): w is string => w !== null),
-      matches: resolved.updatedMatches,
-      cuartosMatches,
-    };
+    const newState = buildOctavosToCuartosState(state, now);
     const ok = await atomicAdvanceTorneoPhase(
       PHASES.OCTAVOS_VOTING,
       preserveEditionMeta(state, newState) as Record<string, unknown>,
@@ -148,17 +146,7 @@ async function doAdvanceTorneoPhase(
   }
 
   if (state.phase === PHASES.CUARTOS_VOTING) {
-    const cuartosObj = state.cuartosMatches || {};
-    const resolved = resolveRoundMatches(CUARTOS_IDS, cuartosObj);
-    const semisMatches = buildSemisMatches(resolved.winners);
-    const newState: TorneoState = {
-      phase: PHASES.SEMIFINALS_VOTING,
-      phaseStart: now,
-      phaseEnd: now + TORNEO_PHASE_DURATION_MS,
-      cuartosWinners: resolved.winners.filter((w): w is string => w !== null),
-      cuartosMatches: resolved.updatedMatches,
-      semisMatches,
-    };
+    const newState = buildCuartosToSemisState(state, now);
     const ok = await atomicAdvanceTorneoPhase(
       PHASES.CUARTOS_VOTING,
       preserveEditionMeta(state, newState) as Record<string, unknown>,
@@ -171,17 +159,7 @@ async function doAdvanceTorneoPhase(
   }
 
   if (state.phase === PHASES.SEMIFINALS_VOTING) {
-    const semisObj = state.semisMatches || {};
-    const resolved = resolveRoundMatches(SEMIS_IDS, semisObj);
-    const finalMatch = buildFinalMatch(resolved.winners);
-    const newState: TorneoState = {
-      phase: PHASES.FINAL_VOTING,
-      phaseStart: now,
-      phaseEnd: now + TORNEO_PHASE_DURATION_MS,
-      semisWinners: resolved.winners.filter((w): w is string => w !== null),
-      semisMatches: resolved.updatedMatches,
-      finalMatch,
-    };
+    const newState = buildSemisToFinalState(state, now);
     const ok = await atomicAdvanceTorneoPhase(
       PHASES.SEMIFINALS_VOTING,
       preserveEditionMeta(state, newState) as Record<string, unknown>,
@@ -196,12 +174,16 @@ async function doAdvanceTorneoPhase(
   if (state.phase === PHASES.BREAK_FINAL) {
     const semisWinners = state.semisWinners || [];
     const finalMatch = buildFinalMatch(semisWinners);
-    const newState: TorneoState = {
-      phase: PHASES.FINAL_VOTING,
-      phaseStart: now,
-      phaseEnd: now + TORNEO_PHASE_DURATION_MS,
-      finalMatch,
-    };
+    const newState = withCanonicalVotingPhaseEnd(
+      {
+        ...state,
+        phase: PHASES.FINAL_VOTING,
+        phaseStart: now,
+        phaseEnd: now + TORNEO_PHASE_DURATION_MS,
+        finalMatch,
+      },
+      now,
+    );
     const ok = await atomicAdvanceTorneoPhase(
       PHASES.BREAK_FINAL,
       preserveEditionMeta(state, newState) as Record<string, unknown>,
@@ -246,12 +228,7 @@ async function advanceTorneoPhaseIfNeeded(
 ): Promise<TorneoState | null> {
   if (!state) return state;
 
-  if (state.phase === PHASES.WAITING_OCTAVOS) {
-    const editionStart = getEditionStartMsForWeekContaining(now);
-    if (now < editionStart && state.phaseEnd > now - 2000) return state;
-  } else if (state.phaseEnd > now - 2000) {
-    return state;
-  }
+  if (!isTorneoPhaseExpired(state, now)) return state;
 
   if (torneoAdvancing) {
     await new Promise((r) => setTimeout(r, 500));
@@ -331,11 +308,26 @@ export async function healTorneo(options?: {
     return { healed: true };
   }
 
+  const roundPatch = repairActiveRoundMatches(existing, now);
+  if (roundPatch && (await applyTorneoStatePatch(roundPatch))) {
+    return { healed: true };
+  }
+
+  const synced = withCanonicalVotingPhaseEnd(existing, now);
+  if (synced.phaseEnd !== existing.phaseEnd) {
+    await applyTorneoStatePatch({ phaseEnd: synced.phaseEnd });
+    return { healed: true };
+  }
+
   const votingEnd = getTorneoVotingCanonicalEndMs(existing, now);
-  if (
-    votingEnd != null &&
-    Math.abs(existing.phaseEnd - votingEnd) > 60_000
-  ) {
+  const votingTimedOut = votingEnd != null && isTorneoVotingPhaseExpired(existing, now);
+
+  if (votingTimedOut) {
+    await advanceTorneoPhaseIfNeeded(existing, now);
+    return { healed: true };
+  }
+
+  if (votingEnd != null && Math.abs(existing.phaseEnd - votingEnd) > 60_000) {
     const db = getAdminDatabase();
     await db.ref("torneo/state/phaseEnd").set(votingEnd);
     return { healed: true };

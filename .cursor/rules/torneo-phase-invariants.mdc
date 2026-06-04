@@ -1,0 +1,29 @@
+---
+description: Invariantes del torneo (timer, avance de fase, votos y cuadro)
+globs: mogverso/src/**/torneo/**,mogverso/src/lib/torneo-*.ts,mogverso/src/lib/firebase/server-torneo.ts
+---
+
+# Torneo — no romper transiciones automáticas
+
+## Una sola fuente de verdad
+
+| Qué | Dónde |
+| :--- | :--- |
+| Cierre de fase (22:40 España, calendario) | `getTorneoVotingCanonicalEndMs`, `isTorneoPhaseExpired` en `torneo-schedule.ts` |
+| Cuenta atrás en UI | `getTorneoVotingTargetMs` / `getTorneoWaitingTargetMs` — **no** usar `state.phaseEnd` a pelo si puede estar desfasado |
+| ¿Avanzar fase? | `isTorneoPhaseExpired` en cliente, servidor y `validate-vote.ts` |
+| Lista de duelos votables | `getTorneoMatchesView` — **solo por `state.phase`**, nunca `matches?.oct_0` como condición suelta |
+| Octavos → cuartos (y siguientes) | `buildOctavosToCuartosState` etc. en `torneo-phase-transition.ts` |
+| Reparar RTDB incompleto | `repairActiveRoundMatches` + heal en `server-torneo.ts` |
+
+## Al tocar timer o fases
+
+1. Timer a 00:00 debe disparar heal (véase `TorneoPhaseCard` + `useTorneo`).
+2. Tras avanzar octavos: persistir **`octavosWinners` (8 slots ordenados)** y **`cuartosMatches`** en la misma escritura.
+3. Ejecutar `pnpm run test` (`torneo-invariants.test.ts`).
+
+## Prohibido
+
+- Avanzar fase mirando solo `phaseEnd` de RTDB si el calendario canónico ya cerró.
+- Mostrar octavos en la UI cuando `phase === cuartos_voting` solo porque existen `matches.oct_*`.
+- `octavosWinners.filter(Boolean)` sin mantener índices de emparejamiento.

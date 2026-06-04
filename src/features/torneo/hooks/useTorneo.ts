@@ -22,6 +22,7 @@ import {
   getEditionStartMsForWeekContaining,
   getTorneoVotingTargetMs,
   getTorneoWaitingTargetMs,
+  isTorneoPhaseExpired,
 } from "@/lib/torneo-schedule";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
 import type { TorneoState } from "@/types/looksmax";
@@ -95,7 +96,7 @@ export function useTorneo(active: boolean) {
         waitingPastStart ||
         waitingStaleTarget ||
         votingStaleTarget ||
-        incoming.phaseEnd <= now - 2000
+        isTorneoPhaseExpired(incoming, now)
       ) {
         if (waitingPastStart || waitingStaleTarget || votingStaleTarget) {
           await healTorneoApi();
@@ -167,7 +168,7 @@ export function useTorneo(active: boolean) {
       const editionStart = getEditionStartMsForWeekContaining(now);
       const waitingPastStart =
         state.phase === PHASES.WAITING_OCTAVOS && now >= editionStart;
-      const phaseExpired = state.phaseEnd <= now - 2000;
+      const phaseExpired = isTorneoPhaseExpired(state, now);
 
       if (!waitingPastStart && !phaseExpired) return;
 
@@ -191,7 +192,7 @@ export function useTorneo(active: boolean) {
     const editionStart = getEditionStartMsForWeekContaining(now);
     const waitingPastStart =
       state.phase === PHASES.WAITING_OCTAVOS && now >= editionStart;
-    const phaseExpired = state.phaseEnd <= now - 2000;
+    const phaseExpired = isTorneoPhaseExpired(state, now);
     const intervalMs = waitingPastStart || phaseExpired ? 15_000 : 60_000;
 
     void tick();

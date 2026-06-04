@@ -42,6 +42,9 @@ jobs:
       - name: TypeScript
         run: pnpm run typecheck
 
+      - name: Torneo invariant tests
+        run: pnpm run test
+
       - name: Markdownlint
         run: pnpm run mdlint
 

@@ -1,5 +1,6 @@
 import { PHASES } from "@/features/torneo/data/torneo-players";
 import { isValidRankVotePair } from "@/features/rankings/lib/ranker-name";
+import { getTorneoVotingCanonicalEndMs } from "@/lib/torneo-schedule";
 import type { TorneoPhase } from "@/types/looksmax";
 
 const OCTAVOS_PREFIX = "oct_";
@@ -21,11 +22,20 @@ export function validateTorneoVoteContext(
 ): { ok: true } | { ok: false; reason: string } {
   const phase = state.phase as TorneoPhase | undefined;
   const phaseEnd = typeof state.phaseEnd === "number" ? state.phaseEnd : 0;
+  const editionStartMs =
+    typeof state.editionStartMs === "number" ? state.editionStartMs : undefined;
   const expected = expectedPhaseForMatchId(matchId);
 
   if (!expected) return { ok: false, reason: "invalid_match_id" };
   if (phase !== expected) return { ok: false, reason: "wrong_phase" };
-  if (now >= phaseEnd - 2000) return { ok: false, reason: "phase_ended" };
+
+  const canonicalEnd =
+    phase != null
+      ? getTorneoVotingCanonicalEndMs({ phase, editionStartMs }, now)
+      : null;
+  const effectiveEnd =
+    canonicalEnd != null ? Math.min(phaseEnd, canonicalEnd) : phaseEnd;
+  if (now >= effectiveEnd - 2000) return { ok: false, reason: "phase_ended" };
 
   const matches = state.matches as Record<string, { resolved?: boolean }> | undefined;
   const cuartos = state.cuartosMatches as

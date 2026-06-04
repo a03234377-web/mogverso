@@ -49,8 +49,7 @@ export function buildOctavosTorneoState(
     cuartosWinners: null,
     createdAt: now,
   };
-  const phaseEnd =
-    getTorneoVotingCanonicalEndMs(draft, now) ?? draft.phaseEnd;
+  const phaseEnd = getTorneoVotingCanonicalEndMs(draft, now) ?? draft.phaseEnd;
   return { ...draft, phaseEnd };
 }
 

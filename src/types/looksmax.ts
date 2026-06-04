@@ -94,8 +94,8 @@ export type TorneoState = {
   cuartosMatches?: Record<string, TorneoMatch>;
   semisMatches?: Record<string, TorneoMatch>;
   finalMatch?: TorneoMatch;
-  octavosWinners?: string[] | null;
-  cuartosWinners?: string[] | null;
+  octavosWinners?: (string | null)[] | null;
+  cuartosWinners?: (string | null)[] | null;
   semisWinners?: string[];
   champion?: string;
 };

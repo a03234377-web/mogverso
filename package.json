@@ -10,6 +10,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "mdlint": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#.next\"",
@@ -43,6 +45,7 @@
     "prettier-plugin-tailwindcss": "^0.8.0",
     "react-doctor": "^0.2.11",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "3.2.4"
   }
 }
