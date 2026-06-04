@@ -2,6 +2,8 @@ import { healTorneoApi } from "@/lib/api/vote-client";
 import type { FirebaseBridge } from "@/lib/firebase/client";
 import {
   getEditionStartMsForWeekContaining,
+  getTorneoVotingCanonicalEndMs,
+  getTorneoVotingTargetMs,
   getUpcomingTorneoStartMs,
 } from "@/lib/torneo-schedule";
 import type { TorneoState } from "@/types/looksmax";
@@ -32,8 +34,11 @@ export async function ensureTorneoState(
     existing.phase === PHASES.WAITING_OCTAVOS &&
     (now >= editionStart ||
       Math.abs(existing.phaseEnd - getUpcomingTorneoStartMs(now)) > 60_000);
+  const votingStaleTarget =
+    getTorneoVotingCanonicalEndMs(existing, now) != null &&
+    Math.abs(existing.phaseEnd - getTorneoVotingTargetMs(existing, now)) > 60_000;
 
-  if (waitingNeedsHeal || existing.phaseEnd <= now - 2000) {
+  if (waitingNeedsHeal || votingStaleTarget || existing.phaseEnd <= now - 2000) {
     await healTorneoApi();
     const refreshed = await readTorneoState(fb);
     return refreshed ?? existing;

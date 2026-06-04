@@ -5,6 +5,7 @@ import {
 } from "@/features/torneo/data/torneo-players";
 import {
   getEditionStartMsForWeekContaining,
+  getTorneoVotingCanonicalEndMs,
   getUpcomingTorneoStartMs,
   shouldForceTorneoWaitingBeforeStart,
   TORNEO_PHASE_DURATION_MS,
@@ -327,6 +328,16 @@ export async function healTorneo(options?: {
     }
 
     await ensureTorneoOctavosStarted(now);
+    return { healed: true };
+  }
+
+  const votingEnd = getTorneoVotingCanonicalEndMs(existing, now);
+  if (
+    votingEnd != null &&
+    Math.abs(existing.phaseEnd - votingEnd) > 60_000
+  ) {
+    const db = getAdminDatabase();
+    await db.ref("torneo/state/phaseEnd").set(votingEnd);
     return { healed: true };
   }
 
