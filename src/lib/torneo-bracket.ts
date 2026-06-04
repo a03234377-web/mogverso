@@ -113,7 +113,22 @@ export function resolveMatchPair(m: TorneoMatch): {
   };
 }
 
-/** Lista de ganadores alineada con `ids` (índice i = duelo ids[i]). */
+/** Ganadores solo de duelos ya resueltos (cuadro; no adelantar rondas futuras). */
+export function deriveBracketRoundWinnersInOrder(
+  ids: readonly string[],
+  obj: Record<string, TorneoMatch> | undefined,
+): (string | null)[] {
+  return ids.map((id) => {
+    const m = obj?.[id];
+    if (!m?.resolved) return null;
+    if (m.winner) return m.winner;
+    const v1 = m.votes?.[m.p1] ?? 0;
+    const v2 = m.votes?.[m.p2] ?? 0;
+    return v1 >= v2 ? m.p1 : m.p2;
+  });
+}
+
+/** Lista de ganadores alineada con `ids` (avanza fase en servidor). */
 export function deriveRoundWinnersInOrder(
   ids: readonly string[],
   obj: Record<string, TorneoMatch> | undefined,
@@ -126,6 +141,13 @@ export function deriveRoundWinnersInOrder(
     const v2 = m.votes?.[m.p2] ?? 0;
     return v1 >= v2 ? m.p1 : m.p2;
   });
+}
+
+function isRoundFullyResolved(
+  ids: readonly string[],
+  obj: Record<string, TorneoMatch> | undefined,
+): boolean {
+  return ids.every((id) => Boolean(obj?.[id]?.resolved));
 }
 
 /** RTDB a veces devuelve arrays como objetos `{0: "…", 1: "…"}`. */
@@ -157,7 +179,7 @@ export function getOctavosWinnersForBracket(
   } | null,
 ): (string | null)[] {
   if (!state) return [];
-  const fromMatches = deriveRoundWinnersInOrder(OCTAVOS_IDS, state.matches);
+  const fromMatches = deriveBracketRoundWinnersInOrder(OCTAVOS_IDS, state.matches);
   if (fromMatches.filter(Boolean).length >= 2) return fromMatches;
   const fromList = normalizeTorneoWinnersList(state.octavosWinners, OCTAVOS_IDS.length);
   if (fromList.filter(Boolean).length >= 2) return fromList;
@@ -171,8 +193,11 @@ export function getCuartosWinnersForBracket(
   } | null,
 ): (string | null)[] {
   if (!state) return [];
-  const fromMatches = deriveRoundWinnersInOrder(CUARTOS_IDS, state.cuartosMatches);
-  if (fromMatches.filter(Boolean).length >= 2) return fromMatches;
+  const fromMatches = deriveBracketRoundWinnersInOrder(
+    CUARTOS_IDS,
+    state.cuartosMatches,
+  );
+  if (isRoundFullyResolved(CUARTOS_IDS, state.cuartosMatches)) return fromMatches;
   const fromList = normalizeTorneoWinnersList(state.cuartosWinners, CUARTOS_IDS.length);
   if (fromList.filter(Boolean).length >= 2) return fromList;
   return fromMatches;

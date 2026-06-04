@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { PHASES } from "@/features/torneo/data/torneo-players";
 import { getTorneoMatchesView } from "@/features/torneo/lib/torneo-matches-view";
+import { getCuartosWinnersForBracket } from "@/lib/torneo-bracket";
 import { buildOctavosToCuartosState } from "@/lib/torneo-phase-transition";
 import {
   getTorneoVotingCanonicalEndMs,
@@ -87,6 +88,22 @@ describe("torneo phase invariants", () => {
     expect(view?.round).toBe("cuartos");
     expect(view?.canVote).toBe(true);
     expect(view?.title).toContain("Cuartos");
+  });
+
+  it("does not preview semifinalists while cuartos duels are still open", () => {
+    const state: TorneoState = {
+      phase: PHASES.CUARTOS_VOTING,
+      phaseEnd: Date.now() + 60_000,
+      cuartosMatches: {
+        cua_0: cuaMatch("cua_0", "RubenMaxxing", "TitoChape"),
+        cua_1: cuaMatch("cua_1", "Kappah", "Ismael"),
+        cua_2: cuaMatch("cua_2", "Giva", "Javichu"),
+        cua_3: cuaMatch("cua_3", "JordiWild", "AlejandroAle"),
+      },
+    };
+
+    const winners = getCuartosWinnersForBracket(state);
+    expect(winners.filter(Boolean)).toHaveLength(0);
   });
 
   it("buildOctavosToCuartosState always includes cuartosMatches and ordered winners", () => {

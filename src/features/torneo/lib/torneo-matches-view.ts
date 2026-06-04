@@ -2,9 +2,13 @@ import { PHASES } from "@/features/torneo/data/torneo-players";
 import {
   buildCuartosFromOctavosWinners,
   getOctavosWinnersForBracket,
+  normalizeTorneoWinnersList,
   OCTAVOS_IDS,
 } from "@/lib/torneo-bracket";
-import { isTorneoEditionLive } from "@/lib/torneo-schedule";
+import {
+  isTorneoEditionLive,
+  isTorneoLegacyBreakReadyToOpen,
+} from "@/lib/torneo-schedule";
 import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 
 export type TorneoMatchesView = {
@@ -18,6 +22,10 @@ export type TorneoMatchesView = {
 
 function resolveCuartosMatches(state: TorneoState): Record<string, TorneoMatch> | null {
   if (state.cuartosMatches?.cua_0) return state.cuartosMatches;
+  const fromList = normalizeTorneoWinnersList(state.octavosWinners, OCTAVOS_IDS.length);
+  if (fromList.filter(Boolean).length >= 8) {
+    return buildCuartosFromOctavosWinners(fromList);
+  }
   const winners = getOctavosWinnersForBracket(state);
   if (winners.filter(Boolean).length < 2) return null;
   return buildCuartosFromOctavosWinners(winners);
@@ -30,26 +38,40 @@ export function getTorneoMatchesView(
 ): TorneoMatchesView | null {
   if (!state) return null;
 
-  if (state.phase === PHASES.CUARTOS_VOTING) {
+  if (state.phase === PHASES.CUARTOS_VOTING || state.phase === PHASES.BREAK_CUARTOS) {
     const matches = resolveCuartosMatches(state);
     if (matches) {
+      const voting =
+        state.phase === PHASES.CUARTOS_VOTING ||
+        (state.phase === PHASES.BREAK_CUARTOS &&
+          isTorneoLegacyBreakReadyToOpen(state, now));
       return {
         matches,
         ids: ["cua_0", "cua_1", "cua_2", "cua_3"],
         round: "cuartos",
-        title: "Cuartos de Final — ¡Vota Ahora!",
-        canVote: true,
+        title: voting
+          ? "Cuartos de Final — ¡Vota Ahora!"
+          : "Cuartos de Final — duelos listos",
+        canVote: voting,
       };
     }
   }
 
-  if (state.phase === PHASES.SEMIFINALS_VOTING && state.semisMatches) {
+  if (
+    state.phase === PHASES.SEMIFINALS_PROMO ||
+    state.phase === PHASES.SEMIFINALS_VOTING
+  ) {
+    if (!state.semisMatches) return null;
+    const voting =
+      state.phase === PHASES.SEMIFINALS_VOTING ||
+      (state.phase === PHASES.SEMIFINALS_PROMO &&
+        isTorneoLegacyBreakReadyToOpen(state, now));
     return {
       matches: state.semisMatches,
       ids: ["semi_0", "semi_1"],
       round: "semis",
-      title: "Semifinales — ¡Vota Ahora!",
-      canVote: true,
+      title: voting ? "Semifinales — ¡Vota Ahora!" : "Semifinales — duelos listos",
+      canVote: voting,
     };
   }
 

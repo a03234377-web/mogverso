@@ -144,15 +144,56 @@ export function getTorneoWaitingTargetMs(
   return state.phaseEnd;
 }
 
-/** Objetivo de cuenta atrás en fases de votación (ignora phaseEnd obsoleto en RTDB). */
+const TORNEO_BREAK_PHASES: TorneoPhase[] = [
+  "break_cuartos",
+  "semifinals_promo",
+  "break_final",
+];
+
+const LEGACY_BREAK_TO_MILESTONE: Partial<Record<TorneoPhase, TorneoSchedulePhaseId>> = {
+  break_cuartos: "cuartos",
+  semifinals_promo: "semis",
+};
+
+/**
+ * Fases `break_*` / `semifinals_promo` heredadas: abrir votación cuando el calendario
+ * de la edición ya está en esa ronda (no esperar solo a `phaseEnd` de la pausa).
+ */
+export function isTorneoLegacyBreakReadyToOpen(
+  state: { phase: TorneoPhase; editionStartMs?: number | null },
+  now = Date.now(),
+): boolean {
+  const milestoneId = LEGACY_BREAK_TO_MILESTONE[state.phase];
+  if (!milestoneId) return false;
+  const editionStart = state.editionStartMs ?? getEditionStartMsForWeekContaining(now);
+  const milestone = getTorneoPhaseSchedule(editionStart, now).find(
+    (m) => m.id === milestoneId,
+  );
+  return milestone?.status === "active";
+}
+
+/** Cuenta atrás visible en la tarjeta de fase (votación, espera o pausa). */
+export function getTorneoPhaseCountdownTargetMs(
+  state: { phase: TorneoPhase; phaseEnd: number; editionStartMs?: number | null },
+  now = Date.now(),
+): number {
+  if (state.phase === "waiting_octavos") {
+    return getTorneoWaitingTargetMs(state, now);
+  }
+  if (TORNEO_BREAK_PHASES.includes(state.phase)) {
+    return state.phaseEnd;
+  }
+  return getTorneoVotingTargetMs(state, now);
+}
+
+/** Objetivo de cuenta atrás en fases de votación (siempre el cierre canónico en UI). */
 export function getTorneoVotingTargetMs(
   state: { phase: TorneoPhase; phaseEnd: number; editionStartMs?: number | null },
   now = Date.now(),
 ): number {
   const canonical = getTorneoVotingCanonicalEndMs(state, now);
   if (canonical == null) return state.phaseEnd;
-  if (Math.abs(state.phaseEnd - canonical) > 60_000) return canonical;
-  return state.phaseEnd;
+  return canonical;
 }
 
 const PHASE_EXPIRE_GRACE_MS = 2000;

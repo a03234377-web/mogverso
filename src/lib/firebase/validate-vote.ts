@@ -1,6 +1,9 @@
 import { PHASES } from "@/features/torneo/data/torneo-players";
 import { isValidRankVotePair } from "@/features/rankings/lib/ranker-name";
-import { getTorneoVotingCanonicalEndMs } from "@/lib/torneo-schedule";
+import {
+  getTorneoVotingCanonicalEndMs,
+  isTorneoLegacyBreakReadyToOpen,
+} from "@/lib/torneo-schedule";
 import type { TorneoPhase } from "@/types/looksmax";
 
 const OCTAVOS_PREFIX = "oct_";
@@ -27,11 +30,21 @@ export function validateTorneoVoteContext(
   const expected = expectedPhaseForMatchId(matchId);
 
   if (!expected) return { ok: false, reason: "invalid_match_id" };
-  if (phase !== expected) return { ok: false, reason: "wrong_phase" };
 
+  const legacyBreakOk =
+    phase != null &&
+    isTorneoLegacyBreakReadyToOpen({ phase, editionStartMs }, now) &&
+    ((phase === PHASES.BREAK_CUARTOS && expected === PHASES.CUARTOS_VOTING) ||
+      (phase === PHASES.SEMIFINALS_PROMO && expected === PHASES.SEMIFINALS_VOTING));
+
+  if (phase !== expected && !legacyBreakOk) {
+    return { ok: false, reason: "wrong_phase" };
+  }
+
+  const phaseForEnd = legacyBreakOk && expected != null ? expected : phase;
   const canonicalEnd =
-    phase != null
-      ? getTorneoVotingCanonicalEndMs({ phase, editionStartMs }, now)
+    phaseForEnd != null
+      ? getTorneoVotingCanonicalEndMs({ phase: phaseForEnd, editionStartMs }, now)
       : null;
   const effectiveEnd =
     canonicalEnd != null ? Math.min(phaseEnd, canonicalEnd) : phaseEnd;

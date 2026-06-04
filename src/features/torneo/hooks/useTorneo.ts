@@ -22,6 +22,7 @@ import {
   getEditionStartMsForWeekContaining,
   getTorneoVotingTargetMs,
   getTorneoWaitingTargetMs,
+  isTorneoLegacyBreakReadyToOpen,
   isTorneoPhaseExpired,
 } from "@/lib/torneo-schedule";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
@@ -91,14 +92,24 @@ export function useTorneo(active: boolean) {
         incoming.phase !== PHASES.WAITING_OCTAVOS &&
         incoming.phase !== PHASES.TORNEO_ENDED &&
         Math.abs(incoming.phaseEnd - getTorneoVotingTargetMs(incoming, now)) > 60_000;
+      const legacyBreakNeedsOpen =
+        (incoming.phase === PHASES.BREAK_CUARTOS ||
+          incoming.phase === PHASES.SEMIFINALS_PROMO) &&
+        isTorneoLegacyBreakReadyToOpen(incoming, now);
 
       if (
         waitingPastStart ||
         waitingStaleTarget ||
         votingStaleTarget ||
+        legacyBreakNeedsOpen ||
         isTorneoPhaseExpired(incoming, now)
       ) {
-        if (waitingPastStart || waitingStaleTarget || votingStaleTarget) {
+        if (
+          waitingPastStart ||
+          waitingStaleTarget ||
+          votingStaleTarget ||
+          legacyBreakNeedsOpen
+        ) {
           await healTorneoApi();
         } else {
           await advanceTorneoPhaseIfNeeded(fb, incoming, now);
