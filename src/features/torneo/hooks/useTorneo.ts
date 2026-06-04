@@ -20,6 +20,7 @@ import {
 } from "@/lib/torneo-vote-keys";
 import {
   getEditionStartMsForWeekContaining,
+  getTorneoVotingTargetMs,
   getTorneoWaitingTargetMs,
 } from "@/lib/torneo-schedule";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
@@ -85,9 +86,18 @@ export function useTorneo(active: boolean) {
       const waitingStaleTarget =
         incoming.phase === PHASES.WAITING_OCTAVOS &&
         Math.abs(incoming.phaseEnd - getTorneoWaitingTargetMs(incoming, now)) > 60_000;
+      const votingStaleTarget =
+        incoming.phase !== PHASES.WAITING_OCTAVOS &&
+        incoming.phase !== PHASES.TORNEO_ENDED &&
+        Math.abs(incoming.phaseEnd - getTorneoVotingTargetMs(incoming, now)) > 60_000;
 
-      if (waitingPastStart || waitingStaleTarget || incoming.phaseEnd <= now - 2000) {
-        if (waitingPastStart || waitingStaleTarget) {
+      if (
+        waitingPastStart ||
+        waitingStaleTarget ||
+        votingStaleTarget ||
+        incoming.phaseEnd <= now - 2000
+      ) {
+        if (waitingPastStart || waitingStaleTarget || votingStaleTarget) {
           await healTorneoApi();
         } else {
           await advanceTorneoPhaseIfNeeded(fb, incoming, now);

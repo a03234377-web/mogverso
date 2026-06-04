@@ -2,6 +2,7 @@ import { creatorImage } from "@/assets/creators";
 import { getRankerFallback, getRankerPhoto } from "@/features/rankings/data/avatars";
 import { buildOctavosMatchesFromSeed } from "@/lib/torneo-bracket";
 import {
+  getTorneoVotingCanonicalEndMs,
   getUpcomingTorneoStartMs,
   TORNEO_PHASE_DURATION_MS,
 } from "@/lib/torneo-schedule";
@@ -37,7 +38,7 @@ export function buildOctavosTorneoState(
   editionStartMs?: number,
 ): TorneoState {
   const edition = editionStartMs ?? getUpcomingTorneoStartMs(now);
-  return {
+  const draft = {
     phase: PHASES.OCTAVOS_VOTING,
     phaseStart: now,
     phaseEnd: now + TORNEO_PHASE_DURATION_MS,
@@ -48,9 +49,12 @@ export function buildOctavosTorneoState(
     cuartosWinners: null,
     createdAt: now,
   };
+  const phaseEnd =
+    getTorneoVotingCanonicalEndMs(draft, now) ?? draft.phaseEnd;
+  return { ...draft, phaseEnd };
 }
 
-/** Cuenta atrás hasta el próximo miércoles 22:30 (inicio del torneo). */
+/** Cuenta atrás hasta el próximo miércoles 22:40 (inicio del torneo). */
 export function createWaitingTorneoState(now = Date.now()): TorneoState {
   const phaseEnd = getUpcomingTorneoStartMs(now);
   return {

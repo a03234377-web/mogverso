@@ -8,8 +8,8 @@ import {
 } from "@/lib/spain-time";
 
 export const TORNEO_START_HOUR = 22;
-export const TORNEO_START_MINUTE = 30;
-/** 0=dom … 3=miércoles (inicio octavos, 22:30 Madrid). */
+export const TORNEO_START_MINUTE = 40;
+/** 0=dom … 3=miércoles (inicio octavos, 22:40 Madrid). */
 export const TORNEO_START_WEEKDAY = 3;
 export const TORNEO_PHASE_DURATION_MS = 24 * 60 * 60 * 1000;
 const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
@@ -42,7 +42,7 @@ export type TorneoScheduleMilestone = {
   status: "past" | "active" | "upcoming";
 };
 
-/** Instant UTC del miércoles (día de inicio) 22:30 de la semana que contiene `from`. */
+/** Instant UTC del miércoles (día de inicio) 22:40 de la semana que contiene `from`. */
 export function getEditionStartMsForWeekContaining(from = Date.now()): number {
   const weekday = getMadridWeekday(from);
   const parts = getMadridParts(from);
@@ -57,14 +57,14 @@ export function getEditionStartMsForWeekContaining(from = Date.now()): number {
   );
 }
 
-/** Fin de la edición en curso (sábado 22:30 si el arranque es miércoles, 4×24 h). */
+/** Fin de la edición en curso (sábado 22:40 si el arranque es miércoles, 4×24 h). */
 export function getEditionEndMs(editionStartMs: number): number {
   return editionStartMs + TORNEO_PHASE_DURATION_MS * 4;
 }
 
 /**
  * Próximo arranque de edición (cuenta atrás / waiting).
- * Si ya pasó el miércoles 22:30 de esta semana pero la edición sigue en curso, devuelve ese miércoles
+ * Si ya pasó el miércoles 22:40 de esta semana pero la edición sigue en curso, devuelve ese miércoles
  * (no salta +7 días — eso impedía el auto-arranque).
  */
 export function getUpcomingTorneoStartMs(from = Date.now()): number {
@@ -89,6 +89,53 @@ export function getTorneoEditionEndMs(editionStartMs: number): number {
   return getEditionEndMs(editionStartMs);
 }
 
+/** Cierre de la fase en curso hoy a las 22:40 (Madrid). */
+export function getTodayTorneoCloseMs(from = Date.now()): number {
+  const parts = getMadridParts(from);
+  return madridLocalToUtc(
+    parts.year,
+    parts.month,
+    parts.day,
+    TORNEO_START_HOUR,
+    TORNEO_START_MINUTE,
+  );
+}
+
+export function getTorneoMilestoneEndMs(
+  editionStartMs: number,
+  phaseId: TorneoSchedulePhaseId,
+): number {
+  const meta = MILESTONE_META.find((m) => m.id === phaseId);
+  if (!meta) return editionStartMs + TORNEO_PHASE_DURATION_MS;
+  return editionStartMs + (meta.dayOffset + 1) * TORNEO_PHASE_DURATION_MS;
+}
+
+const VOTING_PHASE_TO_MILESTONE: Partial<
+  Record<TorneoPhase, TorneoSchedulePhaseId>
+> = {
+  octavos_voting: "octavos",
+  cuartos_voting: "cuartos",
+  semifinals_voting: "semis",
+  final_voting: "final",
+};
+
+/** Fin canónico de la fase de votación (calendario + cierre diario 22:40). */
+export function getTorneoVotingCanonicalEndMs(
+  state: { phase: TorneoPhase; editionStartMs?: number | null },
+  now = Date.now(),
+): number | null {
+  const milestoneId = VOTING_PHASE_TO_MILESTONE[state.phase];
+  if (!milestoneId) return null;
+
+  const editionStart =
+    state.editionStartMs ?? getEditionStartMsForWeekContaining(now);
+  const canonical = getTorneoMilestoneEndMs(editionStart, milestoneId);
+  const dailyClose = getTodayTorneoCloseMs(now);
+
+  if (now < dailyClose && dailyClose < canonical) return dailyClose;
+  return canonical;
+}
+
 /** Objetivo de cuenta atrás en `waiting_octavos` (ignora phaseEnd obsoleto en RTDB). */
 export function getTorneoWaitingTargetMs(
   state: { phaseEnd: number; editionStartMs?: number | null },
@@ -96,6 +143,17 @@ export function getTorneoWaitingTargetMs(
 ): number {
   const editionStart = state.editionStartMs ?? getEditionStartMsForWeekContaining(now);
   const canonical = now < editionStart ? getUpcomingTorneoStartMs(now) : editionStart;
+  if (Math.abs(state.phaseEnd - canonical) > 60_000) return canonical;
+  return state.phaseEnd;
+}
+
+/** Objetivo de cuenta atrás en fases de votación (ignora phaseEnd obsoleto en RTDB). */
+export function getTorneoVotingTargetMs(
+  state: { phase: TorneoPhase; phaseEnd: number; editionStartMs?: number | null },
+  now = Date.now(),
+): number {
+  const canonical = getTorneoVotingCanonicalEndMs(state, now);
+  if (canonical == null) return state.phaseEnd;
   if (Math.abs(state.phaseEnd - canonical) > 60_000) return canonical;
   return state.phaseEnd;
 }

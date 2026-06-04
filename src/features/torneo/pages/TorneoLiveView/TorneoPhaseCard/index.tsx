@@ -15,6 +15,7 @@ import { PHASES } from "@/features/torneo/data/torneo-players";
 import { healTorneoApi } from "@/lib/api/vote-client";
 import { useCountdown } from "@/hooks/useCountdown";
 import {
+  getTorneoVotingTargetMs,
   getTorneoWaitingTargetMs,
   getUpcomingTorneoStartMs,
 } from "@/lib/torneo-schedule";
@@ -32,9 +33,12 @@ export function TorneoPhaseCard({
 }) {
   const waitingTargetMs =
     state?.phase === PHASES.WAITING_OCTAVOS ? getTorneoWaitingTargetMs(state) : null;
-  const cd = useCountdown(
-    state?.phase === PHASES.WAITING_OCTAVOS ? waitingTargetMs : state?.phaseEnd,
-  );
+  const votingTargetMs = state ? getTorneoVotingTargetMs(state) : null;
+  const countdownEnd =
+    state?.phase === PHASES.WAITING_OCTAVOS
+      ? waitingTargetMs
+      : votingTargetMs ?? state?.phaseEnd;
+  const cd = useCountdown(countdownEnd);
   const restartEnd =
     state?.phase === PHASES.TORNEO_ENDED ? getUpcomingTorneoStartMs() : null;
   const restartCd = useCountdown(restartEnd);
