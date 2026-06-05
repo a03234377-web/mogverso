@@ -10,6 +10,11 @@ import {
 import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import { healRankvoteApi } from "@/lib/api/vote-client";
 import { parseAuraScores } from "@/lib/aura/coerce-score";
+import { isRtdbPermissionDenied } from "@/lib/firebase/rtdb-errors";
+import {
+  AURA_RTDB_HYDRATE_TIMEOUT_MS,
+  HEAL_RANKVOTE_COOLDOWN_MS,
+} from "@/lib/vote-intervals";
 import type { AuraScores } from "@/types/aura";
 import type {
   MoverStack,
@@ -100,11 +105,13 @@ export function useRankingData() {
   const [syncState, dispatch] = useReducer(rankingSyncReducer, initialRankingSyncState);
   const healInFlightRef = useRef(false);
   const lastHealRef = useRef(0);
+  const rtdbAuraActiveRef = useRef(false);
+  const auraApiInFlightRef = useRef(false);
 
   const healRankVoteRound = useCallback(async (rv?: RankVoteRound) => {
     if (healInFlightRef.current) return;
     const now = Date.now();
-    if (now - lastHealRef.current < 2000) return;
+    if (now - lastHealRef.current < HEAL_RANKVOTE_COOLDOWN_MS) return;
     lastHealRef.current = now;
     healInFlightRef.current = true;
     try {
@@ -118,6 +125,8 @@ export function useRankingData() {
   }, []);
 
   const fetchAuraScoresFromApi = useCallback(async () => {
+    if (auraApiInFlightRef.current) return;
+    auraApiInFlightRef.current = true;
     try {
       const res = await fetch("/api/aura/scores", { cache: "no-store" });
       const data = (await res.json()) as {
@@ -132,12 +141,19 @@ export function useRankingData() {
       dispatch({ type: "auraScores", payload: parsed });
     } catch (err) {
       console.error("[LooksMax] aura scores API:", err);
+    } finally {
+      auraApiInFlightRef.current = false;
     }
   }, []);
 
   useEffect(() => {
-    if (!ready) return;
-    void fetchAuraScoresFromApi();
+    if (!ready || rtdbAuraActiveRef.current) return;
+
+    const id = window.setTimeout(() => {
+      if (!rtdbAuraActiveRef.current) void fetchAuraScoresFromApi();
+    }, AURA_RTDB_HYDRATE_TIMEOUT_MS);
+
+    return () => window.clearTimeout(id);
   }, [ready, fetchAuraScoresFromApi]);
 
   useEffect(() => {
@@ -172,10 +188,21 @@ export function useRankingData() {
         payload: snap.exists() ? (snap.val() as MoverStack) : {},
       });
     });
-    const unsubAura = onValue(ref(db, "aura/scores"), (snap) => {
-      const parsed = snap.exists() ? parseAuraScores(snap.val()) : {};
-      dispatch({ type: "auraScores", payload: parsed });
-    });
+    const unsubAura = onValue(
+      ref(db, "aura/scores"),
+      (snap) => {
+        rtdbAuraActiveRef.current = true;
+        const parsed = snap.exists() ? parseAuraScores(snap.val()) : {};
+        dispatch({ type: "auraScores", payload: parsed });
+      },
+      (err) => {
+        if (isRtdbPermissionDenied(err)) {
+          void fetchAuraScoresFromApi();
+          return;
+        }
+        console.error("[LooksMax] RTDB aura/scores:", err);
+      },
+    );
     const unsubRv = onValue(ref(db, "rankvote/current"), (snap) => {
       if (!snap.exists()) {
         dispatch({ type: "rankVoteInactive" });
@@ -195,9 +222,12 @@ export function useRankingData() {
       void healRankVoteRound(rv);
     });
 
-    const healPoll = setInterval(() => {
-      void healRankVoteRound();
-    }, 4000);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") {
+        void healRankVoteRound();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisible);
 
     return () => {
       unsubO();
@@ -206,9 +236,9 @@ export function useRankingData() {
       unsubDown();
       unsubAura();
       unsubRv();
-      clearInterval(healPoll);
+      document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [fb, healRankVoteRound]);
+  }, [fb, healRankVoteRound, fetchAuraScoresFromApi]);
 
   const {
     overrides,

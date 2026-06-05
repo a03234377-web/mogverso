@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { formatVoteError } from "@/lib/api/vote-errors";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import {
@@ -26,6 +26,7 @@ import {
   isTorneoPhaseExpired,
 } from "@/lib/torneo-schedule";
 import { useRecaptcha } from "@/hooks/useRecaptcha";
+import { HEAL_TORNEO_COOLDOWN_MS, TORNEO_HEAL_POLL_MS } from "@/lib/vote-intervals";
 import type { TorneoState } from "@/types/looksmax";
 
 type TorneoHookState = {
@@ -72,6 +73,7 @@ export function useTorneo(active: boolean) {
     torneoHookReducer,
     initialTorneoHookState,
   );
+  const lastSyncHealRef = useRef(0);
   const editionStartMs = state?.editionStartMs;
   const serverVotes =
     editionStartMs && serverVotesCache?.editionStartMs === editionStartMs
@@ -97,20 +99,18 @@ export function useTorneo(active: boolean) {
           incoming.phase === PHASES.SEMIFINALS_PROMO) &&
         isTorneoLegacyBreakReadyToOpen(incoming, now);
 
-      if (
+      const needsSyncHeal =
         waitingPastStart ||
         waitingStaleTarget ||
         votingStaleTarget ||
-        legacyBreakNeedsOpen ||
-        isTorneoPhaseExpired(incoming, now)
-      ) {
-        if (
-          waitingPastStart ||
-          waitingStaleTarget ||
-          votingStaleTarget ||
-          legacyBreakNeedsOpen
-        ) {
-          await healTorneoApi();
+        legacyBreakNeedsOpen;
+
+      if (needsSyncHeal || isTorneoPhaseExpired(incoming, now)) {
+        if (needsSyncHeal) {
+          if (now - lastSyncHealRef.current >= HEAL_TORNEO_COOLDOWN_MS) {
+            lastSyncHealRef.current = now;
+            await healTorneoApi();
+          }
         } else {
           await advanceTorneoPhaseIfNeeded(fb, incoming, now);
         }
@@ -209,10 +209,11 @@ export function useTorneo(active: boolean) {
     const waitingPastStart =
       state.phase === PHASES.WAITING_OCTAVOS && now >= editionStart;
     const phaseExpired = isTorneoPhaseExpired(state, now);
-    const intervalMs = waitingPastStart || phaseExpired ? 15_000 : 60_000;
+
+    if (!waitingPastStart && !phaseExpired) return;
 
     void tick();
-    const id = setInterval(() => void tick(), intervalMs);
+    const id = setInterval(() => void tick(), TORNEO_HEAL_POLL_MS);
     return () => clearInterval(id);
   }, [fb, active, state?.phase, state?.phaseEnd, state?.createdAt]);
 

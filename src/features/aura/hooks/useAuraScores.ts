@@ -4,16 +4,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFirebase } from "@/features/app/context/FirebaseProvider";
 import { resolveCanonicalRankerName } from "@/features/rankings/data/ranker-aliases";
 import { parseAuraScores } from "@/lib/aura/coerce-score";
+import { isRtdbPermissionDenied } from "@/lib/firebase/rtdb-errors";
+import {
+  AURA_API_FALLBACK_POLL_MS,
+  AURA_RTDB_HYDRATE_TIMEOUT_MS,
+} from "@/lib/vote-intervals";
 import type { AuraScores } from "@/types/aura";
-
-const AURA_SCORES_POLL_MS = 20_000;
-
-function isRtdbPermissionDenied(err: unknown): boolean {
-  if (!err || typeof err !== "object") return false;
-  const code = "code" in err ? String((err as { code: string }).code) : "";
-  const message = "message" in err ? String((err as { message: string }).message) : "";
-  return /permission_denied/i.test(code) || /permission_denied/i.test(message);
-}
 
 async function fetchAuraScoresFromApi(): Promise<AuraScores | null> {
   try {
@@ -42,13 +38,15 @@ function mergeScores(remote: AuraScores, patches: AuraScores): AuraScores {
   return merged;
 }
 
-/** Puntuaciones de aura en vivo (RTDB + API de respaldo en /aura). */
+/** Puntuaciones de aura en vivo (RTDB; API solo si RTDB no está disponible). */
 export function useAuraScores() {
   const { fb, ready } = useFirebase();
   const [remoteScores, setRemoteScores] = useState<AuraScores>({});
   const [patches, setPatches] = useState<AuraScores>({});
   const [hydrated, setHydrated] = useState(false);
+  const [apiFallback, setApiFallback] = useState(false);
   const pollInFlightRef = useRef(false);
+  const rtdbActiveRef = useRef(false);
 
   const applyRemote = useCallback((parsed: AuraScores) => {
     setRemoteScores(parsed);
@@ -74,11 +72,6 @@ export function useAuraScores() {
   }, [applyRemote]);
 
   useEffect(() => {
-    if (!ready) return;
-    void refreshFromApi();
-  }, [ready, refreshFromApi]);
-
-  useEffect(() => {
     if (!fb) return;
     const { db, ref, onValue } = fb;
 
@@ -87,12 +80,16 @@ export function useAuraScores() {
     unsub = onValue(
       ref(db, "aura/scores"),
       (snap) => {
+        rtdbActiveRef.current = true;
+        setApiFallback(false);
         const parsed = snap.exists() ? parseAuraScores(snap.val()) : {};
         applyRemote(parsed);
       },
       (err) => {
         if (isRtdbPermissionDenied(err)) {
           unsub();
+          rtdbActiveRef.current = false;
+          setApiFallback(true);
           if (process.env.NODE_ENV === "development") {
             console.warn(
               "[Aura] RTDB aura/scores: lectura denegada por reglas Firebase; usando /api/aura/scores.",
@@ -109,19 +106,35 @@ export function useAuraScores() {
   }, [fb, applyRemote, refreshFromApi]);
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || hydrated || rtdbActiveRef.current) return;
 
-    const id = window.setInterval(() => void refreshFromApi(), AURA_SCORES_POLL_MS);
+    const id = window.setTimeout(() => {
+      if (!rtdbActiveRef.current) setApiFallback(true);
+    }, AURA_RTDB_HYDRATE_TIMEOUT_MS);
+
+    return () => window.clearTimeout(id);
+  }, [ready, hydrated]);
+
+  useEffect(() => {
+    if (!apiFallback) return;
+
+    void refreshFromApi();
+    const id = window.setInterval(
+      () => void refreshFromApi(),
+      AURA_API_FALLBACK_POLL_MS,
+    );
+    return () => window.clearInterval(id);
+  }, [apiFallback, refreshFromApi]);
+
+  useEffect(() => {
+    if (!ready) return;
 
     const onVisible = () => {
       if (document.visibilityState === "visible") void refreshFromApi();
     };
     document.addEventListener("visibilitychange", onVisible);
 
-    return () => {
-      window.clearInterval(id);
-      document.removeEventListener("visibilitychange", onVisible);
-    };
+    return () => document.removeEventListener("visibilitychange", onVisible);
   }, [ready, refreshFromApi]);
 
   const scores = useMemo(
