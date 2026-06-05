@@ -3,7 +3,10 @@ import { PHASES } from "@/features/torneo/data/torneo-players";
 import { getTorneoMatchesView } from "@/features/torneo/lib/torneo-matches-view";
 import { getCuartosWinnersForBracket } from "@/lib/torneo-bracket";
 import { validateTorneoVoteContext } from "@/lib/firebase/validate-vote";
-import { buildOctavosToCuartosState } from "@/lib/torneo-phase-transition";
+import {
+  buildOctavosToCuartosState,
+  resolveLegacyBreakAdvanceState,
+} from "@/lib/torneo-phase-transition";
 import {
   getEditionStartMsForWeekContaining,
   getTorneoVotingCanonicalEndMs,
@@ -149,6 +152,28 @@ describe("torneo phase invariants", () => {
 
     const winners = getCuartosWinnersForBracket(state);
     expect(winners.filter(Boolean)).toHaveLength(0);
+  });
+
+  it("skips break_cuartos to semifinals when cuartos voting window already closed", () => {
+    const now = Date.UTC(2026, 5, 5, 21, 0, 0);
+    const editionStartMs = getEditionStartMsForWeekContaining(now);
+    const state: TorneoState = {
+      phase: PHASES.BREAK_CUARTOS,
+      phaseEnd: now - 60_000,
+      editionStartMs,
+      cuartosMatches: {
+        cua_0: cuaMatch("cua_0", "RubenMaxxing", "TitoChape"),
+        cua_1: cuaMatch("cua_1", "Kappah", "Ismael"),
+        cua_2: cuaMatch("cua_2", "Giva", "Javichu"),
+        cua_3: cuaMatch("cua_3", "JordiWild", "AlejandroAle"),
+      },
+    };
+
+    const next = resolveLegacyBreakAdvanceState(state, now);
+    expect(next?.phase).toBe(PHASES.SEMIFINALS_VOTING);
+    expect(next?.semisMatches?.semi_0.p1).toBeTruthy();
+    expect(next?.semisMatches?.semi_0.p2).toBeTruthy();
+    expect(next?.cuartosMatches?.cua_0.resolved).toBe(true);
   });
 
   it("buildOctavosToCuartosState always includes cuartosMatches and ordered winners", () => {

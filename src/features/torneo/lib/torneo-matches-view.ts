@@ -1,13 +1,17 @@
 import { PHASES } from "@/features/torneo/data/torneo-players";
 import {
   buildCuartosFromOctavosWinners,
+  buildSemisMatches,
+  CUARTOS_IDS,
   getOctavosWinnersForBracket,
   normalizeTorneoWinnersList,
   OCTAVOS_IDS,
+  resolveRoundMatches,
 } from "@/lib/torneo-bracket";
 import {
   isTorneoEditionLive,
   isTorneoLegacyBreakReadyToOpen,
+  isTorneoVotingPhaseExpired,
 } from "@/lib/torneo-schedule";
 import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 
@@ -39,6 +43,22 @@ export function getTorneoMatchesView(
   if (!state) return null;
 
   if (state.phase === PHASES.CUARTOS_VOTING || state.phase === PHASES.BREAK_CUARTOS) {
+    const cuartosPeriodExpired =
+      state.phase === PHASES.BREAK_CUARTOS &&
+      isTorneoVotingPhaseExpired({ ...state, phase: PHASES.CUARTOS_VOTING }, now);
+
+    if (cuartosPeriodExpired && state.cuartosMatches?.cua_0) {
+      const resolved = resolveRoundMatches(CUARTOS_IDS, state.cuartosMatches);
+      const semisMatches = state.semisMatches ?? buildSemisMatches(resolved.winners);
+      return {
+        matches: semisMatches,
+        ids: ["semi_0", "semi_1"],
+        round: "semis",
+        title: "Semifinales — ¡Vota Ahora!",
+        canVote: true,
+      };
+    }
+
     const matches = resolveCuartosMatches(state);
     if (matches) {
       const voting =

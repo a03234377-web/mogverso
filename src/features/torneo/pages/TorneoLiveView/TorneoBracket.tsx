@@ -15,8 +15,10 @@ import {
   getCuartosWinnersForBracket,
   getOctavosWinnersForBracket,
   OCTAVOS_IDS,
+  resolveRoundMatches,
   SEMIS_IDS,
 } from "@/lib/torneo-bracket";
+import { isTorneoVotingPhaseExpired } from "@/lib/torneo-schedule";
 import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 import { cn } from "@/lib/cn";
 
@@ -58,9 +60,13 @@ function isRoundVoting(state: TorneoState | null, round: BracketRound): boolean 
   return state.phase === VOTING_PHASE_BY_ROUND[round];
 }
 
-function getBracketFocusRound(phase: string | undefined): BracketRound {
+function getBracketFocusRound(
+  phase: string | undefined,
+  cuartosPeriodExpired?: boolean,
+): BracketRound {
   switch (phase) {
     case PHASES.BREAK_CUARTOS:
+      return cuartosPeriodExpired ? "semis" : "cuartos";
     case PHASES.CUARTOS_VOTING:
       return "cuartos";
     case PHASES.SEMIFINALS_PROMO:
@@ -102,11 +108,21 @@ export function TorneoBracket({
   }
 
   const octavosWinners = getOctavosWinnersForBracket(state);
-  const cuartosWinners = getCuartosWinnersForBracket(state);
+  const cuartosPeriodExpired =
+    state?.phase === PHASES.BREAK_CUARTOS &&
+    isTorneoVotingPhaseExpired({ ...state, phase: PHASES.CUARTOS_VOTING });
+  let cuartosWinners = getCuartosWinnersForBracket(state);
+  if (
+    cuartosPeriodExpired &&
+    cuartosWinners.filter(Boolean).length < 2 &&
+    state?.cuartosMatches?.cua_0
+  ) {
+    cuartosWinners = resolveRoundMatches(CUARTOS_IDS, state.cuartosMatches).winners;
+  }
   const champion = state?.champion ?? null;
   const fm = state?.finalMatch;
   const octavosVoting = isRoundVoting(state, "octavos");
-  const focusRound = getBracketFocusRound(state?.phase);
+  const focusRound = getBracketFocusRound(state?.phase, cuartosPeriodExpired);
 
   return (
     <TorneoBracketShell focusRound={focusRound}>
@@ -191,12 +207,21 @@ export function TorneoBracket({
                 tone="purple"
                 match={semiMatch}
                 matchNum={i + 1}
-                votingActive={isRoundVoting(state, "semis") && !semiMatch.resolved}
+                votingActive={
+                  (isRoundVoting(state, "semis") || cuartosPeriodExpired) &&
+                  !semiMatch.resolved
+                }
                 myVote={getLocalVote?.(matchId) ?? null}
                 onVoteClick={() => scrollToTorneoMatch(matchId)}
               />
             ) : w1 && w2 ? (
-              <BracketMatchGroup tone="purple" matchNum={i + 1} p1={w1} p2={w2} />
+              <BracketMatchGroup
+                tone="purple"
+                matchNum={i + 1}
+                p1={w1}
+                p2={w2}
+                votingActive={cuartosPeriodExpired}
+              />
             ) : (
               <BracketMatchGroup tone="purple" matchNum={i + 1} pending />
             )}
