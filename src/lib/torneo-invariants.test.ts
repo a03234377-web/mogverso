@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import { PHASES } from "@/features/torneo/data/torneo-players";
 import { getTorneoMatchesView } from "@/features/torneo/lib/torneo-matches-view";
 import { getCuartosWinnersForBracket } from "@/lib/torneo-bracket";
+import { validateTorneoVoteContext } from "@/lib/firebase/validate-vote";
 import { buildOctavosToCuartosState } from "@/lib/torneo-phase-transition";
 import {
+  getEditionStartMsForWeekContaining,
   getTorneoVotingCanonicalEndMs,
   isTorneoPhaseExpired,
   isTorneoVotingPhaseExpired,
@@ -60,6 +62,49 @@ describe("torneo phase invariants", () => {
 
     expect(isTorneoVotingPhaseExpired(state, now)).toBe(true);
     expect(isTorneoPhaseExpired(state, now)).toBe(true);
+  });
+
+  it("keeps voting open when RTDB phaseEnd is stale but canonical close is still in the future", () => {
+    const now = Date.UTC(2026, 5, 5, 14, 0, 0);
+    const editionStartMs = getEditionStartMsForWeekContaining(now);
+    const canonical = getTorneoVotingCanonicalEndMs(
+      { phase: PHASES.CUARTOS_VOTING, editionStartMs },
+      now,
+    );
+    expect(canonical).not.toBeNull();
+    expect(canonical!).toBeGreaterThan(now + 3_600_000);
+
+    const state = {
+      phase: PHASES.CUARTOS_VOTING,
+      phaseEnd: now - 86_400_000,
+      editionStartMs,
+    };
+
+    expect(isTorneoVotingPhaseExpired(state, now)).toBe(false);
+    expect(isTorneoPhaseExpired(state, now)).toBe(false);
+    expect(validateTorneoVoteContext(state, "cua_0", now)).toEqual({ ok: true });
+  });
+
+  it("allows cuartos votes during legacy break when schedule milestone is active", () => {
+    const now = Date.UTC(2026, 5, 5, 14, 0, 0);
+    const editionStartMs = getEditionStartMsForWeekContaining(now);
+    const canonical = getTorneoVotingCanonicalEndMs(
+      { phase: PHASES.CUARTOS_VOTING, editionStartMs },
+      now,
+    );
+    expect(canonical).not.toBeNull();
+    expect(canonical!).toBeGreaterThan(now);
+
+    const state = {
+      phase: PHASES.BREAK_CUARTOS,
+      phaseEnd: now - 60_000,
+      editionStartMs,
+      cuartosMatches: {
+        cua_0: cuaMatch("cua_0", "RubenMaxxing", "TitoChape"),
+      },
+    };
+
+    expect(validateTorneoVoteContext(state, "cua_0", now)).toEqual({ ok: true });
   });
 
   it("shows cuartos matches when phase is cuartos even if octavos matches remain", () => {

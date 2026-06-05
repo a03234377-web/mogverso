@@ -139,7 +139,12 @@ export function useTorneo(active: boolean) {
     const unsub = onValue(ref(db, "torneo/state"), (snap) => {
       if (!snap.exists()) return;
       const incoming = snap.val() as TorneoState;
-      if (incoming.phase === PHASES.OCTAVOS_VOTING) {
+      if (
+        incoming.phase === PHASES.OCTAVOS_VOTING ||
+        incoming.phase === PHASES.CUARTOS_VOTING ||
+        incoming.phase === PHASES.SEMIFINALS_VOTING ||
+        incoming.phase === PHASES.FINAL_VOTING
+      ) {
         setVoteError(null);
       }
       if (debounceId) clearTimeout(debounceId);

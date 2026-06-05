@@ -46,8 +46,7 @@ export function validateTorneoVoteContext(
     phaseForEnd != null
       ? getTorneoVotingCanonicalEndMs({ phase: phaseForEnd, editionStartMs }, now)
       : null;
-  const effectiveEnd =
-    canonicalEnd != null ? Math.min(phaseEnd, canonicalEnd) : phaseEnd;
+  const effectiveEnd = canonicalEnd != null ? canonicalEnd : phaseEnd;
   if (now >= effectiveEnd - 2000) return { ok: false, reason: "phase_ended" };
 
   const matches = state.matches as Record<string, { resolved?: boolean }> | undefined;

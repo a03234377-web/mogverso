@@ -198,13 +198,15 @@ export function getTorneoVotingTargetMs(
 
 const PHASE_EXPIRE_GRACE_MS = 2000;
 
-/** La fase de votación terminó (calendario 22:40 o `phaseEnd` en RTDB). */
+/** La fase de votación terminó según el calendario canónico (22:40 Madrid). */
 export function isTorneoVotingPhaseExpired(
   state: { phase: TorneoPhase; phaseEnd: number; editionStartMs?: number | null },
   now = Date.now(),
 ): boolean {
   const canonical = getTorneoVotingCanonicalEndMs(state, now);
-  if (canonical != null && canonical <= now - PHASE_EXPIRE_GRACE_MS) return true;
+  if (canonical != null) {
+    return canonical <= now - PHASE_EXPIRE_GRACE_MS;
+  }
   return state.phaseEnd <= now - PHASE_EXPIRE_GRACE_MS;
 }
 
@@ -218,6 +220,14 @@ export function isTorneoPhaseExpired(
   }
   if (VOTING_PHASE_TO_MILESTONE[state.phase]) {
     return isTorneoVotingPhaseExpired(state, now);
+  }
+  if (
+    (state.phase === "break_cuartos" || state.phase === "semifinals_promo") &&
+    isTorneoLegacyBreakReadyToOpen(state, now)
+  ) {
+    const votingPhase: TorneoPhase =
+      state.phase === "break_cuartos" ? "cuartos_voting" : "semifinals_voting";
+    return isTorneoVotingPhaseExpired({ ...state, phase: votingPhase }, now);
   }
   return state.phaseEnd <= now - PHASE_EXPIRE_GRACE_MS;
 }
