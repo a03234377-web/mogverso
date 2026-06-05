@@ -154,6 +154,20 @@ describe("torneo phase invariants", () => {
     expect(winners.filter(Boolean)).toHaveLength(0);
   });
 
+  it("shows full semifinals window before milestone start instead of today's 22:40 close", () => {
+    const editionStartMs = getEditionStartMsForWeekContaining(
+      Date.UTC(2026, 5, 5, 20, 34, 0),
+    );
+    const now = Date.UTC(2026, 5, 5, 20, 34, 0);
+    const canonical = getTorneoVotingCanonicalEndMs(
+      { phase: PHASES.SEMIFINALS_VOTING, editionStartMs },
+      now,
+    );
+
+    expect(canonical).not.toBeNull();
+    expect(canonical!).toBeGreaterThan(now + 20 * 3_600_000);
+  });
+
   it("skips break_cuartos to semifinals when cuartos voting window already closed", () => {
     const now = Date.UTC(2026, 5, 5, 21, 0, 0);
     const editionStartMs = getEditionStartMsForWeekContaining(now);

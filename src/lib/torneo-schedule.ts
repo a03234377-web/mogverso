@@ -101,6 +101,15 @@ export function getTodayTorneoCloseMs(from = Date.now()): number {
   );
 }
 
+export function getTorneoMilestoneStartMs(
+  editionStartMs: number,
+  phaseId: TorneoSchedulePhaseId,
+): number {
+  const meta = MILESTONE_META.find((m) => m.id === phaseId);
+  if (!meta) return editionStartMs;
+  return editionStartMs + meta.dayOffset * TORNEO_PHASE_DURATION_MS;
+}
+
 export function getTorneoMilestoneEndMs(
   editionStartMs: number,
   phaseId: TorneoSchedulePhaseId,
@@ -126,8 +135,13 @@ export function getTorneoVotingCanonicalEndMs(
   if (!milestoneId) return null;
 
   const editionStart = state.editionStartMs ?? getEditionStartMsForWeekContaining(now);
+  const milestoneStart = getTorneoMilestoneStartMs(editionStart, milestoneId);
   const canonical = getTorneoMilestoneEndMs(editionStart, milestoneId);
   const dailyClose = getTodayTorneoCloseMs(now);
+
+  // Antes del arranque canónico de la ronda, no acortar al cierre de hoy (p. ej. semis
+  // abiertas unos minutos antes de las 22:40 del viernes deben mostrar ~24 h hasta sábado).
+  if (now < milestoneStart) return canonical;
 
   if (now < dailyClose && dailyClose < canonical) return dailyClose;
   return canonical;
