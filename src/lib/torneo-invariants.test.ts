@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { PHASES } from "@/features/torneo/data/torneo-players";
 import { getTorneoMatchesView } from "@/features/torneo/lib/torneo-matches-view";
-import { getCuartosWinnersForBracket, getFinalistsForBracket } from "@/lib/torneo-bracket";
+import {
+  getCuartosWinnersForBracket,
+  getFinalistsForBracket,
+} from "@/lib/torneo-bracket";
 import { validateTorneoVoteContext } from "@/lib/firebase/validate-vote";
 import {
   buildOctavosToCuartosState,
