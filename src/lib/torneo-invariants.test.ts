@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { PHASES } from "@/features/torneo/data/torneo-players";
 import { getTorneoMatchesView } from "@/features/torneo/lib/torneo-matches-view";
-import { getCuartosWinnersForBracket } from "@/lib/torneo-bracket";
+import { getCuartosWinnersForBracket, getFinalistsForBracket } from "@/lib/torneo-bracket";
 import { validateTorneoVoteContext } from "@/lib/firebase/validate-vote";
 import {
   buildOctavosToCuartosState,
@@ -136,6 +136,34 @@ describe("torneo phase invariants", () => {
     expect(view?.round).toBe("cuartos");
     expect(view?.canVote).toBe(true);
     expect(view?.title).toContain("Cuartos");
+  });
+
+  it("previews finalists in bracket from open semifinal vote leaders", () => {
+    const state: TorneoState = {
+      phase: PHASES.SEMIFINALS_VOTING,
+      phaseEnd: Date.now() + 60_000,
+      semisMatches: {
+        semi_0: {
+          ...cuaMatch("semi_0", "TitoChape", "Kappah"),
+          id: "semi_0",
+          round: "semis",
+          votes: { TitoChape: 68, Kappah: 31 },
+        },
+        semi_1: {
+          ...cuaMatch("semi_1", "Giva", "JordiWild"),
+          id: "semi_1",
+          round: "semis",
+          votes: { Giva: 16, JordiWild: 61 },
+        },
+      },
+    };
+
+    const finalists = getFinalistsForBracket(state);
+    expect(finalists).toEqual({
+      p1: "TitoChape",
+      p2: "JordiWild",
+      preview: true,
+    });
   });
 
   it("does not preview semifinalists while cuartos duels are still open", () => {

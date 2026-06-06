@@ -147,6 +147,18 @@ export function TorneoPhaseCard({
   }
 
   if (state.phase === PHASES.BREAK_CUARTOS && cuartosPeriodExpired) {
+    if (cd.expired || isTorneoPhaseExpired(state)) {
+      return (
+        <PhaseDisplay>
+          <PhaseCard variant="break">
+            <PhaseLabel color="gold">SEMIFINALES CONCLUIDAS</PhaseLabel>
+            <PhaseTitle color="gold">ABRIENDO GRAN FINAL</PhaseTitle>
+            <PhaseSub>Actualizando el torneo en unos segundos…</PhaseSub>
+            <PhaseTimer h="00" m="00" s="00" color="gold" />
+          </PhaseCard>
+        </PhaseDisplay>
+      );
+    }
     return (
       <PhaseDisplay>
         <PhaseCard variant="voting">
@@ -239,6 +251,18 @@ export function TorneoPhaseCard({
   }
 
   if (state.phase === PHASES.SEMIFINALS_VOTING) {
+    if (cd.expired || isTorneoPhaseExpired(state)) {
+      return (
+        <PhaseDisplay>
+          <PhaseCard variant="break">
+            <PhaseLabel color="gold">SEMIFINALES CONCLUIDAS</PhaseLabel>
+            <PhaseTitle color="gold">ABRIENDO GRAN FINAL</PhaseTitle>
+            <PhaseSub>Actualizando el torneo en unos segundos…</PhaseSub>
+            <PhaseTimer h="00" m="00" s="00" color="gold" />
+          </PhaseCard>
+        </PhaseDisplay>
+      );
+    }
     return (
       <PhaseDisplay>
         <PhaseCard variant="voting">

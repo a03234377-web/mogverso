@@ -13,6 +13,7 @@ import {
 import {
   CUARTOS_IDS,
   getCuartosWinnersForBracket,
+  getFinalistsForBracket,
   getOctavosWinnersForBracket,
   OCTAVOS_IDS,
   resolveRoundMatches,
@@ -121,6 +122,7 @@ export function TorneoBracket({
   }
   const champion = state?.champion ?? null;
   const fm = state?.finalMatch;
+  const finalists = getFinalistsForBracket(state);
   const octavosVoting = isRoundVoting(state, "octavos");
   const focusRound = getBracketFocusRound(state?.phase, cuartosPeriodExpired);
 
@@ -207,21 +209,12 @@ export function TorneoBracket({
                 tone="purple"
                 match={semiMatch}
                 matchNum={i + 1}
-                votingActive={
-                  (isRoundVoting(state, "semis") || cuartosPeriodExpired) &&
-                  !semiMatch.resolved
-                }
+                votingActive={isRoundVoting(state, "semis") && !semiMatch.resolved}
                 myVote={getLocalVote?.(matchId) ?? null}
                 onVoteClick={() => scrollToTorneoMatch(matchId)}
               />
             ) : w1 && w2 ? (
-              <BracketMatchGroup
-                tone="purple"
-                matchNum={i + 1}
-                p1={w1}
-                p2={w2}
-                votingActive={cuartosPeriodExpired}
-              />
+              <BracketMatchGroup tone="purple" matchNum={i + 1} p1={w1} p2={w2} />
             ) : (
               <BracketMatchGroup tone="purple" matchNum={i + 1} pending />
             )}
@@ -246,12 +239,18 @@ export function TorneoBracket({
             myVote={getLocalVote?.("final_0") ?? null}
             onVoteClick={() => scrollToTorneoMatch("final_0")}
           />
-        ) : state?.semisWinners && state.semisWinners.length >= 2 ? (
+        ) : finalists.p1 && finalists.p2 ? (
           <BracketMatchGroup
             tone="gold"
             matchNum={1}
-            p1={state.semisWinners[0]}
-            p2={state.semisWinners[1]}
+            p1={finalists.p1}
+            p2={finalists.p2}
+            votingActive={isRoundVoting(state, "final") && !finalists.preview}
+            onVoteClick={
+              isRoundVoting(state, "final")
+                ? () => scrollToTorneoMatch("final_0")
+                : undefined
+            }
           />
         ) : (
           <BracketSlot tone="gold" pending finalPending />
