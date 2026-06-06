@@ -8,7 +8,10 @@ import {
   resolveRoundMatches,
   SEMIS_IDS,
 } from "@/lib/torneo-bracket";
-import { getTorneoVotingCanonicalEndMs } from "@/lib/torneo-schedule";
+import {
+  getTorneoVotingCanonicalEndMs,
+  isTorneoVotingPhaseExpired,
+} from "@/lib/torneo-schedule";
 import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 
 const SYNC_TOLERANCE_MS = 60_000;
@@ -156,6 +159,43 @@ export function openBreakToVotingState(
       phaseEnd: now + 86_400_000,
     };
     return finalizeVotingPhaseEnd(draft, now);
+  }
+
+  return null;
+}
+
+/**
+ * Avanza pausas heredadas (`break_cuartos`, `semifinals_promo`).
+ * Si el calendario ya cerró la ronda intermedia, salta a la siguiente fase de votación.
+ */
+export function resolveLegacyBreakAdvanceState(
+  state: TorneoState,
+  now: number,
+): TorneoState | null {
+  if (state.phase === PHASES.BREAK_CUARTOS) {
+    const asCuartos: TorneoState = { ...state, phase: PHASES.CUARTOS_VOTING };
+    if (isTorneoVotingPhaseExpired(asCuartos, now)) {
+      let base = state;
+      if (!state.cuartosMatches?.cua_0) {
+        if (!state.matches?.oct_0) return null;
+        base = buildOctavosToCuartosState(state, now);
+      }
+      return buildCuartosToSemisState(base, now);
+    }
+    return openBreakToVotingState(state, now);
+  }
+
+  if (state.phase === PHASES.SEMIFINALS_PROMO) {
+    const asSemis: TorneoState = { ...state, phase: PHASES.SEMIFINALS_VOTING };
+    if (isTorneoVotingPhaseExpired(asSemis, now)) {
+      let base = state;
+      if (!state.semisMatches?.semi_0) {
+        if (!state.cuartosMatches?.cua_0) return null;
+        base = buildCuartosToSemisState(state, now);
+      }
+      return buildSemisToFinalState(base, now);
+    }
+    return openBreakToVotingState(state, now);
   }
 
   return null;

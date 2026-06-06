@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { PHASES } from "@/features/torneo/data/torneo-players";
 import { getTorneoMatchesView } from "@/features/torneo/lib/torneo-matches-view";
-import { getCuartosWinnersForBracket } from "@/lib/torneo-bracket";
+import {
+  getCuartosWinnersForBracket,
+  getFinalistsForBracket,
+} from "@/lib/torneo-bracket";
 import { validateTorneoVoteContext } from "@/lib/firebase/validate-vote";
-import { buildOctavosToCuartosState } from "@/lib/torneo-phase-transition";
+import {
+  buildOctavosToCuartosState,
+  resolveLegacyBreakAdvanceState,
+} from "@/lib/torneo-phase-transition";
 import {
   getEditionStartMsForWeekContaining,
   getTorneoVotingCanonicalEndMs,
@@ -135,6 +141,34 @@ describe("torneo phase invariants", () => {
     expect(view?.title).toContain("Cuartos");
   });
 
+  it("previews finalists in bracket from open semifinal vote leaders", () => {
+    const state: TorneoState = {
+      phase: PHASES.SEMIFINALS_VOTING,
+      phaseEnd: Date.now() + 60_000,
+      semisMatches: {
+        semi_0: {
+          ...cuaMatch("semi_0", "TitoChape", "Kappah"),
+          id: "semi_0",
+          round: "semis",
+          votes: { TitoChape: 68, Kappah: 31 },
+        },
+        semi_1: {
+          ...cuaMatch("semi_1", "Giva", "JordiWild"),
+          id: "semi_1",
+          round: "semis",
+          votes: { Giva: 16, JordiWild: 61 },
+        },
+      },
+    };
+
+    const finalists = getFinalistsForBracket(state);
+    expect(finalists).toEqual({
+      p1: "TitoChape",
+      p2: "JordiWild",
+      preview: true,
+    });
+  });
+
   it("does not preview semifinalists while cuartos duels are still open", () => {
     const state: TorneoState = {
       phase: PHASES.CUARTOS_VOTING,
@@ -149,6 +183,42 @@ describe("torneo phase invariants", () => {
 
     const winners = getCuartosWinnersForBracket(state);
     expect(winners.filter(Boolean)).toHaveLength(0);
+  });
+
+  it("shows full semifinals window before milestone start instead of today's 22:40 close", () => {
+    const editionStartMs = getEditionStartMsForWeekContaining(
+      Date.UTC(2026, 5, 5, 20, 34, 0),
+    );
+    const now = Date.UTC(2026, 5, 5, 20, 34, 0);
+    const canonical = getTorneoVotingCanonicalEndMs(
+      { phase: PHASES.SEMIFINALS_VOTING, editionStartMs },
+      now,
+    );
+
+    expect(canonical).not.toBeNull();
+    expect(canonical!).toBeGreaterThan(now + 20 * 3_600_000);
+  });
+
+  it("skips break_cuartos to semifinals when cuartos voting window already closed", () => {
+    const now = Date.UTC(2026, 5, 5, 21, 0, 0);
+    const editionStartMs = getEditionStartMsForWeekContaining(now);
+    const state: TorneoState = {
+      phase: PHASES.BREAK_CUARTOS,
+      phaseEnd: now - 60_000,
+      editionStartMs,
+      cuartosMatches: {
+        cua_0: cuaMatch("cua_0", "RubenMaxxing", "TitoChape"),
+        cua_1: cuaMatch("cua_1", "Kappah", "Ismael"),
+        cua_2: cuaMatch("cua_2", "Giva", "Javichu"),
+        cua_3: cuaMatch("cua_3", "JordiWild", "AlejandroAle"),
+      },
+    };
+
+    const next = resolveLegacyBreakAdvanceState(state, now);
+    expect(next?.phase).toBe(PHASES.SEMIFINALS_VOTING);
+    expect(next?.semisMatches?.semi_0.p1).toBeTruthy();
+    expect(next?.semisMatches?.semi_0.p2).toBeTruthy();
+    expect(next?.cuartosMatches?.cua_0.resolved).toBe(true);
   });
 
   it("buildOctavosToCuartosState always includes cuartosMatches and ordered winners", () => {

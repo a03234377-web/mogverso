@@ -203,6 +203,46 @@ export function getCuartosWinnersForBracket(
   return fromMatches;
 }
 
+/** Finalistas para la columna Final (resueltos o líderes en semis abiertas). */
+export function getFinalistsForBracket(
+  state: {
+    finalMatch?: TorneoMatch | null;
+    semisWinners?: (string | null)[] | Record<string, string> | null;
+    semisMatches?: Record<string, TorneoMatch>;
+  } | null,
+): { p1: string | null; p2: string | null; preview: boolean } {
+  if (!state) return { p1: null, p2: null, preview: false };
+
+  const fm = state.finalMatch;
+  if (fm?.p1 && fm?.p2 && fm.p1 !== "TBD" && fm.p2 !== "TBD") {
+    return { p1: fm.p1, p2: fm.p2, preview: false };
+  }
+
+  const fromList = normalizeTorneoWinnersList(state.semisWinners, 2);
+  if (fromList[0] && fromList[1]) {
+    return { p1: fromList[0], p2: fromList[1], preview: false };
+  }
+
+  const fromResolved = deriveBracketRoundWinnersInOrder(SEMIS_IDS, state.semisMatches);
+  if (fromResolved[0] && fromResolved[1]) {
+    return { p1: fromResolved[0], p2: fromResolved[1], preview: false };
+  }
+
+  const leaders = SEMIS_IDS.map((id) => {
+    const m = state.semisMatches?.[id];
+    if (!m?.p1 || !m?.p2 || m.p1 === "TBD" || m.p2 === "TBD") return null;
+    const v1 = m.votes?.[m.p1] ?? 0;
+    const v2 = m.votes?.[m.p2] ?? 0;
+    if (v1 + v2 <= 0) return null;
+    return v1 >= v2 ? m.p1 : m.p2;
+  });
+  if (leaders[0] && leaders[1]) {
+    return { p1: leaders[0], p2: leaders[1], preview: true };
+  }
+
+  return { p1: null, p2: null, preview: false };
+}
+
 export function resolveRoundMatches(
   ids: readonly string[],
   obj: Record<string, TorneoMatch>,

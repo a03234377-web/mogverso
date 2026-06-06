@@ -20,6 +20,7 @@ import {
   getUpcomingTorneoStartMs,
   isTorneoLegacyBreakReadyToOpen,
   isTorneoPhaseExpired,
+  isTorneoVotingPhaseExpired,
 } from "@/lib/torneo-schedule";
 import type { TorneoState } from "@/types/looksmax";
 import { TorneoPhaseEnded, TorneoPhaseWaitingOctavos } from "./TorneoPhaseViews";
@@ -33,13 +34,20 @@ export function TorneoPhaseCard({
   loading: boolean;
   onRestart: () => void;
 }) {
+  const cuartosPeriodExpired =
+    state?.phase === PHASES.BREAK_CUARTOS &&
+    isTorneoVotingPhaseExpired({ ...state, phase: PHASES.CUARTOS_VOTING });
   const cuartosVotingLive =
     state?.phase === PHASES.CUARTOS_VOTING ||
-    (state?.phase === PHASES.BREAK_CUARTOS && isTorneoLegacyBreakReadyToOpen(state));
+    (state?.phase === PHASES.BREAK_CUARTOS &&
+      isTorneoLegacyBreakReadyToOpen(state) &&
+      !cuartosPeriodExpired);
   const countdownEnd = state
-    ? cuartosVotingLive && state.phase === PHASES.BREAK_CUARTOS
-      ? getTorneoVotingTargetMs({ ...state, phase: PHASES.CUARTOS_VOTING })
-      : getTorneoPhaseCountdownTargetMs(state)
+    ? cuartosPeriodExpired && state.phase === PHASES.BREAK_CUARTOS
+      ? getTorneoVotingTargetMs({ ...state, phase: PHASES.SEMIFINALS_VOTING })
+      : cuartosVotingLive && state.phase === PHASES.BREAK_CUARTOS
+        ? getTorneoVotingTargetMs({ ...state, phase: PHASES.CUARTOS_VOTING })
+        : getTorneoPhaseCountdownTargetMs(state)
     : null;
   const cd = useCountdown(countdownEnd);
   const restartEnd =
@@ -67,7 +75,7 @@ export function TorneoPhaseCard({
       state &&
       (state.phase === PHASES.BREAK_CUARTOS ||
         state.phase === PHASES.SEMIFINALS_PROMO) &&
-      isTorneoLegacyBreakReadyToOpen(state);
+      (isTorneoLegacyBreakReadyToOpen(state) || cuartosPeriodExpired);
     if (
       !needsHealOnExpire ||
       !state ||
@@ -138,6 +146,47 @@ export function TorneoPhaseCard({
     );
   }
 
+  if (state.phase === PHASES.BREAK_CUARTOS && cuartosPeriodExpired) {
+    if (cd.expired || isTorneoPhaseExpired(state)) {
+      return (
+        <PhaseDisplay>
+          <PhaseCard variant="break">
+            <PhaseLabel color="gold">SEMIFINALES CONCLUIDAS</PhaseLabel>
+            <PhaseTitle color="gold">ABRIENDO GRAN FINAL</PhaseTitle>
+            <PhaseSub>Actualizando el torneo en unos segundos…</PhaseSub>
+            <PhaseTimer h="00" m="00" s="00" color="gold" />
+          </PhaseCard>
+        </PhaseDisplay>
+      );
+    }
+    return (
+      <PhaseDisplay>
+        <PhaseCard variant="voting">
+          <PhaseLabel color="gold">
+            <span>
+              <Icon
+                name="zap"
+                size={14}
+                className="mr-1 inline shrink-0 align-middle"
+              />
+              SEMIFINALES EN VIVO · VOTA AHORA
+            </span>
+          </PhaseLabel>
+          <PhaseTitle color="gold">
+            <Icon
+              name="trophy"
+              size={18}
+              className="mr-1.5 inline shrink-0 align-middle"
+            />
+            SEMIFINALES
+          </PhaseTitle>
+          <PhaseSub>{TORNEO_VOTING_SUB}</PhaseSub>
+          <PhaseTimer h={cd.h} m={cd.m} s={cd.s} color="gold" />
+        </PhaseCard>
+      </PhaseDisplay>
+    );
+  }
+
   if (state.phase === PHASES.BREAK_CUARTOS && !cuartosVotingLive) {
     return (
       <PhaseDisplay>
@@ -202,6 +251,18 @@ export function TorneoPhaseCard({
   }
 
   if (state.phase === PHASES.SEMIFINALS_VOTING) {
+    if (cd.expired || isTorneoPhaseExpired(state)) {
+      return (
+        <PhaseDisplay>
+          <PhaseCard variant="break">
+            <PhaseLabel color="gold">SEMIFINALES CONCLUIDAS</PhaseLabel>
+            <PhaseTitle color="gold">ABRIENDO GRAN FINAL</PhaseTitle>
+            <PhaseSub>Actualizando el torneo en unos segundos…</PhaseSub>
+            <PhaseTimer h="00" m="00" s="00" color="gold" />
+          </PhaseCard>
+        </PhaseDisplay>
+      );
+    }
     return (
       <PhaseDisplay>
         <PhaseCard variant="voting">

@@ -18,7 +18,7 @@ import {
   buildCuartosToSemisState,
   buildOctavosToCuartosState,
   buildSemisToFinalState,
-  openBreakToVotingState,
+  resolveLegacyBreakAdvanceState,
   repairActiveRoundMatches,
   withCanonicalVotingPhaseEnd,
 } from "@/lib/torneo-phase-transition";
@@ -305,11 +305,11 @@ export async function healTorneo(options?: {
     if (!readyToOpen) {
       return { healed: false };
     }
-    const opened = openBreakToVotingState(existing, now);
-    if (!opened) return { healed: false };
+    const advanced = resolveLegacyBreakAdvanceState(existing, now);
+    if (!advanced) return { healed: false };
     const ok = await atomicAdvanceTorneoPhase(
       existing.phase,
-      preserveEditionMeta(existing, opened) as Record<string, unknown>,
+      preserveEditionMeta(existing, advanced) as Record<string, unknown>,
     );
     return { healed: ok };
   }

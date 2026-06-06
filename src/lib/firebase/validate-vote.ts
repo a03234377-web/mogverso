@@ -3,6 +3,7 @@ import { isValidRankVotePair } from "@/features/rankings/lib/ranker-name";
 import {
   getTorneoVotingCanonicalEndMs,
   isTorneoLegacyBreakReadyToOpen,
+  isTorneoVotingPhaseExpired,
 } from "@/lib/torneo-schedule";
 import type { TorneoPhase } from "@/types/looksmax";
 
@@ -31,11 +32,20 @@ export function validateTorneoVoteContext(
 
   if (!expected) return { ok: false, reason: "invalid_match_id" };
 
+  const cuartosBreakPastToSemis =
+    phase === PHASES.BREAK_CUARTOS &&
+    expected === PHASES.SEMIFINALS_VOTING &&
+    isTorneoVotingPhaseExpired(
+      { phase: PHASES.CUARTOS_VOTING, editionStartMs, phaseEnd },
+      now,
+    );
+
   const legacyBreakOk =
-    phase != null &&
-    isTorneoLegacyBreakReadyToOpen({ phase, editionStartMs }, now) &&
-    ((phase === PHASES.BREAK_CUARTOS && expected === PHASES.CUARTOS_VOTING) ||
-      (phase === PHASES.SEMIFINALS_PROMO && expected === PHASES.SEMIFINALS_VOTING));
+    cuartosBreakPastToSemis ||
+    (phase != null &&
+      isTorneoLegacyBreakReadyToOpen({ phase, editionStartMs }, now) &&
+      ((phase === PHASES.BREAK_CUARTOS && expected === PHASES.CUARTOS_VOTING) ||
+        (phase === PHASES.SEMIFINALS_PROMO && expected === PHASES.SEMIFINALS_VOTING)));
 
   if (phase !== expected && !legacyBreakOk) {
     return { ok: false, reason: "wrong_phase" };
