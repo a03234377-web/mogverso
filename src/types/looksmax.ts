@@ -98,6 +98,9 @@ export type TorneoState = {
   cuartosWinners?: (string | null)[] | null;
   semisWinners?: string[];
   champion?: string;
+  /** Fin del periodo de premio (+5 en ranking), 48 h tras la final. */
+  prizeEndMs?: number;
+  prizeApplied?: boolean;
 };
 
 export type OctavosMatchDef = {

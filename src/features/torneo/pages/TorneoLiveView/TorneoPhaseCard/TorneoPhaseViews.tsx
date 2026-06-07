@@ -16,6 +16,10 @@ import type { CountdownParts } from "@/hooks/useCountdown";
 import type { TorneoState } from "@/types/looksmax";
 import { cn } from "@/lib/cn";
 import {
+  TORNEO_CHAMPION_RANK_BOOST,
+  type TorneoChampionResult,
+} from "@/lib/torneo-champion-prize";
+import {
   TORNEO_PRESTART_BRACKET,
   TORNEO_PRESTART_FIRST_ROUND,
   TORNEO_PRESTART_FOOTER,
@@ -87,6 +91,96 @@ export function TorneoPhaseWaitingOctavos({
   );
 }
 
+export function TorneoPhaseChampionReveal({
+  result,
+  prizeCd,
+  pendingHeal,
+}: {
+  result: TorneoChampionResult;
+  prizeCd: CountdownParts;
+  pendingHeal?: boolean;
+}) {
+  const champInfo = getPlayerByName(result.champion);
+
+  return (
+    <PhaseDisplay>
+      <PhaseCard variant="waiting">
+        <PhaseLabel color="orange" pulse={!pendingHeal}>
+          <Icon name="crown" size={14} className="mr-1 inline shrink-0 align-middle" />
+          {pendingHeal ? "VOTACIÓN CERRADA · CORONANDO CAMPEÓN" : "CAMPEÓN DEL TORNEO"}
+          <Icon name="crown" size={14} className="ml-1 inline shrink-0 align-middle" />
+        </PhaseLabel>
+        <div className="my-1 font-display text-[clamp(0.9rem,2.5vw,1.3rem)] tracking-[3px] text-lm-text2">
+          Torneo de LooksMaxing
+        </div>
+        <PhaseTitle color="orange" className="text-[clamp(1.6rem,5vw,3.5rem)]">
+          {pendingHeal ? "CORONANDO CAMPEÓN" : "GRAN FINAL CONCLUIDA"}
+        </PhaseTitle>
+        <div className="mx-auto my-4 flex justify-center">
+          <div
+            className={cn(
+              "relative overflow-hidden rounded-2xl border-[3px] border-lm-orange",
+              "shadow-[0_0_40px_rgba(255,107,0,0.35)]",
+              "size-[clamp(10rem,38vw,16rem)]",
+            )}
+          >
+            <CreatorImage
+              src={champInfo.photo}
+              alt={result.champion}
+              className="object-cover"
+              sizes="(max-width: 768px) 38vw, 256px"
+              fallback={
+                <CreatorIcon name={result.champion} icon={champInfo.icon} size={72} />
+              }
+            />
+          </div>
+        </div>
+        <div
+          className={cn(
+            "mx-auto my-1 mb-2 w-fit max-w-full px-1 font-display text-transparent",
+            "bg-[linear-gradient(135deg,var(--color-lm-orange),var(--color-lm-gold2))] bg-clip-text",
+            "text-[clamp(2rem,9vw,6rem)] leading-[1.05] tracking-[4px]",
+            "max-[360px]:tracking-[1px] max-md:tracking-[2px]",
+          )}
+        >
+          {result.champion}
+        </div>
+        <div className="mb-3 text-center text-base font-bold text-lm-text2">
+          <Icon name="trophy" size={14} className="mr-1 inline shrink-0 align-middle" />
+          Ganó con <strong className="text-lm-orange">
+            {result.championVotes}
+          </strong>{" "}
+          votos
+          {" · "}
+          {result.runnerUp} {result.runnerUpVotes}
+        </div>
+        {pendingHeal ? (
+          <PhaseSub className="mb-0 text-lm-orange">
+            Actualizando el torneo en unos segundos…
+          </PhaseSub>
+        ) : (
+          <>
+            <PhaseTimer h={prizeCd.h} m={prizeCd.m} s={prizeCd.s} color="orange" />
+            <PhaseSub className="mt-3 mb-0">
+              <Icon
+                name="zap"
+                size={14}
+                className="mr-1 inline shrink-0 align-middle"
+              />
+              Premio en cuenta atrás: sube{" "}
+              <strong>{TORNEO_CHAMPION_RANK_BOOST} puestos</strong> en el ranking
+              oficial
+              <br />
+              El boost se aplica al terminar las 48 horas
+            </PhaseSub>
+            <SpainTimezoneNote className="mt-3 text-center" />
+          </>
+        )}
+      </PhaseCard>
+    </PhaseDisplay>
+  );
+}
+
 export function TorneoPhaseEnded({
   state,
   restartCd,
@@ -113,7 +207,9 @@ export function TorneoPhaseEnded({
           />
           CAMPEÓN
         </PhaseTitle>
-        <PhaseSub>El mejor looksmaxer de España ha sido coronado</PhaseSub>
+        <PhaseSub>
+          Premio entregado · +{TORNEO_CHAMPION_RANK_BOOST} puestos en el ranking
+        </PhaseSub>
         <div className="my-4 flex flex-col items-center gap-3">
           <div className="relative size-[90px] overflow-hidden rounded-full border-[3px] border-lm-gold">
             <CreatorImage

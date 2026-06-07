@@ -322,16 +322,15 @@ export function shouldShowTorneoComingSoon(
   now: number,
   phase?: TorneoPhase | null,
 ): boolean {
+  // Campeón, premio +5 y cuenta atrás post-torneo viven en TorneoLiveView.
+  if (phase === "torneo_ended") return false;
+
   const editionStart = getEditionStartMsForWeekContaining(now);
   if (now >= editionStart && now < getEditionEndMs(editionStart)) {
     return false;
   }
   const upcomingStart = getUpcomingTorneoStartMs(now);
-  if (now < upcomingStart) return true;
-  if (phase === "torneo_ended") {
-    return now < getUpcomingTorneoStartMs(upcomingStart + 60_000);
-  }
-  return false;
+  return now < upcomingStart;
 }
 
 export function isTorneoEditionLive(now = Date.now()): boolean {

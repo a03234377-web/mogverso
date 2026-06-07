@@ -22,8 +22,16 @@ import {
   isTorneoPhaseExpired,
   isTorneoVotingPhaseExpired,
 } from "@/lib/torneo-schedule";
+import {
+  getTorneoChampionResult,
+  getTorneoPrizeCountdownTargetMs,
+} from "@/lib/torneo-champion-prize";
 import type { TorneoState } from "@/types/looksmax";
-import { TorneoPhaseEnded, TorneoPhaseWaitingOctavos } from "./TorneoPhaseViews";
+import {
+  TorneoPhaseChampionReveal,
+  TorneoPhaseEnded,
+  TorneoPhaseWaitingOctavos,
+} from "./TorneoPhaseViews";
 
 export function TorneoPhaseCard({
   state,
@@ -50,9 +58,17 @@ export function TorneoPhaseCard({
         : getTorneoPhaseCountdownTargetMs(state)
     : null;
   const cd = useCountdown(countdownEnd);
+  const prizeCountdownEnd =
+    state?.phase === PHASES.TORNEO_ENDED && !state.prizeApplied
+      ? getTorneoPrizeCountdownTargetMs(state)
+      : null;
+  const prizeCd = useCountdown(prizeCountdownEnd);
   const restartEnd =
-    state?.phase === PHASES.TORNEO_ENDED ? getUpcomingTorneoStartMs() : null;
+    state?.phase === PHASES.TORNEO_ENDED && state.prizeApplied
+      ? getUpcomingTorneoStartMs()
+      : null;
   const restartCd = useCountdown(restartEnd);
+  const championResult = getTorneoChampionResult(state);
 
   useEffect(() => {
     if (state?.phase !== PHASES.WAITING_OCTAVOS || !cd.expired) return;
@@ -90,12 +106,32 @@ export function TorneoPhaseCard({
   }, [state, cd.expired, onRestart]);
 
   useEffect(() => {
-    if (state?.phase !== PHASES.TORNEO_ENDED || !restartCd.expired) return;
+    if (
+      state?.phase !== PHASES.TORNEO_ENDED ||
+      state.prizeApplied ||
+      !prizeCd.expired
+    ) {
+      return;
+    }
+    void (async () => {
+      await healTorneoApi();
+      onRestart();
+    })();
+  }, [state?.phase, state?.prizeApplied, prizeCd.expired, onRestart]);
+
+  useEffect(() => {
+    if (
+      state?.phase !== PHASES.TORNEO_ENDED ||
+      !state.prizeApplied ||
+      !restartCd.expired
+    ) {
+      return;
+    }
     void (async () => {
       await healTorneoApi({ restartIfEnded: true });
       onRestart();
     })();
-  }, [state?.phase, restartCd.expired, onRestart]);
+  }, [state?.phase, state?.prizeApplied, restartCd.expired, onRestart]);
 
   if (loading || !state) {
     return (
@@ -314,6 +350,15 @@ export function TorneoPhaseCard({
   }
 
   if (state.phase === PHASES.FINAL_VOTING) {
+    if ((cd.expired || isTorneoPhaseExpired(state)) && championResult) {
+      return (
+        <TorneoPhaseChampionReveal
+          result={championResult}
+          prizeCd={prizeCd}
+          pendingHeal
+        />
+      );
+    }
     return (
       <PhaseDisplay>
         <PhaseCard variant="semifinals">
@@ -336,6 +381,9 @@ export function TorneoPhaseCard({
   }
 
   if (state.phase === PHASES.TORNEO_ENDED) {
+    if (!state.prizeApplied && championResult) {
+      return <TorneoPhaseChampionReveal result={championResult} prizeCd={prizeCd} />;
+    }
     return <TorneoPhaseEnded state={state} restartCd={restartCd} />;
   }
 
