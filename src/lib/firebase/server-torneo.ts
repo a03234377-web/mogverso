@@ -22,7 +22,9 @@ import {
   repairActiveRoundMatches,
   withCanonicalVotingPhaseEnd,
 } from "@/lib/torneo-phase-transition";
+import { applyTorneoChampionPrize } from "@/lib/firebase/server-torneo-prize";
 import { fetchTorneoSeedNames } from "@/lib/firebase/torneo-seed";
+import { TORNEO_CHAMPION_PRIZE_DURATION_MS } from "@/lib/torneo-champion-prize";
 import type { TorneoMatch, TorneoState } from "@/types/looksmax";
 import { getAdminDatabase } from "./admin";
 
@@ -203,10 +205,13 @@ async function doAdvanceTorneoPhase(
     const v2 = fm.votes?.[fm.p2] || 0;
     const champion = v1 >= v2 ? fm.p1 : fm.p2;
     const updatedFinal: TorneoMatch = { ...fm, winner: champion, resolved: true };
+    const prizeEndMs = now + TORNEO_CHAMPION_PRIZE_DURATION_MS;
     const newState: TorneoState = {
       phase: PHASES.TORNEO_ENDED,
       phaseStart: now,
-      phaseEnd: getUpcomingTorneoStartMs(now + 60_000),
+      phaseEnd: prizeEndMs,
+      prizeEndMs,
+      prizeApplied: false,
       champion,
       finalMatch: updatedFinal,
     };
@@ -278,6 +283,27 @@ export async function healTorneo(options?: {
     const waiting = createWaitingTorneoState(now);
     await resetTorneoState(waiting as Record<string, unknown>);
     return { healed: true };
+  }
+
+  if (existing.phase === PHASES.TORNEO_ENDED && !existing.prizeApplied) {
+    const prizeEnd =
+      existing.prizeEndMs ??
+      (existing.phaseStart ?? now) + TORNEO_CHAMPION_PRIZE_DURATION_MS;
+    if (now >= prizeEnd - 2_000) {
+      if (existing.champion) {
+        await applyTorneoChampionPrize(existing.champion);
+      }
+      await applyTorneoStatePatch({
+        prizeApplied: true,
+        prizeEndMs: prizeEnd,
+        phaseEnd: getUpcomingTorneoStartMs(now + 60_000),
+      });
+      return { healed: true };
+    }
+    if (!existing.prizeEndMs || Math.abs(existing.phaseEnd - prizeEnd) > 60_000) {
+      await applyTorneoStatePatch({ prizeEndMs: prizeEnd, phaseEnd: prizeEnd });
+      return { healed: true };
+    }
   }
 
   if (options?.restartIfEnded && existing.phase === PHASES.TORNEO_ENDED) {

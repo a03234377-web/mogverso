@@ -16,6 +16,10 @@ import type { CountdownParts } from "@/hooks/useCountdown";
 import type { TorneoState } from "@/types/looksmax";
 import { cn } from "@/lib/cn";
 import {
+  TORNEO_CHAMPION_RANK_BOOST,
+  type TorneoChampionResult,
+} from "@/lib/torneo-champion-prize";
+import {
   TORNEO_PRESTART_BRACKET,
   TORNEO_PRESTART_FIRST_ROUND,
   TORNEO_PRESTART_FOOTER,
@@ -87,6 +91,71 @@ export function TorneoPhaseWaitingOctavos({
   );
 }
 
+export function TorneoPhaseChampionReveal({
+  result,
+  prizeCd,
+  pendingHeal,
+}: {
+  result: TorneoChampionResult;
+  prizeCd: CountdownParts;
+  pendingHeal?: boolean;
+}) {
+  const champInfo = getPlayerByName(result.champion);
+
+  return (
+    <PhaseDisplay>
+      <PhaseCard variant="semifinals">
+        <PhaseLabel color="gold" pulse>
+          <Icon name="crown" size={14} className="mr-1 inline shrink-0 align-middle" />
+          {pendingHeal ? "VOTACIÓN CERRADA · CORONANDO CAMPEÓN" : "CAMPEÓN DEL TORNEO"}
+          <Icon name="crown" size={14} className="ml-1 inline shrink-0 align-middle" />
+        </PhaseLabel>
+        <div className="my-5 flex flex-col items-center gap-4">
+          <div className="relative size-[clamp(7rem,22vw,9.5rem)] overflow-hidden rounded-full border-4 border-lm-gold shadow-[0_0_32px_rgba(232,184,75,0.35)]">
+            <CreatorImage
+              src={champInfo.photo}
+              alt={result.champion}
+              className="object-cover"
+              sizes="152px"
+              fallback={
+                <CreatorIcon name={result.champion} icon={champInfo.icon} size={56} />
+              }
+            />
+          </div>
+          <div
+            className={cn(
+              "mx-auto w-fit max-w-full px-2 font-display text-transparent",
+              "bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text",
+              "text-[clamp(2.4rem,9vw,5rem)] leading-none tracking-[3px]",
+            )}
+          >
+            {result.champion}
+          </div>
+          <div className="rounded-full border border-lm-gold/40 bg-lm-gold/10 px-4 py-1.5 text-sm font-black tracking-wide text-lm-gold uppercase">
+            {result.championVotes} votos · {result.runnerUp} {result.runnerUpVotes}
+          </div>
+        </div>
+        {pendingHeal ? (
+          <PhaseSub className="mb-0 text-lm-gold">
+            Actualizando el torneo en unos segundos…
+          </PhaseSub>
+        ) : (
+          <>
+            <PhaseSub className="mb-1">
+              Premio: sube <strong>{TORNEO_CHAMPION_RANK_BOOST} puestos</strong> en el
+              ranking oficial
+            </PhaseSub>
+            <p className="mb-4 text-xs font-semibold text-lm-text2">
+              El boost se aplica cuando termine la cuenta atrás
+            </p>
+            <PhaseTimer h={prizeCd.h} m={prizeCd.m} s={prizeCd.s} color="gold" />
+          </>
+        )}
+      </PhaseCard>
+    </PhaseDisplay>
+  );
+}
+
 export function TorneoPhaseEnded({
   state,
   restartCd,
@@ -113,7 +182,9 @@ export function TorneoPhaseEnded({
           />
           CAMPEÓN
         </PhaseTitle>
-        <PhaseSub>El mejor looksmaxer de España ha sido coronado</PhaseSub>
+        <PhaseSub>
+          Premio entregado · +{TORNEO_CHAMPION_RANK_BOOST} puestos en el ranking
+        </PhaseSub>
         <div className="my-4 flex flex-col items-center gap-3">
           <div className="relative size-[90px] overflow-hidden rounded-full border-[3px] border-lm-gold">
             <CreatorImage
