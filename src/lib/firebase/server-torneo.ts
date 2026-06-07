@@ -275,16 +275,6 @@ export async function healTorneo(options?: {
     return { healed: true };
   }
 
-  if (
-    now < editionStart &&
-    (existing.phase !== PHASES.WAITING_OCTAVOS ||
-      Math.abs(existing.phaseEnd - editionStart) > 60_000)
-  ) {
-    const waiting = createWaitingTorneoState(now);
-    await resetTorneoState(waiting as Record<string, unknown>);
-    return { healed: true };
-  }
-
   if (existing.phase === PHASES.TORNEO_ENDED && !existing.prizeApplied) {
     const prizeEnd =
       existing.prizeEndMs ??
@@ -304,6 +294,18 @@ export async function healTorneo(options?: {
       await applyTorneoStatePatch({ prizeEndMs: prizeEnd, phaseEnd: prizeEnd });
       return { healed: true };
     }
+    return { healed: false };
+  }
+
+  if (
+    now < editionStart &&
+    existing.phase !== PHASES.TORNEO_ENDED &&
+    (existing.phase !== PHASES.WAITING_OCTAVOS ||
+      Math.abs(existing.phaseEnd - editionStart) > 60_000)
+  ) {
+    const waiting = createWaitingTorneoState(now);
+    await resetTorneoState(waiting as Record<string, unknown>);
+    return { healed: true };
   }
 
   if (options?.restartIfEnded && existing.phase === PHASES.TORNEO_ENDED) {
