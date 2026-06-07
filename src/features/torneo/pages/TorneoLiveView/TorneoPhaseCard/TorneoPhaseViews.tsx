@@ -100,6 +100,8 @@ export function TorneoPhaseChampionReveal({
   prizeCd: CountdownParts;
   pendingHeal?: boolean;
 }) {
+  const champInfo = getPlayerByName(result.champion);
+
   return (
     <PhaseDisplay>
       <PhaseCard variant="waiting">
@@ -114,19 +116,43 @@ export function TorneoPhaseChampionReveal({
         <PhaseTitle color="orange" className="text-[clamp(1.6rem,5vw,3.5rem)]">
           {pendingHeal ? "CORONANDO CAMPEÓN" : "GRAN FINAL CONCLUIDA"}
         </PhaseTitle>
-        <div className="mb-2 text-center text-base font-bold text-lm-text2">
-          <Icon name="trophy" size={14} className="mr-1 inline shrink-0 align-middle" />
-          {result.championVotes} votos · {result.runnerUp} {result.runnerUpVotes}
+        <div className="mx-auto my-4 flex justify-center">
+          <div
+            className={cn(
+              "relative overflow-hidden rounded-2xl border-[3px] border-lm-orange",
+              "shadow-[0_0_40px_rgba(255,107,0,0.35)]",
+              "size-[clamp(10rem,38vw,16rem)]",
+            )}
+          >
+            <CreatorImage
+              src={champInfo.photo}
+              alt={result.champion}
+              className="object-cover"
+              sizes="(max-width: 768px) 38vw, 256px"
+              fallback={
+                <CreatorIcon name={result.champion} icon={champInfo.icon} size={72} />
+              }
+            />
+          </div>
         </div>
         <div
           className={cn(
-            "mx-auto my-1 mb-2.5 w-fit max-w-full px-1 font-display text-transparent",
+            "mx-auto my-1 mb-2 w-fit max-w-full px-1 font-display text-transparent",
             "bg-[linear-gradient(135deg,var(--color-lm-orange),var(--color-lm-gold2))] bg-clip-text",
-            "text-[clamp(1.8rem,8vw,6rem)] leading-[1.05] tracking-[4px]",
+            "text-[clamp(2rem,9vw,6rem)] leading-[1.05] tracking-[4px]",
             "max-[360px]:tracking-[1px] max-md:tracking-[2px]",
           )}
         >
           {result.champion}
+        </div>
+        <div className="mb-3 text-center text-base font-bold text-lm-text2">
+          <Icon name="trophy" size={14} className="mr-1 inline shrink-0 align-middle" />
+          Ganó con <strong className="text-lm-orange">
+            {result.championVotes}
+          </strong>{" "}
+          votos
+          {" · "}
+          {result.runnerUp} {result.runnerUpVotes}
         </div>
         {pendingHeal ? (
           <PhaseSub className="mb-0 text-lm-orange">

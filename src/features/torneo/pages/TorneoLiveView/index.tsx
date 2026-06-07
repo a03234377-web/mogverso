@@ -16,6 +16,7 @@ import {
   TORNEO_HERO_TITLE,
 } from "@/features/torneo/components/torneo-hero-content";
 import { TorneoEditionCalendar } from "@/features/torneo/components/TorneoEditionCalendar";
+import { PHASES } from "@/features/torneo/data/torneo-players";
 import { useTorneo } from "@/features/torneo/hooks/useTorneo";
 import { getUpcomingTorneoStartMs } from "@/lib/torneo-schedule";
 
@@ -24,6 +25,8 @@ export function TorneoLiveView() {
   const [, setTick] = useState(0);
   const [now, setNow] = useState(() => Date.now());
   const refresh = useCallback(() => setTick((t) => t + 1), []);
+  const championPrizeActive =
+    state?.phase === PHASES.TORNEO_ENDED && !state.prizeApplied;
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 60_000);
@@ -43,12 +46,14 @@ export function TorneoLiveView() {
 
       <TorneoPhaseCard state={state} loading={loading} onRestart={refresh} />
 
-      <div className="mx-auto mb-6 flex justify-center px-5 max-md:px-3">
-        <TorneoEditionCalendar
-          editionStartMs={state?.editionStartMs ?? getUpcomingTorneoStartMs(now)}
-          now={now}
-        />
-      </div>
+      {championPrizeActive ? null : (
+        <div className="mx-auto mb-6 flex justify-center px-5 max-md:px-3">
+          <TorneoEditionCalendar
+            editionStartMs={state?.editionStartMs ?? getUpcomingTorneoStartMs(now)}
+            now={now}
+          />
+        </div>
+      )}
 
       {voteError ? (
         <p
@@ -64,24 +69,28 @@ export function TorneoLiveView() {
         </p>
       ) : null}
 
-      <TorneoMatchesSection
-        state={state}
-        getLocalVote={getLocalVote}
-        votingDisabled={voting}
-        onVote={async (matchId, name) => {
-          const result = await vote(matchId, name);
-          if (result.ok) refresh();
-        }}
-      />
+      {championPrizeActive ? null : (
+        <>
+          <TorneoMatchesSection
+            state={state}
+            getLocalVote={getLocalVote}
+            votingDisabled={voting}
+            onVote={async (matchId, name) => {
+              const result = await vote(matchId, name);
+              if (result.ok) refresh();
+            }}
+          />
 
-      <div className="mx-auto mb-8 max-w-[860px] px-5 pb-8 max-md:px-3 max-md:pb-4">
-        <SectionTitle center className="mb-4">
-          <IconLabel icon="bar-chart-3" iconSize={20}>
-            Cuadro del Torneo
-          </IconLabel>
-        </SectionTitle>
-        <TorneoBracket state={state} getLocalVote={getLocalVote} />
-      </div>
+          <div className="mx-auto mb-8 max-w-[860px] px-5 pb-8 max-md:px-3 max-md:pb-4">
+            <SectionTitle center className="mb-4">
+              <IconLabel icon="bar-chart-3" iconSize={20}>
+                Cuadro del Torneo
+              </IconLabel>
+            </SectionTitle>
+            <TorneoBracket state={state} getLocalVote={getLocalVote} />
+          </div>
+        </>
+      )}
     </ActivePage>
   );
 }

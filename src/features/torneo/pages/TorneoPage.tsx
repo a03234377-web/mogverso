@@ -32,7 +32,8 @@ export function TorneoPage() {
   const [now, setNow] = useState(() => Date.now());
   const promoReady = useIsClient();
   const phase = useTorneoPhase();
-  const showComingSoon = shouldShowTorneoComingSoon(now, phase);
+  const showComingSoon =
+    phase != null && phase !== "torneo_ended" && shouldShowTorneoComingSoon(now, phase);
   const { open: promoOpen, close: closePromo } = useTorneoPromoModal();
 
   useEffect(() => {
