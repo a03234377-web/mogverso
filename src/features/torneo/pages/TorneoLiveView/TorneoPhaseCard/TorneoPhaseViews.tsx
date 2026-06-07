@@ -100,55 +100,54 @@ export function TorneoPhaseChampionReveal({
   prizeCd: CountdownParts;
   pendingHeal?: boolean;
 }) {
-  const champInfo = getPlayerByName(result.champion);
-
   return (
     <PhaseDisplay>
-      <PhaseCard variant="semifinals">
-        <PhaseLabel color="gold" pulse>
+      <PhaseCard variant="waiting">
+        <PhaseLabel color="orange" pulse={!pendingHeal}>
           <Icon name="crown" size={14} className="mr-1 inline shrink-0 align-middle" />
           {pendingHeal ? "VOTACIÓN CERRADA · CORONANDO CAMPEÓN" : "CAMPEÓN DEL TORNEO"}
           <Icon name="crown" size={14} className="ml-1 inline shrink-0 align-middle" />
         </PhaseLabel>
-        <div className="my-5 flex flex-col items-center gap-4">
-          <div className="relative size-[clamp(7rem,22vw,9.5rem)] overflow-hidden rounded-full border-4 border-lm-gold shadow-[0_0_32px_rgba(232,184,75,0.35)]">
-            <CreatorImage
-              src={champInfo.photo}
-              alt={result.champion}
-              className="object-cover"
-              sizes="152px"
-              fallback={
-                <CreatorIcon name={result.champion} icon={champInfo.icon} size={56} />
-              }
-            />
-          </div>
-          <div
-            className={cn(
-              "mx-auto w-fit max-w-full px-2 font-display text-transparent",
-              "bg-[linear-gradient(135deg,#fff,var(--color-lm-gold2),var(--color-lm-gold))] bg-clip-text",
-              "text-[clamp(2.4rem,9vw,5rem)] leading-none tracking-[3px]",
-            )}
-          >
-            {result.champion}
-          </div>
-          <div className="rounded-full border border-lm-gold/40 bg-lm-gold/10 px-4 py-1.5 text-sm font-black tracking-wide text-lm-gold uppercase">
-            {result.championVotes} votos · {result.runnerUp} {result.runnerUpVotes}
-          </div>
+        <div className="my-1 font-display text-[clamp(0.9rem,2.5vw,1.3rem)] tracking-[3px] text-lm-text2">
+          Torneo de LooksMaxing
+        </div>
+        <PhaseTitle color="orange" className="text-[clamp(1.6rem,5vw,3.5rem)]">
+          {pendingHeal ? "CORONANDO CAMPEÓN" : "GRAN FINAL CONCLUIDA"}
+        </PhaseTitle>
+        <div className="mb-2 text-center text-base font-bold text-lm-text2">
+          <Icon name="trophy" size={14} className="mr-1 inline shrink-0 align-middle" />
+          {result.championVotes} votos · {result.runnerUp} {result.runnerUpVotes}
+        </div>
+        <div
+          className={cn(
+            "mx-auto my-1 mb-2.5 w-fit max-w-full px-1 font-display text-transparent",
+            "bg-[linear-gradient(135deg,var(--color-lm-orange),var(--color-lm-gold2))] bg-clip-text",
+            "text-[clamp(1.8rem,8vw,6rem)] leading-[1.05] tracking-[4px]",
+            "max-[360px]:tracking-[1px] max-md:tracking-[2px]",
+          )}
+        >
+          {result.champion}
         </div>
         {pendingHeal ? (
-          <PhaseSub className="mb-0 text-lm-gold">
+          <PhaseSub className="mb-0 text-lm-orange">
             Actualizando el torneo en unos segundos…
           </PhaseSub>
         ) : (
           <>
-            <PhaseSub className="mb-1">
-              Premio: sube <strong>{TORNEO_CHAMPION_RANK_BOOST} puestos</strong> en el
-              ranking oficial
+            <PhaseTimer h={prizeCd.h} m={prizeCd.m} s={prizeCd.s} color="orange" />
+            <PhaseSub className="mt-3 mb-0">
+              <Icon
+                name="zap"
+                size={14}
+                className="mr-1 inline shrink-0 align-middle"
+              />
+              Premio en cuenta atrás: sube{" "}
+              <strong>{TORNEO_CHAMPION_RANK_BOOST} puestos</strong> en el ranking
+              oficial
+              <br />
+              El boost se aplica al terminar las 48 horas
             </PhaseSub>
-            <p className="mb-4 text-xs font-semibold text-lm-text2">
-              El boost se aplica cuando termine la cuenta atrás
-            </p>
-            <PhaseTimer h={prizeCd.h} m={prizeCd.m} s={prizeCd.s} color="gold" />
+            <SpainTimezoneNote className="mt-3 text-center" />
           </>
         )}
       </PhaseCard>
