@@ -74,7 +74,7 @@ export function RankingsPage({
           <>
             Rankings
             <br />
-            LooksMax
+            Aura
           </>
         }
         subtitle="Temporada 2025 · España"

@@ -17,7 +17,7 @@ export function BrandLink({
     <Link
       href={LOOKSMAX_PATHS.rankings}
       className="group flex shrink-0 items-center gap-2.5 rounded-xl no-underline lm-focus-ring outline-offset-4"
-      aria-label="LooksMax España — Ir a Rankings"
+      aria-label="Aura España — Ir a Rankings"
     >
       <div
         className={cn(
@@ -43,7 +43,7 @@ export function BrandLink({
             "bg-clip-text font-display text-[1.35rem] tracking-[0.06em] text-transparent",
           )}
         >
-          LooksMax<span className="text-lm-gold">ES</span>
+          Aura
         </div>
         <span className="block font-sans text-sm font-semibold tracking-wide text-lm-text2 max-lg:hidden">
           España · Ranking
