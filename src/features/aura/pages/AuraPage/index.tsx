@@ -169,9 +169,9 @@ export function AuraPage({
         eyebrow="Votación comunitaria"
         title={
           <>
-            Aura
+            Ranking
             <br />
-            LooksMax
+            Aura
           </>
         }
         subtitle={`Top ${AURA_RANKING_SIZE} del ranking · ${SPAIN_TIMEZONE_LABEL}`}
