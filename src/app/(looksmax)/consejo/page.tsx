@@ -3,8 +3,8 @@ import { LOOKSMAX_PATHS } from "@/features/app/routes";
 import { buildPageGenerateMetadata } from "@/lib/seo/metadata";
 
 export const generateMetadata = buildPageGenerateMetadata({
-  title: "Aura LooksMax",
-  description: "Redirección a la votación de aura del ranking LooksMax España.",
+  title: "Votación Aura",
+  description: "Redirección a la votación de aura del ranking Aura España.",
   path: LOOKSMAX_PATHS.aura,
   noIndex: true,
 });

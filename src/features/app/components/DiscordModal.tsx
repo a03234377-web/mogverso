@@ -58,7 +58,7 @@ function DiscordModalContent() {
         Comunidad
       </div>
       <div className="mb-5 text-center lm-type-label text-lm-gold">
-        ES Looksmaxer · Miembros Exclusivos
+        Comunidad Aura · Miembros exclusivos
       </div>
       <div className="mb-5 h-px bg-[linear-gradient(90deg,transparent,var(--color-lm-border2),transparent)]" />
       <div className="mb-6 flex flex-col gap-3">
@@ -74,8 +74,8 @@ function DiscordModalContent() {
               Añade tu creador al ranking
             </strong>
             <span className="text-base leading-snug font-semibold text-lm-text2">
-              Propón a tu creador favorito para que entre en el ranking oficial de
-              LooksMax España
+              Propón a tu creador favorito para que entre en el ranking oficial de Aura
+              España
             </span>
           </div>
         </div>

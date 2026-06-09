@@ -15,9 +15,9 @@ export function BrandLink({
 }) {
   return (
     <Link
-      href={LOOKSMAX_PATHS.rankings}
+      href={LOOKSMAX_PATHS.aura}
       className="group flex shrink-0 items-center gap-2.5 rounded-xl no-underline lm-focus-ring outline-offset-4"
-      aria-label="LooksMax España — Ir a Rankings"
+      aria-label="Aura España — Ir a votación Aura"
     >
       <div
         className={cn(
@@ -28,7 +28,7 @@ export function BrandLink({
         )}
         aria-hidden
       >
-        <Icon name="crown" size={22} />
+        <Icon name="sparkles" size={22} />
       </div>
       <div
         id="logo-container"
@@ -43,10 +43,10 @@ export function BrandLink({
             "bg-clip-text font-display text-[1.35rem] tracking-[0.06em] text-transparent",
           )}
         >
-          LooksMax<span className="text-lm-gold">ES</span>
+          Aura<span className="text-lm-gold">ES</span>
         </div>
         <span className="block font-sans text-sm font-semibold tracking-wide text-lm-text2 max-lg:hidden">
-          España · Ranking
+          España · Votación Aura
         </span>
       </div>
     </Link>

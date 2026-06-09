@@ -166,14 +166,8 @@ export function AuraPage({
     <div id="page-aura" className="block animate-fade-up">
       <AuraHowItWorksModal open={howItWorksOpen} onClose={closeHowItWorks} />
       <HeroSection
-        eyebrow="Votación comunitaria"
-        title={
-          <>
-            Aura
-            <br />
-            LooksMax
-          </>
-        }
+        eyebrow="Votación comunitaria · España"
+        title="Aura"
         subtitle={`Top ${AURA_RANKING_SIZE} del ranking · ${SPAIN_TIMEZONE_LABEL}`}
         badges={heroQuotaBadge}
       />

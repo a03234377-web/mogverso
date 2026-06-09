@@ -16,7 +16,7 @@ export function RankingsQuickActions() {
     >
       <QuickActionRow
         variant="vote"
-        caption="Elige a tu looksmaxer favorito para que suba en el ranking"
+        caption="Elige a tu creador favorito para que suba en el ranking"
         onClick={() => navigate("rankvote")}
       />
       <QuickActionRow

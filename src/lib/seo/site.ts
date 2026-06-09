@@ -5,8 +5,8 @@ export function getSiteUrl(): string {
   return "https://mogverso.vercel.app";
 }
 
-export const SITE_NAME = "LooksMax España";
-export const SITE_TAGLINE = "El ranking oficial de looksmaxing en España";
+export const SITE_NAME = "Aura España";
+export const SITE_TAGLINE = "Votación de aura y ranking de creadores en España";
 
 export const DEFAULT_DESCRIPTION =
-  "Ranking oficial de looksmaxing en España. Votaciones en tiempo real, torneo en vivo, noticias y comunidad.";
+  "Vota aura del top del ranking, sigue ascensos en tiempo real y la comunidad de creadores en España.";

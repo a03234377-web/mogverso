@@ -35,7 +35,7 @@ export function RankingItemListJsonLd() {
         "@context": "https://schema.org",
         "@type": "ItemList",
         name: `${SITE_NAME} — Ranking completo`,
-        description: "Ranking de creadores looksmaxer en España (orden de referencia).",
+        description: "Ranking de creadores en España (orden de referencia).",
         url: `${url}${LOOKSMAX_PATHS.rankings}`,
         numberOfItems: RANKERS.length,
         itemListElement: RANKERS.map((r, i) => ({

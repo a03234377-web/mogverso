@@ -6,7 +6,7 @@ import { buildPageGenerateMetadata } from "@/lib/seo/metadata";
 
 export const generateMetadata = buildPageGenerateMetadata({
   title: "404 — Página no encontrada",
-  description: "La página que buscas no existe en LooksMax España.",
+  description: "La página que buscas no existe en Aura España.",
   path: "/404",
   noIndex: true,
 });
@@ -33,7 +33,7 @@ export default function NotFound() {
         </div>
 
         <div>
-          <p className="mb-2 lm-type-label text-lm-gold">LooksMax España</p>
+          <p className="mb-2 lm-type-label text-lm-gold">Aura España</p>
           <h1
             className={cn(
               "mx-auto w-fit bg-clip-text font-display text-transparent",

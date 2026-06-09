@@ -74,7 +74,7 @@ export function SiteCreditFooter() {
         </Link>
       </div>
 
-      <p className="mt-5 text-xs text-lm-text2/75">LooksMax España · Mogverso</p>
+      <p className="mt-5 text-xs text-lm-text2/75">Aura España · Mogverso</p>
     </footer>
   );
 }
