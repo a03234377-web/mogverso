@@ -11,9 +11,14 @@ export const DESKTOP_TABS: {
   badgeClass?: string;
 }[] = [
   { id: "rankings", label: "Rankings", icon: "trophy" },
-  { id: "aura", label: "Aura", icon: "sparkles" },
   { id: "rankvote", label: "Votar Rank", icon: "vote" },
-  { id: "torneo", label: "Torneo", icon: "goal" },
+  {
+    id: "torneo",
+    label: "Torneo",
+    icon: "goal",
+    badge: "LIVE",
+    badgeClass: "tab-badge-new",
+  },
   {
     id: "noticias",
     label: "Noticias",
@@ -21,6 +26,7 @@ export const DESKTOP_TABS: {
     badge: "HOT",
     badgeClass: "tab-badge",
   },
+  { id: "aura", label: "Aura", icon: "sparkles" },
 ];
 
 export function sectionTitle(page: PageId): string {

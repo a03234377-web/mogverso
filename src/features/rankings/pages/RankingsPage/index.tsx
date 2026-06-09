@@ -69,7 +69,7 @@ export function RankingsPage({
   return (
     <div id="page-rankings" className="block animate-fade-up">
       <HeroSection
-        eyebrow="Votación de aura · Comunidad española"
+        eyebrow="La Comunidad Española de Looksmaxing"
         title={
           <>
             Rankings

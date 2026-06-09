@@ -91,7 +91,7 @@ export function buildContestants(): Ranker[] {
       top: "",
       tags: profile?.tags ?? ["ptag-new", "ptag-appeal", "ptag-risers"],
       tagNames: profile?.tagNames ?? ["Nuevo", "Contendiente", "En Ascenso"],
-      bio: profile?.bio ?? `${name} compite en el ranking Aura España.`,
+      bio: profile?.bio ?? `${name} compite en el ranking LooksMax España.`,
       movement: profile?.movement ?? `${name} mantiene su puesto en el ranking.`,
       movIcon: profile?.movIcon ?? "star",
       photoBg: PHOTO_BACKGROUNDS[index % PHOTO_BACKGROUNDS.length]!,

@@ -3,17 +3,22 @@ import { LOOKSMAX_PATHS, profilePath } from "@/features/app/routes";
 import { buildPageGenerateMetadata } from "@/lib/seo/metadata";
 
 export const generateRankingsMetadata = buildPageGenerateMetadata({
-  title: "Rankings Aura",
+  title: "Rankings LooksMax",
   description:
-    "Ranking oficial de creadores en España. Consulta posiciones, aura y movimientos en tiempo real.",
+    "Ranking oficial de looksmaxing en España. Consulta posiciones, scores y movimientos en tiempo real.",
   path: LOOKSMAX_PATHS.rankings,
-  keywords: ["aura españa", "ranking aura", "votación aura", "creadores españa"],
+  keywords: [
+    "looksmax españa",
+    "ranking looksmax",
+    "looksmaxing ranking",
+    "creadores looksmax",
+  ],
 });
 
 export const generateRankvoteMetadata = buildPageGenerateMetadata({
   title: "Votar ranking",
   description:
-    "Vota en el duelo de ranking. Tu voto decide quién sube o baja en la comunidad.",
+    "Vota en el duelo de ranking looksmaxer. Tu voto decide quién sube o baja en la comunidad.",
   path: LOOKSMAX_PATHS.rankvote,
 });
 
@@ -27,28 +32,28 @@ export const generateTorneoMetadata = buildPageGenerateMetadata({
 export const generateNoticiasMetadata = buildPageGenerateMetadata({
   title: "Noticias",
   description:
-    "Últimas noticias y novedades de la comunidad: rankings, aura, ascensos y torneo.",
+    "Últimas noticias y novedades del mundo looksmaxer español: rankings, ascensos y comunidad.",
   path: LOOKSMAX_PATHS.noticias,
 });
 
 export const generateAuraMetadata = buildPageGenerateMetadata({
-  title: "Votación Aura",
+  title: "Aura LooksMax",
   description:
     "Vota aura del top 70 del ranking oficial: +230 o −100 por voto. 10 votos semanales y reinicio mensual de puntuaciones.",
   path: LOOKSMAX_PATHS.aura,
-  keywords: ["aura españa", "votación aura", "ranking aura"],
+  keywords: ["aura looksmax", "votación aura", "ranking looksmax españa"],
 });
 
 export const generateHomeRedirectMetadata = buildPageGenerateMetadata({
-  title: "Aura y Rankings",
+  title: "Ranking Oficial",
   description:
-    "Votación de aura y ranking de creadores en España. Votaciones en tiempo real y comunidad.",
+    "Ranking oficial de looksmaxing en España. Votaciones en tiempo real, torneo y comunidad.",
   path: "/rankings",
 });
 
 export const generateProfileNotFoundMetadata = buildPageGenerateMetadata({
   title: "Perfil no encontrado",
-  description: "Este perfil no existe en el ranking de Aura España.",
+  description: "Este perfil no existe en el ranking de LooksMax España.",
   path: "/rankings",
   noIndex: true,
 });

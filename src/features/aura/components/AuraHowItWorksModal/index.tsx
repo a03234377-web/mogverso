@@ -85,7 +85,7 @@ export function AuraHowItWorksModal({ open, onClose }: AuraHowItWorksModalProps)
           id="aura-how-it-works-desc"
           className="mb-5 text-center text-sm font-semibold text-lm-text2"
         >
-          Aura en un minuto
+          Aura LooksMax en un minuto
         </p>
 
         <div className="mb-5 h-px bg-[linear-gradient(90deg,transparent,var(--color-lm-border2),transparent)]" />
