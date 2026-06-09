@@ -43,7 +43,7 @@ export function BrandLink({
             "bg-clip-text font-display text-[1.35rem] tracking-[0.06em] text-transparent",
           )}
         >
-          Aura<span className="text-lm-gold">ES</span>
+          Aura
         </div>
         <span className="block font-sans text-sm font-semibold tracking-wide text-lm-text2 max-lg:hidden">
           España · Votación Aura
