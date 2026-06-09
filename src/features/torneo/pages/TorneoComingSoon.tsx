@@ -66,7 +66,7 @@ export function TorneoComingSoon() {
         <PhaseCard variant="waiting">
           <PhaseLabel color="orange">{TORNEO_PRESTART_LABEL}</PhaseLabel>
           <div className="my-1 font-display text-[clamp(0.9rem,2.5vw,1.3rem)] tracking-[3px] text-lm-text2">
-            Torneo de LooksMaxing
+            Torneo de Aura
           </div>
           <PhaseTitle color="orange" className="text-[clamp(2rem,6vw,4.5rem)]">
             {cd.expired ? "ARRANCANDO OCTAVOS" : TORNEO_PRESTART_HEADLINE}

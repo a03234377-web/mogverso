@@ -12,9 +12,9 @@ export const TORNEO_HERO_TITLE = (
   <>
     Torneo
     <br />
-    Looksmaxing
+    Aura
   </>
 );
 
 export const TORNEO_HERO_SUBTITLE =
-  "Eliminación directa · El mejor looksmaxer de España";
+  "Eliminación directa · El que más aura tenga en España";
